@@ -167,6 +167,11 @@ body.publico{background:#fff}
 .filters select,.filters input{width:auto;min-width:132px}
 .filters input[type=date]{min-width:145px}
 .filters .sep{font-size:12px;color:var(--ink-faint)}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--accent-soft);
+  border:1px solid var(--accent);color:var(--accent-ink);border-radius:20px;padding:5px 10px 5px 12px;
+  font-size:12.5px;font-weight:600;white-space:nowrap}
+.chip[hidden]{display:none}
+.chip button{background:none;border:none;color:inherit;cursor:pointer;font-size:15px;line-height:1;padding:0 2px}
 .filters .count{font-size:12px;color:var(--ink-faint);margin-left:auto}
 
 .twrap{overflow:auto;max-height:74vh;border:1px solid var(--line);border-radius:8px;background:var(--card);
@@ -519,6 +524,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
     <button class="btn sm" data-limpa="com">Limpar filtros</button>
     <button class="btn sm" data-rel="com">Imprimir relatório</button>
     <button class="btn sm" data-xls="com">Exportar Excel</button>
+    <span class="chip" id="chipCom" hidden></span>
     <span class="count" id="cntCom"></span>
   </div>
   <div class="bulkbar" id="bulkCom"></div>
@@ -557,6 +563,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
     <button class="btn sm" data-limpa="ven">Limpar filtros</button>
     <button class="btn sm" data-rel="ven">Imprimir relatório</button>
     <button class="btn sm" data-xls="ven">Exportar Excel</button>
+    <span class="chip" id="chipVen" hidden></span>
     <span class="count" id="cntVen"></span>
   </div>
   <div class="bulkbar" id="bulkVen"></div>
@@ -652,6 +659,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
     <button class="btn sm" data-limpa="con">Limpar filtros</button>
     <button class="btn sm" data-rel="con">Imprimir relatório</button>
     <button class="btn sm" data-xls="con">Exportar Excel</button>
+    <span class="chip" id="chipCon" hidden></span>
     <span class="count" id="cntCon"></span>
   </div>
   <div class="bulkbar" id="bulkCon"></div>
@@ -798,10 +806,10 @@ let edit = {prod:null,com:null,ven:null,des:null,con:null,cli:null};
 let fotos = {prod:'', insp:''};
 let fil = {
   prodGen:'',prodFoto:'',prodQ:'',prodTester:'',
-  comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',
-  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',
+  comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
+  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',
   estGen:'',estStat:'',estQ:'',
-  conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',
+  conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
   desDe:'',desAte:'',desQ:''
 };
@@ -1101,6 +1109,22 @@ document.addEventListener('click', e=>{
   if(l){ const g=l.dataset.limpasel; sel[g].clear(); ACOES_MASSA[g].render(); renderBulk(g); }
 });
 
+/* etiqueta do produto selecionado por clique — filtro exato, não por trecho */
+function chipProduto(g, campo){
+  const el = $('#chip'+g[0].toUpperCase()+g.slice(1));
+  if(!el) return;
+  const v = fil[campo];
+  el.hidden = !v;
+  if(v) el.innerHTML = `Produto: ${esc(v)} <button title="remover">×</button>`;
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('.chip button'); if(!b) return;
+  const id = b.closest('.chip').id;
+  const mapa = {chipCom:['comProdX',renderCom], chipVen:['venProdX',renderVen], chipCon:['conProdX',renderCon]};
+  const m = mapa[id]; if(!m) return;
+  fil[m[0]] = ''; m[1]();
+});
+
 function goTab(nome){
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===nome));
   document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));
@@ -1111,10 +1135,10 @@ function goTab(nome){
 /* ---------------- limpar filtros ---------------- */
 const GRUPOS = {
   prod:{campos:['prodGen','prodFoto','prodQ','prodTester'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester'}, render:()=>renderProd()},
-  com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
-  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
+  com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
+  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
   est:{campos:['estGen','estStat','estQ'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca'}, render:()=>renderEst()},
-  con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
+  con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
   cli:{campos:['cliSit','cliQ'], els:{cliSit:'#filCliSit',cliQ:'#filCliBusca'}, render:()=>renderCli()},
   tes:{campos:['tesGen','tesQ'], els:{tesGen:'#filTesGen',tesQ:'#filTesBusca'}, render:()=>renderTes()},
@@ -1536,11 +1560,17 @@ function renderDash(){
 }
 const kpi = (l,v,c,s) => `<div class="kpi ${c||''}"><div class="lbl">${l}</div><div class="val">${v}</div>${s?`<div class="sub">${s}</div>`:''}</div>`;
 
+$('#tTes').addEventListener('click', e=>{
+  const b=e.target.closest('[data-tcon]'); if(!b) return;
+  aplicaFiltros('con', {conSit:'Em consignação', conTipo:'Tester', conProdX:b.dataset.tcon});
+  goTab('consignado');
+});
 $('#tEst').addEventListener('click', e=>{
   const ent=e.target.closest('[data-ent]'), cam=e.target.closest('[data-cam]'), con=e.target.closest('[data-con]');
-  if(ent){ aplicaFiltros('ven', {venEnt:'Não', venQ:ent.dataset.ent}); return goTab('vendas'); }
-  if(cam){ aplicaFiltros('com', {comEnt:'Não', comQ:cam.dataset.cam}); return goTab('compras'); }
-  if(con){ aplicaFiltros('con', {conSit:'Em consignação', conQ:con.dataset.con}); return goTab('consignado'); }
+  if(ent){ aplicaFiltros('ven', {venEnt:'Não', venProdX:ent.dataset.ent}); return goTab('vendas'); }
+  /* só lacrado: é o que o estoque conta */
+  if(cam){ aplicaFiltros('com', {comEnt:'Não', comTipo:'Lacrado', comProdX:cam.dataset.cam}); return goTab('compras'); }
+  if(con){ aplicaFiltros('con', {conSit:'Em consignação', conTipo:'Lacrado', conProdX:con.dataset.con}); return goTab('consignado'); }
 });
 $('#kpiEst').addEventListener('click', e=>{
   const b = e.target.closest('[data-est]'); if(!b) return;
@@ -1623,7 +1653,9 @@ function renderCom(){
   if(fil.comTipo) rows = rows.filter(c=>c.tipo===fil.comTipo);
   if(fil.comEnt) rows = rows.filter(c=>(c.entregue==='Sim'?'Sim':'Não')===fil.comEnt);
   rows = rows.filter(c=>noPeriodo(c.data, fil.comDe, fil.comAte));
+  if(fil.comProdX) rows = rows.filter(c=>c.produto===fil.comProdX);
   if(fil.comQ) rows = rows.filter(c=>norm(c.produto).includes(norm(fil.comQ))||norm(c.observacao).includes(norm(fil.comQ)));
+  chipProduto('com','comProdX');
   rows = ord(rows, sort.com);
   const st = sort.com;
   const tq = rows.reduce((s,c)=>s+Number(c.qtde),0), tv = rows.reduce((s,c)=>s+Number(c.custoTotal),0);
@@ -1647,7 +1679,9 @@ function renderVen(){
   if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
   if(fil.venEnt) rows = rows.filter(v=>v.entregue===fil.venEnt);
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
+  if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
   if(fil.venQ) rows = rows.filter(v=>norm(v.produto).includes(norm(fil.venQ))||norm(v.cliente).includes(norm(fil.venQ)));
+  chipProduto('ven','venProdX');
   rows = ord(rows, sort.ven);
   const st = sort.ven;
   const tq = rows.reduce((s,v)=>s+Number(v.qtde),0);
@@ -1709,7 +1743,9 @@ function renderCon(){
   if(fil.conTipo) rows = rows.filter(c=>c.tipo===fil.conTipo);
   if(fil.conSit) rows = rows.filter(c=>c.situacao===fil.conSit);
   rows = rows.filter(c=>noPeriodo(c.data, fil.conDe, fil.conAte));
+  if(fil.conProdX) rows = rows.filter(c=>c.produto===fil.conProdX);
   if(fil.conQ) rows = rows.filter(c=>norm(c.produto).includes(norm(fil.conQ))||norm(c.parceiro).includes(norm(fil.conQ)));
+  chipProduto('con','conProdX');
   rows = ord(rows, sort.con);
   const st = sort.con;
   $('#cntCon').textContent = `${rows.length} de ${data.consignments.length}`;
@@ -1757,7 +1793,9 @@ function renderTes(){
   $('#tTes').innerHTML = rows.length
     ? `<thead><tr><th class="ctr">Foto</th>${th('Tester','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Recebidos','qtd',st,'num')}${th('Consignados','consig',st,'num')}${th('Em mãos','emMaos',st,'num')}${th('Custo investido','custo',st,'num')}${th('Custo médio','cm',st,'num')}${th('Situação','situacao',st,'ctr')}</tr></thead><tbody>`+
       rows.map(r=>`<tr><td class="ctr">${thumb(foto(r.produto),r.produto)}</td><td>${esc(r.produto)}</td><td class="ctr">${bGen(r.genero)}</td>
-        <td class="num">${r.qtd}</td><td class="num">${r.consig||'—'}</td><td class="num">${r.emMaos}</td>
+        <td class="num">${r.qtd}</td>
+        <td class="num">${r.consig?`<button class="numlink" data-tcon="${esc(r.produto)}">${r.consig}</button>`:'—'}</td>
+        <td class="num">${r.emMaos}</td>
         <td class="num">${money(r.custo)}</td><td class="num">${money(r.cm)}</td><td class="ctr">${bSitT(r.situacao)}</td></tr>`).join('')+
       `</tbody><tfoot><tr><td colspan="3">Total</td><td class="num">${t.q}</td><td class="num">${t.cg}</td><td class="num">${t.em}</td><td class="num">${money(t.c)}</td><td colspan="2"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhum tester recebido ainda. Os que estão a caminho aparecem na aba Compras.</td></tr></tbody>`;
@@ -2479,7 +2517,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'tabela-fixa · 16/08';
+const VERSAO = 'filtro-exato · 16/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
