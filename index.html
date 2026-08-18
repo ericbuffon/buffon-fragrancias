@@ -46,22 +46,54 @@ header.top{display:flex;align-items:center;justify-content:space-between;padding
 .save-state{font-size:12px;color:var(--ink-faint);display:flex;align-items:center;gap:6px}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--verde)}
 
-nav.tabs{display:flex;gap:7px;padding:.85rem 2rem;border-bottom:1px solid var(--line);
-  overflow-x:auto;background:var(--card);flex-wrap:wrap}
-.tab{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:9px 16px;
-  font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap;
-  transition:border-color .12s,background .12s,color .12s,transform .08s}
-.tab:hover:not(.active){background:var(--card);border-color:var(--ink-faint);color:var(--ink);transform:translateY(-1px)}
-.tab.active{background:var(--accent);border-color:var(--accent);color:#fff;
-  box-shadow:0 2px 6px rgba(168,70,43,.25)}
-@media(max-width:640px){nav.tabs{gap:6px}.tab{padding:8px 13px;font-size:12.5px}}
+/* ---------- navegação ---------- */
+nav.tabs{display:flex;gap:7px;padding:.7rem 1.1rem;background:var(--card);
+  border-bottom:1px solid var(--line);overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.navgrupo{display:none}
+.tab{display:inline-flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--line);
+  border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);
+  white-space:nowrap;flex:none;transition:background .12s,color .12s,border-color .12s}
+.tab svg{width:16px;height:16px;flex:none;opacity:.75}
+.tab:hover:not(.active){background:var(--card);border-color:var(--ink-faint);color:var(--ink)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab.active svg{opacity:1}
 
-main{padding:1.75rem 2rem;max-width:1320px;margin:0 auto}
-section{display:none}
+/* ---------- computador: menu lateral fixo ---------- */
+@media(min-width:960px){
+  body{display:grid;grid-template-columns:228px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
+    min-height:100vh;padding-bottom:0}
+  header.top{grid-column:1/-1;padding:.9rem 1.6rem}
+  nav.tabs{grid-column:1;grid-row:2;flex-direction:column;flex-wrap:nowrap;gap:2px;
+    padding:1rem .8rem 2rem;border-bottom:none;border-right:1px solid var(--line);
+    overflow-y:auto;overflow-x:hidden;position:sticky;top:0;align-self:start;max-height:calc(100vh - 74px)}
+  .navgrupo{display:block;font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ink-faint);padding:14px 12px 6px}
+  .navgrupo:first-child{padding-top:2px}
+  .tab{width:100%;justify-content:flex-start;background:none;border-color:transparent;
+    border-radius:7px;padding:9px 12px;font-weight:500;font-size:13.5px}
+  .tab:hover:not(.active){background:var(--paper);border-color:transparent}
+  .tab.active{background:var(--accent-soft);border-color:transparent;color:var(--accent-ink);font-weight:700}
+  .tab.active svg{color:var(--accent)}
+  main{grid-column:2;grid-row:2;min-width:0;width:100%;padding:1.5rem 1.8rem 3rem}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:1.5rem}
+  .sec-head p{margin-top:0;text-align:right;max-width:52ch;flex:0 1 auto}
+  .sec-head h2{flex:none}
+}
+@media(min-width:1500px){ main{padding-left:2.4rem;padding-right:2.4rem} }
+main{padding:1.4rem 1.1rem 3rem;max-width:1320px;margin:0 auto;min-width:0}
+section{display:none;min-width:0}
 section.active{display:block}
+main,section,.twrap,.card,.kpis{min-width:0;max-width:100%}
 .sec-head{margin-bottom:1.2rem}
 .sec-head h2{font-size:19px}
 .sec-head p{margin:3px 0 0;font-size:12.5px;color:var(--ink-soft);max-width:74ch}
+.resumo{display:flex;flex-wrap:wrap;gap:0;background:var(--card);border:1px solid var(--line);
+  border-radius:8px;margin-bottom:1rem;overflow:hidden}
+.resumo div{flex:1 1 130px;padding:9px 14px;border-right:1px solid var(--line2);min-width:0}
+.resumo div:last-child{border-right:none}
+.resumo .r{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
+.resumo .v{font-size:15px;font-weight:700;margin-top:1px;white-space:nowrap}
+.resumo .v.al{color:var(--vermelho)} .resumo .v.ok{color:var(--verde)} .resumo .v.am{color:var(--ambar)}
 
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;margin-bottom:1.1rem}
 .kpi{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;padding:12px 14px}
@@ -189,7 +221,7 @@ body.publico{background:#fff}
 .twrap.fixa2 th:nth-child(1){width:63px;min-width:63px}
 .compacto .op{display:none}
 @media print{.twrap{max-height:none;overflow:visible}}
-th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);
   font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--paper);white-space:nowrap}
 th.sortable{cursor:pointer;user-select:none}
 th.sortable:hover{color:var(--accent-ink)}
@@ -221,6 +253,7 @@ ul.simple{list-style:none;margin:0;padding:0}
 ul.simple li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 ul.simple li:last-child{border-bottom:none}
 ul.simple .val{font-weight:600;white-space:nowrap}
+ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-weight:600}
 .note{font-size:11px;color:var(--ink-faint);padding-top:7px;line-height:1.5}
 .numlink{background:none;border:none;padding:0;font:inherit;color:var(--accent-ink);cursor:pointer;
   text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line);font-variant-numeric:tabular-nums}
@@ -287,7 +320,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 #catalogo .topo .rive{font-family:'Fraunces',Georgia,serif;font-size:11.5px;letter-spacing:.3em;
   font-weight:600;border:1px solid var(--tinta);padding:1.2mm 3.4mm}
 #catalogo .pe{margin-top:auto;padding-top:2.6mm;border-top:.8px solid var(--fio);
-  text-align:center;font-size:9px;letter-spacing:.3em;color:var(--suave);flex:none;font-weight:500}
+  text-align:center;font-size:10px;letter-spacing:.14em;color:var(--suave);flex:none;font-weight:500}
 
 /* entradas */
 #catalogo .lista{flex:1;display:flex;flex-direction:column;gap:0}
@@ -310,32 +343,32 @@ ul.simple .val{font-weight:600;white-space:nowrap}
   color:var(--acc);font-weight:600}
 #catalogo .meio .nome{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;
   line-height:1.12;margin-top:1.8mm;color:var(--tinta)}
-#catalogo .meio .edp{font-size:8.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--suave);margin-top:1.4mm}
+#catalogo .meio .edp{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--suave);margin-top:1.4mm}
 #catalogo .meio .regua{width:18mm;height:1.4px;background:var(--acc);margin:3mm 0}
 #catalogo .inspcol{flex:0 0 31mm;text-align:center;padding:0}
-#catalogo .inspcol .lbl{font-size:8.5px;letter-spacing:.3em;text-transform:uppercase;
+#catalogo .inspcol .lbl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--suave);font-weight:600}
 #catalogo .inspcol .fio{width:12mm;height:1px;background:var(--acc);margin:2mm auto}
 #catalogo .inspcol .insp{font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:600;
   line-height:1.2;color:var(--tinta)}
-#catalogo .inspcol .marca{font-size:9px;letter-spacing:.26em;text-transform:uppercase;
+#catalogo .inspcol .marca{font-size:9px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--suave);margin-top:1.2mm}
-#catalogo .meio .selotest{font-size:7px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;
+#catalogo .meio .selotest{font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;
   border:.8px solid var(--ouro);color:var(--ouro);padding:.5mm 2mm}
-#catalogo .meio .fam{display:inline-block;margin-top:2mm;font-size:8px;letter-spacing:.22em;
+#catalogo .meio .fam{display:inline-block;margin-top:2mm;font-size:8.5px;letter-spacing:.13em;
   text-transform:uppercase;font-weight:700;color:var(--acc);border:.9px solid var(--acc);padding:.7mm 2.4mm}
 #catalogo .piramide{display:flex;align-items:center;gap:3mm;margin-top:3mm}
 #catalogo .piramide svg{flex:none}
 #catalogo .piramide .niveis{flex:1;min-width:0}
 #catalogo .piramide .nv{display:flex;gap:2.5mm;align-items:baseline;margin-bottom:1.3mm}
 #catalogo .piramide .nv:last-child{margin-bottom:0}
-#catalogo .piramide .nv b{flex:none;width:15mm;font-size:7.5px;letter-spacing:.16em;
+#catalogo .piramide .nv b{flex:none;width:15mm;font-size:8px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--suave);font-weight:700}
-#catalogo .piramide .nv span{font-size:8.5px;line-height:1.4;color:var(--tinta)}
+#catalogo .piramide .nv span{font-size:9.2px;line-height:1.5;color:var(--tinta)}
 #catalogo .semnotas{font-size:8.5px;color:var(--fraco);margin-top:3mm;font-style:italic}
 #catalogo .meio .preco{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;margin-top:3mm;color:var(--tinta)}
 #catalogo .dir{flex:none;display:flex;flex-direction:column;align-items:center;gap:1.8mm}
-#catalogo .dir .cap{font-size:7.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--fraco)}
+#catalogo .dir .cap{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--fraco)}
 
 /* página final */
 
@@ -396,16 +429,21 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 </header>
 
 <nav class="tabs" id="tabs">
-  <button class="tab active" data-tab="dashboard">Dashboard</button>
-  <button class="tab" data-tab="produtos">Produtos</button>
-  <button class="tab" data-tab="compras">Compras</button>
-  <button class="tab" data-tab="vendas">Vendas</button>
-  <button class="tab" data-tab="clientes">Clientes</button>
-  <button class="tab" data-tab="canais">Canais</button>
-  <button class="tab" data-tab="estoque">Estoque</button>
-  <button class="tab" data-tab="consignado">Consignado</button>
-  <button class="tab" data-tab="testers">Testers</button>
-  <button class="tab" data-tab="despesas">Despesas</button>
+  <div class="navgrupo">Visão</div>
+  <button class="tab active" data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h6V3H3zM11 21h6v-9h-6zM3 21h6v-6H3zM11 8h6V3h-6z"/></svg><span>Dashboard</span></button>
+  <div class="navgrupo">Operação</div>
+  <button class="tab" data-tab="compras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.6 11.6a2 2 0 0 0 2 1.4h7.8a2 2 0 0 0 2-1.5L21 8H7"/><circle cx="10" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><span>Compras</span></button>
+  <button class="tab" data-tab="vendas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span>Vendas</span></button>
+  <button class="tab" data-tab="consignado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/><path d="M4 12h16"/></svg><span>Consignado</span></button>
+  <div class="navgrupo">Estoque</div>
+  <button class="tab" data-tab="estoque"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5z"/><path d="M3 8.5 12 13l9-4.5M12 13v7"/></svg><span>Estoque</span></button>
+  <button class="tab" data-tab="testers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4v4l3 4.5V20a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8.5L10 7z"/><path d="M7.5 14h9"/></svg><span>Testers</span></button>
+  <div class="navgrupo">Cadastros</div>
+  <button class="tab" data-tab="produtos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v3l2 2.5V20a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7.5L9 5z"/></svg><span>Produtos</span></button>
+  <button class="tab" data-tab="clientes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 11.5a3 3 0 1 0-1.6-5.5M21.5 20a5 5 0 0 0-4-4.9"/></svg><span>Clientes</span></button>
+  <div class="navgrupo">Análise</div>
+  <button class="tab" data-tab="canais"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="19" r="2.5"/><path d="M7.6 7.8 11 16.6M16.4 7.8 13 16.6"/></svg><span>Canais</span></button>
+  <button class="tab" data-tab="despesas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3z"/><circle cx="12" cy="12" r="2.6"/><path d="M7 12h.01M17 12h.01"/></svg><span>Despesas</span></button>
 </nav>
 
 <main>
@@ -433,12 +471,18 @@ ul.simple .val{font-weight:600;white-space:nowrap}
       <div class="card"><div class="card-title">Mais vendidos</div><ul class="simple" id="lTop"></ul></div>
       <div class="card"><div class="card-title">Maiores margens</div><ul class="simple" id="lLucro"></ul></div>
       <div class="card"><div class="card-title">Break-even do investimento</div><ul class="simple" id="lBE"></ul></div>
+      <div class="card"><div class="card-title">Este mês contra o anterior</div><ul class="simple" id="lMesMes"></ul></div>
+      <div class="card"><div class="card-title">Dinheiro parado</div><ul class="simple" id="lParado"></ul></div>
+      <div class="card"><div class="card-title">Curva ABC — concentração do faturamento</div>
+        <ul class="simple" id="lABC"></ul></div>
+      <div class="card"><div class="card-title">Tempo até vender</div><ul class="simple" id="lGiro"></ul></div>
     </div>
   </div>
 </section>
 
 <section id="sec-produtos">
   <div class="sec-head"><h2>Cadastro de produtos</h2><p>Gênero, estoque ideal, preço e fotos vêm daqui para as outras telas e para o catálogo.</p></div>
+  <div class="resumo" id="resProd"></div>
   <div class="card">
     <div class="card-title" id="tProdForm">Novo produto</div>
     <form id="fProd">
@@ -498,6 +542,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-compras">
   <div class="sec-head"><h2>Compras</h2><p>Só entra no estoque quando marcada como recebida. Tipo "Tester" nunca entra no estoque de venda.</p></div>
+  <div class="resumo" id="resCom"></div>
   <div class="card">
     <div class="card-title" id="tComForm">Nova compra</div>
     <form id="fCom">
@@ -533,6 +578,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-vendas">
   <div class="sec-head"><h2>Vendas</h2><p>A baixa no estoque só acontece quando a venda está marcada como entregue. Custo, lucro e margem saem do custo médio das compras lacradas.</p></div>
+  <div class="resumo" id="resVen"></div>
   <div class="card">
     <div class="card-title" id="tVenForm">Nova venda</div>
     <form id="fVen">
@@ -572,6 +618,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-clientes">
   <div class="sec-head"><h2>Clientes</h2><p>Só aparecem as vendas em que você anotou o comprador. As vendas por parceiro ou por outra pessoa ficam na aba Canais, porque quem responde por elas é o canal, não o comprador final.</p></div>
+  <div class="resumo" id="resCli"></div>
   <div class="card">
     <div class="card-title" id="tCliForm">Novo cliente</div>
     <form id="fCli">
@@ -599,6 +646,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-canais">
   <div class="sec-head"><h2>Canais de venda</h2><p>Quem vendeu: você, a barbearia, outra pessoa. Serve para saber o que cada canal traz e o que cada um ainda tem para acertar com você. Em vendas por canal o comprador final costuma não ser identificado — isso é normal e não atrapalha as contas.</p></div>
+  <div class="resumo" id="resCan"></div>
   <div class="kpis" id="kpiCanal"></div>
   <div class="filters">
     <select id="filCanSit"><option value="">Todos os canais</option><option value="acertar">Com valor a acertar</option><option value="entregar">Com entrega pendente</option><option value="quites">Sem pendência</option></select>
@@ -615,6 +663,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-estoque">
   <div class="sec-head"><h2>Estoque</h2><p><b>Em mãos</b> é o que está fisicamente com você: recebido − vendido e entregue − consignado. <b>Saldo</b> é a posição total: tudo que você comprou menos tudo que vendeu, incluindo o que está a caminho, consignado ou ainda por entregar. É o Saldo que define a situação e a quantidade a comprar.</p></div>
+  <div class="resumo" id="resEst"></div>
   <div class="filters">
     <select id="filEstGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
     <select id="filEstStat"><option value="">Toda situação</option><option value="REPOR">Repor</option><option value="NORMAL">Normal</option><option value="EXCESSO">Excesso</option></select>
@@ -631,6 +680,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-consignado">
   <div class="sec-head"><h2>Estoque consignado</h2><p>Produtos e testers deixados com um parceiro. Continuam sendo seus, mas saem do estoque em mãos. Conforme o parceiro for vendendo, atualize a quantidade vendida — dá para dar baixa parcial. Cada unidade vendida também precisa ser lançada na aba Vendas.</p></div>
+  <div class="resumo" id="resCon"></div>
   <div class="card">
     <div class="card-title" id="tConForm">Nova consignação</div>
     <form id="fCon">
@@ -668,6 +718,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-testers">
   <div class="sec-head"><h2>Testers</h2><p>Só aparecem os testers já recebidos. Os que ainda estão a caminho aparecem na aba Compras.</p></div>
+  <div class="resumo" id="resTes"></div>
   <div class="filters">
     <select id="filTesGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
     <input id="filTesBusca" placeholder="Buscar tester…">
@@ -681,6 +732,7 @@ ul.simple .val{font-weight:600;white-space:nowrap}
 
 <section id="sec-despesas">
   <div class="sec-head"><h2>Despesas operacionais</h2><p>Entram no investimento total e no cálculo de ROI.</p></div>
+  <div class="resumo" id="resDes"></div>
   <div class="card">
     <div class="card-title" id="tDesForm">Nova despesa</div>
     <form id="fDes">
@@ -1023,6 +1075,13 @@ const bCon   = v => v==='Encerrada'?'<span class="badge teal">Encerrada</span>':
 const bSitT  = v => v==='Bonificado'?'<span class="badge ambar">Bonificado</span>':'<span class="badge verde">Com custo</span>';
 const thumb  = (src,alt) => src?`<img class="thumb" src="${src}" alt="${esc(alt)}" data-zoom="${esc(alt)}">`:`<div class="thumb-none" title="Sem foto">·</div>`;
 
+/* barra de números no topo de cada tela, sempre sobre o que está filtrado */
+function resumo(id, itens){
+  const el = $('#'+id); if(!el) return;
+  el.innerHTML = itens.filter(Boolean).map(([r,v,c])=>
+    `<div><div class="r">${r}</div><div class="v ${c||''}">${v}</div></div>`).join('');
+}
+
 function ord(rows, st){
   const {k,d} = st;
   return rows.slice().sort((a,b)=>{
@@ -1274,6 +1333,15 @@ function renderCli(){
   rows = ord(rows, sort.cli);
   const st = sort.cli;
   $('#cntCli').textContent = `${rows.length} de ${total}`;
+  const cDev = rows.filter(c=>c.emAberto>0), cSum = rows.filter(c=>c.diasSem!==null && c.diasSem>=45);
+  resumo('resCli', [
+    ['Clientes', rows.length],
+    ['Pedidos', rows.reduce((s,c)=>s+c.pedidos,0)],
+    ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
+    ['Em aberto', money(cDev.reduce((s,c)=>s+c.emAberto,0)), cDev.length?'al':'ok'],
+    ['Ticket médio', money(rows.reduce((s,c)=>s+c.total,0)/Math.max(1,rows.reduce((s,c)=>s+c.pedidos,0)))],
+    ['Sumidos', cSum.length, cSum.length?'am':'ok']
+  ]);
 
   const todos = clientesRows();
   const devendo = todos.filter(c=>c.emAberto>0);
@@ -1380,6 +1448,13 @@ function renderCanal(){
   rows = ord(rows, sort.can);
   const st = sort.can;
   $('#cntCan').textContent = `${rows.length} de ${total}`;
+  resumo('resCan', [
+    ['Canais', rows.length],
+    ['Pedidos', rows.reduce((s,c)=>s+c.n,0)],
+    ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
+    ['Lucro', money(rows.reduce((s,c)=>s+c.lucro,0)), 'ok'],
+    ['A acertar', money(rows.reduce((s,c)=>s+c.aAcertar,0)), rows.some(c=>c.aAcertar>0)?'al':'ok']
+  ]);
   const tot = rows.reduce((a,c)=>({n:a.n+c.n,it:a.it+c.itens,t:a.t+c.total,l:a.l+c.lucro,ac:a.ac+c.aAcertar}),{n:0,it:0,t:0,l:0,ac:0});
   const todos = canaisRows().slice().sort((a,b)=>b.total-a.total);
   const devendo = todos.filter(c=>c.aAcertar>0);
@@ -1548,6 +1623,93 @@ function renderDash(){
       + `<li class="note">Margem · unidades vendidas · lucro acumulado. Margem alta com uma venda só ainda é um ponto isolado.</li>`
     : `<li><span class="empty">Nenhuma venda lançada.</span></li>`;
 
+  // ----- este mês contra o anterior -----
+  const ym = d => d.slice(0,7);
+  const agora = new Date();
+  const mesAtual = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}`;
+  const ant = new Date(agora.getFullYear(), agora.getMonth()-1, 1);
+  const mesAnt = `${ant.getFullYear()}-${String(ant.getMonth()+1).padStart(2,'0')}`;
+  const doMes = m => data.sales.filter(v=>v.data && ym(v.data)===m);
+  const bloco = vs => ({fat:vs.reduce((s,v)=>s+Number(v.valorVenda),0),
+    luc:vs.reduce((s,v)=>s+calcVenda(v).lucro,0), ped:contaPedidos(vs), un:vs.reduce((s,v)=>s+Number(v.qtde),0)});
+  const A = bloco(doMes(mesAtual)), B = bloco(doMes(mesAnt));
+  const varia = (a,b)=> b>0 ? `<span style="color:var(--${a>=b?'verde':'vermelho'})">${a>=b?'▲':'▼'} ${Math.abs((a/b-1)*100).toFixed(0)}%</span>` : '';
+  const linhaMM = (rot, a, b, fmt) =>
+    `<li><span>${rot}</span><span class="val">${fmt(a)} ${varia(a,b)}<br><span style="font-weight:400;color:var(--ink-faint);font-size:11.5px">antes ${fmt(b)}</span></span></li>`;
+  $('#lMesMes').innerHTML = (A.ped||B.ped)
+    ? linhaMM('Faturamento', A.fat, B.fat, money)
+      + linhaMM('Lucro', A.luc, B.luc, money)
+      + linhaMM('Pedidos', A.ped, B.ped, v=>String(v))
+      + linhaMM('Unidades', A.un, B.un, v=>String(v))
+      + `<li><span>Ticket médio</span><span class="val">${money(A.ped?A.fat/A.ped:0)}</span></li>`
+      + `<li class="note">Comparando ${rotuloMes(mesAtual)} com ${rotuloMes(mesAnt)}, só vendas com data.</li>`
+    : `<li><span class="empty">Sem vendas com data nos dois últimos meses.</span></li>`;
+
+  // ----- dinheiro parado: estoque sem giro -----
+  const ultimaVenda = {};
+  data.sales.filter(v=>v.data).forEach(v=>{ if(!ultimaVenda[v.produto]||v.data>ultimaVenda[v.produto]) ultimaVenda[v.produto]=v.data; });
+  const parados = est.filter(r=>r.saldo+r.consig>0).map(r=>{
+    const u = ultimaVenda[r.produto];
+    return {...r, dias: u ? Math.floor((Date.now()-Date.parse(u+'T00:00:00'))/86400000) : null,
+            valor: (r.saldo+r.consig)*r.custoMedio};
+  }).filter(r=>r.dias===null || r.dias>=45).sort((a,b)=>b.valor-a.valor);
+  const totParado = parados.reduce((s,r)=>s+r.valor,0);
+  $('#lParado').innerHTML = parados.length
+    ? `<li><span>Produtos sem giro</span><span class="val">${parados.length} de ${est.filter(r=>r.saldo+r.consig>0).length}</span></li>`
+      + `<li><span>Custo empatado</span><span class="val" style="color:var(--vermelho)">${money(totParado)}</span></li>`
+      + parados.slice(0,5).map(r=>`<li><span>${esc(r.produto)}</span><span class="val">${money(r.valor)} · ${r.dias===null?'nunca vendeu':r.dias+' d'}</span></li>`).join('')
+      + `<li class="note">Com estoque e sem venda há 45 dias ou mais. É o capital que não está girando.</li>`
+    : `<li><span class="empty">Tudo com estoque teve venda nos últimos 45 dias.</span></li>`;
+
+  // ----- curva ABC: quais produtos concentram o faturamento -----
+  const fatProd = {};
+  data.sales.forEach(v=>{ fatProd[v.produto]=(fatProd[v.produto]||0)+Number(v.valorVenda); });
+  const rank = Object.entries(fatProd).map(([p,f])=>({p,f})).sort((a,b)=>b.f-a.f);
+  const totFat = rank.reduce((s,r)=>s+r.f,0);
+  let acum=0; const classes={A:[],B:[],C:[]};
+  rank.forEach(r=>{ acum+=r.f; const pctAcum=acum/totFat;
+    r.classe = pctAcum<=0.8 ? 'A' : pctAcum<=0.95 ? 'B' : 'C';
+    classes[r.classe].push(r); });
+  const semVenda = data.products.filter(p=>!fatProd[p.nome]).length;
+  const linhaABC = (c, rot, cor) => {
+    const l = classes[c], f = l.reduce((s,r)=>s+r.f,0);
+    return `<li><span><span class="badge ${cor}">${c}</span> ${rot}</span>
+      <span class="val">${l.length} ${plural(l.length,'produto','produtos')} · ${money(f)} · ${totFat?pct(f/totFat):'—'}</span></li>`;
+  };
+  $('#lABC').innerHTML = rank.length
+    ? linhaABC('A','os que sustentam o negócio','verde')
+      + linhaABC('B','importância média','ambar')
+      + linhaABC('C','cauda longa','cinza')
+      + (semVenda?`<li><span><span class="badge vermelho">—</span> nunca venderam</span><span class="val">${semVenda} ${plural(semVenda,'produto','produtos')}</span></li>`:'')
+      + `<li class="note">A = até 80% do faturamento, B = até 95%, C = o resto. Os A merecem nunca faltar; os C você compra sob encomenda.</li>`
+      + rank.slice(0,5).map((r,i)=>`<li><span><b class="pos">${i+1}.</b> ${esc(r.p)}</span><span class="val">${money(r.f)} · ${pct(r.f/totFat)}</span></li>`).join('')
+    : `<li><span class="empty">Nenhuma venda lançada.</span></li>`;
+
+  // ----- tempo entre comprar e vender -----
+  const giro = [];
+  data.products.forEach(prod=>{
+    const compras = data.purchases.filter(c=>c.produto===prod.nome && c.tipo==='Lacrado' && c.data).map(c=>c.data).sort();
+    const vendas = data.sales.filter(v=>v.produto===prod.nome && v.data).map(v=>v.data).sort();
+    if(!compras.length || !vendas.length) return;
+    /* casa cada venda com a compra mais recente que a antecede */
+    const dias = [];
+    vendas.forEach(dv=>{
+      const ant = compras.filter(dc=>dc<=dv).pop();
+      if(ant) dias.push(Math.round((Date.parse(dv)-Date.parse(ant))/86400000));
+    });
+    if(dias.length) giro.push({p:prod.nome, media: dias.reduce((s,d)=>s+d,0)/dias.length, n:dias.length});
+  });
+  giro.sort((a,b)=>a.media-b.media);
+  const mediaGeral = giro.length ? giro.reduce((s,g)=>s+g.media*g.n,0)/giro.reduce((s,g)=>s+g.n,0) : 0;
+  $('#lGiro').innerHTML = giro.length
+    ? `<li><span>Média geral</span><span class="val">${mediaGeral.toFixed(0)} dias entre comprar e vender</span></li>`
+      + `<li class="note" style="padding-top:2px">Mais rápidos</li>`
+      + giro.slice(0,3).map(g=>`<li><span>${esc(g.p)}</span><span class="val" style="color:var(--verde)">${g.media.toFixed(0)} dias</span></li>`).join('')
+      + `<li class="note" style="padding-top:8px">Mais lentos</li>`
+      + giro.slice(-3).reverse().map(g=>`<li><span>${esc(g.p)}</span><span class="val" style="color:var(--ambar)">${g.media.toFixed(0)} dias</span></li>`).join('')
+      + `<li class="note">Quanto tempo seu dinheiro fica preso em cada perfume. Calculado sobre ${giro.length} ${plural(giro.length,'produto','produtos')} com compra e venda datadas.</li>`
+    : `<li><span class="empty">Precisa de compras e vendas com data para calcular.</span></li>`;
+
   const precoRef = data.products.length?data.products.reduce((s,p)=>s+(Number(p.precoVenda)||90),0)/data.products.length:90;
   const unAdd = margem>0?Math.ceil(be/(margem*precoRef)):0;
   $('#lBE').innerHTML = `
@@ -1601,6 +1763,15 @@ function renderProd(){
   rows = ord(rows, sort.prod);
   const st = sort.prod;
   $('#cntProd').textContent = `${rows.length} de ${data.products.length}`;
+  const semF = rows.filter(p=>!p.foto).length, comP = rows.filter(p=>temProvador(p)).length;
+  resumo('resProd', [
+    ['Produtos', rows.length],
+    ['Masculinos', rows.filter(p=>p.genero==='Masculino').length],
+    ['Femininos', rows.filter(p=>p.genero==='Feminino').length],
+    ['Com provador', comP, comP===rows.length?'ok':'am'],
+    ['Sem foto', semF, semF?'am':'ok'],
+    ['Preço médio', money(rows.length?rows.reduce((s,p)=>s+Number(p.precoVenda),0)/rows.length:0)]
+  ]);
   $('#tProd').innerHTML = rows.length
     ? `<thead><tr>${th('Foto','temFoto',st,'ctr')}${th('Produto','nome',st)}${th('Inspiração','inspiracao',st)}${th('Família','familia',st)}${th('Provador','provador',st,'ctr')}${th('Gênero','genero',st,'ctr')}${th('Ideal','estoqueIdeal',st,'num')}${th('Preço','precoVenda',st,'num')}<th></th></tr></thead><tbody>`+
       rows.map(p=>`<tr><td class="ctr">${thumb(p.foto,p.nome)}</td><td>${esc(p.nome)}</td>
@@ -1660,6 +1831,15 @@ function renderCom(){
   const st = sort.com;
   const tq = rows.reduce((s,c)=>s+Number(c.qtde),0), tv = rows.reduce((s,c)=>s+Number(c.custoTotal),0);
   $('#cntCom').textContent = `${rows.length} de ${data.purchases.length}`;
+  const cCam = rows.filter(c=>c.entregue!=='Sim');
+  resumo('resCom', [
+    ['Lançamentos', rows.length],
+    ['Unidades', tq],
+    ['Investido', money(tv)],
+    ['Custo médio', money(tq?tv/tq:0)],
+    ['A caminho', cCam.reduce((s,c)=>s+Number(c.qtde),0)+' un', cCam.length?'am':'ok'],
+    ['Valor a caminho', money(cCam.reduce((s,c)=>s+Number(c.custoTotal),0)), cCam.length?'am':'ok']
+  ]);
   $('#tCom').innerHTML = rows.length
     ? `<thead><tr>${chkTodos('com')}${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Tipo','tipo',st,'ctr')}${th('Situação','entregue',st,'ctr')}${th('Qtde','qtde',st,'num')}${th('Custo total','custoTotal',st,'num')}${th('Custo unit.','custoUnit',st,'num')}<th>Obs.</th><th></th></tr></thead><tbody>`+
       rows.map(c=>`<tr>${chkLinha('com',c.id)}<td>${dt(c.data)}</td><td>${esc(c.produto)}</td><td class="ctr">${bGen(c.genero)}</td><td class="ctr">${bTipo(c.tipo)}</td>
@@ -1688,6 +1868,16 @@ function renderVen(){
   const tv = rows.reduce((s,v)=>s+Number(v.valorVenda),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
+  const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
+  resumo('resVen', [
+    ['Pedidos', contaPedidos(rows)],
+    ['Itens', rows.length],
+    ['Faturado', money(tv)],
+    ['Lucro', money(tl), 'ok'],
+    ['Margem', tv?pct(tl/tv):'—'],
+    ['A receber', money(vPend.reduce((s,v)=>s+Number(v.valorVenda),0)), vPend.length?'al':'ok'],
+    ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
+  ]);
   $('#tVen').innerHTML = rows.length
     ? `<thead><tr>${chkTodos('ven')}${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
       rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
@@ -1715,6 +1905,15 @@ function renderEst(){
     cp:a.cp+Math.max(0,r.comprar)}),
     {rc:0,cm:0,vd:0,ae:0,cg:0,sl:0,pv:0,ce:0,lp:0,cp:0});
   t.cmed = t.sl+t.cg ? t.ce/(t.sl+t.cg) : 0;
+  resumo('resEst', [
+    ['Em mãos', t.sl+' un'],
+    ['Saldo', t.pv+' un'],
+    ['A caminho', t.cm+' un', t.cm?'am':''],
+    ['Consignado', t.cg+' un', t.cg?'am':''],
+    ['Custo do estoque', money(t.ce)],
+    ['Lucro potencial', money(t.lp), 'ok'],
+    ['A repor', rows.filter(r=>r.status==='REPOR').length, rows.filter(r=>r.status==='REPOR').length?'al':'ok']
+  ]);
   $('#tEst').innerHTML = rows.length
     ? `<thead><tr><th class="ctr">Foto</th>${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr op')}${th('Recebido','recebido',st,'num op')}${th('A caminho','caminho',st,'num')}${th('Vendido','vendido',st,'num op')}${th('A entregar','aEntregar',st,'num')}${th('Consignado','consig',st,'num')}${th('Em mãos','saldo',st,'num')}${th('Saldo','previsto',st,'num')}${th('Custo médio','custoMedio',st,'num op')}${th('Custo estoque','custoEst',st,'num op')}${th('Lucro potencial','lucroPot',st,'num op')}${th('Ideal','ideal',st,'num')}${th('Situação','status',st,'ctr')}${th('Comprar','comprar',st,'num')}</tr></thead><tbody>`+
       rows.map(r=>`<tr><td class="ctr">${thumb(foto(r.produto),r.produto)}</td><td>${esc(r.produto)}</td><td class="ctr op">${bGen(r.genero)}</td>
@@ -1749,6 +1948,14 @@ function renderCon(){
   rows = ord(rows, sort.con);
   const st = sort.con;
   $('#cntCon').textContent = `${rows.length} de ${data.consignments.length}`;
+  resumo('resCon', [
+    ['Registros', rows.length],
+    ['Enviado', rows.reduce((s,c)=>s+Number(c.qtde),0)+' un'],
+    ['No parceiro', rows.reduce((s,c)=>s+c.saldo,0)+' un', 'am'],
+    ['Vendido', rows.reduce((s,c)=>s+c.vendida,0)+' un', 'ok'],
+    ['Devolvido', rows.reduce((s,c)=>s+c.devolvida,0)+' un'],
+    ['Custo no parceiro', money(rows.reduce((s,c)=>s+c.saldo*custoMedio(c.produto),0))]
+  ]);
 
   const todos = data.consignments;
   const saldoTotal = todos.reduce((s,c)=>s+saldoCon(c),0);
@@ -1789,6 +1996,14 @@ function renderTes(){
   rows = ord(rows, sort.tes);
   const st = sort.tes;
   $('#cntTes').textContent = `${rows.length} de ${total}`;
+  resumo('resTes', [
+    ['Testers', rows.length],
+    ['Unidades', rows.reduce((s,r)=>s+r.qtd,0)],
+    ['Em mãos', rows.reduce((s,r)=>s+r.emMaos,0)],
+    ['Consignados', rows.reduce((s,r)=>s+r.consig,0), rows.some(r=>r.consig)?'am':''],
+    ['Investido', money(rows.reduce((s,r)=>s+r.custo,0))],
+    ['Bonificados', rows.filter(r=>r.situacao==='Bonificado').length, 'ok']
+  ]);
   const t = rows.reduce((a,r)=>({q:a.q+r.qtd,cg:a.cg+r.consig,em:a.em+r.emMaos,c:a.c+r.custo}),{q:0,cg:0,em:0,c:0});
   $('#tTes').innerHTML = rows.length
     ? `<thead><tr><th class="ctr">Foto</th>${th('Tester','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Recebidos','qtd',st,'num')}${th('Consignados','consig',st,'num')}${th('Em mãos','emMaos',st,'num')}${th('Custo investido','custo',st,'num')}${th('Custo médio','cm',st,'num')}${th('Situação','situacao',st,'ctr')}</tr></thead><tbody>`+
@@ -1810,6 +2025,15 @@ function renderDes(){
   const st = sort.des;
   const t = rows.reduce((s,d)=>s+Number(d.valor),0);
   $('#cntDes').textContent = `${rows.length} de ${data.expenses.length}`;
+  const porCat = {}; rows.forEach(d=>porCat[d.categoria||'—']=(porCat[d.categoria||'—']||0)+Number(d.valor));
+  const maior = Object.entries(porCat).sort((a,b)=>b[1]-a[1])[0];
+  resumo('resDes', [
+    ['Lançamentos', rows.length],
+    ['Total', money(t)],
+    ['Média', money(rows.length?t/rows.length:0)],
+    ['Categorias', Object.keys(porCat).length],
+    maior && ['Maior categoria', `${maior[0]} · ${money(maior[1])}`]
+  ]);
   $('#tDes').innerHTML = rows.length
     ? `<thead><tr>${th('Data','data',st)}${th('Item','item',st)}${th('Categoria','categoria',st)}${th('Valor','valor',st,'num')}<th>Obs.</th><th></th></tr></thead><tbody>`+
       rows.map(d=>`<tr><td>${dt(d.data)}</td><td>${esc(d.item)}</td><td>${esc(d.categoria)||'—'}</td><td class="num">${money(d.valor)}</td><td>${esc(d.observacao)||'—'}</td>
@@ -2002,9 +2226,10 @@ $('#fCom').addEventListener('submit',e=>{
     entregue:$('#comEnt').value,custoTotal:Number($('#comCusto').value)||0,observacao:$('#comObs').value.trim()};
   if(edit.com){ const i=data.purchases.findIndex(c=>c.id===edit.com); data.purchases[i]={...data.purchases[i],...payload}; cancCom(); }
   else data.purchases.push({id:uid(),...payload});
-  $('#fCom').reset(); $('#comQtd').value=1; $('#comTipo').value='Lacrado'; $('#comEnt').value='Sim'; save(); renderAll();
+  $('#fCom').reset(); $('#comQtd').value=1; $('#comTipo').value='Lacrado'; $('#comEnt').value='Sim';
+  $('#comData').value=hoje(); save(); renderAll();
 });
-function cancCom(){ edit.com=null; $('#fCom').reset(); $('#comQtd').value=1; $('#comTipo').value='Lacrado'; $('#comEnt').value='Sim';
+function cancCom(){ edit.com=null; $('#fCom').reset(); $('#comQtd').value=1; $('#comTipo').value='Lacrado'; $('#comEnt').value='Sim'; $('#comData').value=hoje();
   $('#tComForm').textContent='Nova compra'; $('#bCom').textContent='Adicionar compra'; $('#cancCom').hidden=true; }
 $('#cancCom').addEventListener('click',cancCom);
 $('#tCom').addEventListener('click',e=>{
@@ -2039,9 +2264,10 @@ $('#fVen').addEventListener('submit',e=>{
   const ultimoCanal = payload.canal;
   $('#fVen').reset(); $('#venQtd').value=1; $('#venStat').value='Pago'; $('#venEnt').value='Sim';
   $('#venCanal').value = ultimoCanal;          // mantém o canal para o próximo lançamento
+  $('#venData').value = hoje();
   save(); renderAll();
 });
-function cancVen(){ edit.ven=null; $('#fVen').reset(); $('#venQtd').value=1; $('#venStat').value='Pago'; $('#venEnt').value='Sim'; $('#venCanal').value='';
+function cancVen(){ edit.ven=null; $('#fVen').reset(); $('#venQtd').value=1; $('#venStat').value='Pago'; $('#venEnt').value='Sim'; $('#venCanal').value=''; $('#venData').value=hoje();
   $('#tVenForm').textContent='Nova venda'; $('#bVen').textContent='Adicionar venda'; $('#cancVen').hidden=true; }
 $('#cancVen').addEventListener('click',cancVen);
 $('#tVen').addEventListener('click',e=>{
@@ -2517,7 +2743,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'filtro-exato · 16/08';
+const VERSAO = 'erp-5 · 17/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
@@ -3286,6 +3512,7 @@ const qs = new URLSearchParams(location.search);
 const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
 if(paramC){ abreVitrine(qs.get('c')||''); } else {
 load(); renderAll();
+$('#comData').value = hoje(); $('#venData').value = hoje();
 retomaAuto().then(avisoBackup);
 nvBotoes();
 if(nvLigado()){ nvStatus('ok','conectado'); nvRenovar().finally(()=>nvSincronizar(true)); }
