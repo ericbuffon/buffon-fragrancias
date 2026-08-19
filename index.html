@@ -640,7 +640,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   </div>
   <div class="kpis" id="kpiCli"></div>
   <div class="filters">
-    <select id="filCliSit"><option value="">Todos</option><option value="devendo">Com saldo em aberto</option><option value="quitado">Sem pendência</option><option value="sumido">Sem comprar há 45+ dias</option><option value="semtel">Sem WhatsApp</option></select>
+    <select id="filCliSit"><option value="">Todos</option><option value="devendo">Com saldo em aberto</option><option value="quitado">Sem pendência</option><option value="semtel">Sem WhatsApp</option></select>
     <input id="filCliBusca" placeholder="Buscar cliente…">
     <button class="btn sm" data-limpa="cli">Limpar filtros</button>
     <button class="btn sm" data-rel="cli">Imprimir relatório</button>
@@ -1313,7 +1313,7 @@ function textoReativacao(cli, r){
   const d = diasSemComprar(r);
   const ref = r.favorito ? `Vi aqui que o *${r.favorito}* é o seu preferido.` : '';
   return `Oi, ${nome}! Tudo bem?\n\n`
-    + (d ? `Faz um tempinho que a gente não se fala — sua última compra foi em ${dt(r.ultima)}.\n\n` : '')
+    + (d ? `Sua última compra foi em ${dt(r.ultima)}.\n\n` : '')
     + (ref ? ref + `\n\n` : '')
     + `Chegaram reposições na Buffon Fragrâncias.\n`
     + `Quer que eu te mande o catálogo atualizado?`;
@@ -1333,20 +1333,19 @@ function renderCli(){
   const total = rows.length;
   if(fil.cliSit==='devendo') rows = rows.filter(c=>c.emAberto>0);
   if(fil.cliSit==='quitado') rows = rows.filter(c=>c.emAberto===0);
-  if(fil.cliSit==='sumido') rows = rows.filter(c=>c.diasSem!==null && c.diasSem>=45);
   if(fil.cliSit==='semtel') rows = rows.filter(c=>!soDigitos(c.telefone));
   if(fil.cliQ) rows = rows.filter(c=>norm(c.nome).includes(norm(fil.cliQ)));
   rows = ord(rows, sort.cli);
   const st = sort.cli;
   $('#cntCli').textContent = `${rows.length} de ${total}`;
-  const cDev = rows.filter(c=>c.emAberto>0), cSum = rows.filter(c=>c.diasSem!==null && c.diasSem>=45);
+  const cDev = rows.filter(c=>c.emAberto>0);
   resumo('resCli', [
     ['Clientes', rows.length],
     ['Pedidos', rows.reduce((s,c)=>s+c.pedidos,0)],
     ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
     ['Em aberto', money(cDev.reduce((s,c)=>s+c.emAberto,0)), cDev.length?'al':'ok'],
     ['Ticket médio', money(rows.reduce((s,c)=>s+c.total,0)/Math.max(1,rows.reduce((s,c)=>s+c.pedidos,0)))],
-    ['Sumidos', cSum.length, cSum.length?'am':'ok']
+    ['Recorrentes', rows.filter(c=>c.pedidos>1).length, 'ok']
   ]);
 
   const todos = clientesRows();
@@ -1358,23 +1357,24 @@ function renderCli(){
     kpi('Maior devedor', devendo.length ? devendo.sort((a,b)=>b.emAberto-a.emAberto)[0].nome : '—', 'ambar',
         devendo.length ? money(devendo[0].emAberto) : ''),
     kpi('Ticket médio', money(todos.reduce((s,c)=>s+c.total,0) / Math.max(1, todos.reduce((s,c)=>s+c.pedidos,0))), 'verde', 'por pedido'),
-    kpi('Sumidos', todos.filter(c=>c.diasSem!==null && c.diasSem>=45).length, 'ambar', 'sem comprar há 45+ dias'),
+    kpi('Recorrentes', todos.filter(c=>c.pedidos>1).length, 'verde', 'compraram mais de uma vez'),
     kpi('Sem WhatsApp', todos.filter(c=>!soDigitos(c.telefone)).length, 'cinza', 'não dá para chamar')
   ].join('');
 
-  const t = rows.reduce((a,c)=>({p:a.p+c.pedidos,n:a.n+c.nCompras,tot:a.tot+c.total,ab:a.ab+c.emAberto,lu:a.lu+c.lucro}),{p:0,n:0,tot:0,ab:0,lu:0});
+  const t = rows.reduce((a,c)=>({p:a.p+c.pedidos,n:a.n+c.nCompras,un:a.un+c.unidades,
+    tot:a.tot+c.total,ab:a.ab+c.emAberto,lu:a.lu+c.lucro}),{p:0,n:0,un:0,tot:0,ab:0,lu:0});
   $('#tCli').innerHTML = rows.length
-    ? `<thead><tr>${th('Cliente','nome',st)}${th('WhatsApp','telefone',st)}${th('Pedidos','pedidos',st,'num')}${th('Itens','nCompras',st,'num')}${th('Unidades','unidades',st,'num')}${th('Total','total',st,'num')}${th('Em aberto','emAberto',st,'num')}${th('Lucro','lucro',st,'num')}${th('Ticket','ticket',st,'num')}${th('Última','ultima',st)}${th('Sem comprar','diasSem',st,'num')}${th('Preferido','favorito',st)}<th></th></tr></thead><tbody>`+
+    ? `<thead><tr>${th('Cliente','nome',st)}${th('WhatsApp','telefone',st)}${th('Pedidos','pedidos',st,'num')}${th('Itens','nCompras',st,'num')}${th('Unidades','unidades',st,'num')}${th('Total','total',st,'num')}${th('Em aberto','emAberto',st,'num')}${th('Lucro','lucro',st,'num')}${th('Ticket','ticket',st,'num')}${th('Última','ultima',st)}${th('Última compra há','diasSem',st,'num')}${th('Preferido','favorito',st)}<th></th></tr></thead><tbody>`+
       rows.map(c=>`<tr><td><button class="linkcli" data-ficha="${c.id}">${esc(c.nome)}</button></td>
         <td>${esc(c.telefone)||'—'}</td><td class="num">${c.pedidos}</td><td class="num">${c.nCompras}</td><td class="num">${c.unidades}</td>
         <td class="num">${money(c.total)}</td>
         <td class="num">${c.emAberto>0?`<b style="color:var(--vermelho)">${money(c.emAberto)}</b>`:'—'}</td>
         <td class="num">${money(c.lucro)}</td><td class="num">${money(c.ticket)}</td>
         <td>${dt(c.ultima)}</td>
-        <td class="num">${c.diasSem===null?'—':(c.diasSem>=45?`<b style="color:var(--ambar)">${c.diasSem} d</b>`:c.diasSem+' d')}</td>
+        <td class="num">${c.diasSem===null?'—':c.diasSem+' d'}</td>
         <td>${esc(c.favorito)||'—'}</td>
         <td><div class="rowacts"><button class="btn sm" data-ecl="${c.id}">Editar</button><button class="btn sm ghost" data-dcl="${c.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="2">Total</td><td class="num">${t.p}</td><td class="num">${t.n}</td><td></td><td class="num">${money(t.tot)}</td><td class="num">${money(t.ab)}</td><td class="num">${money(t.lu)}</td><td colspan="4"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td>Total</td><td></td><td class="num">${t.p}</td><td class="num">${t.n}</td><td class="num">${t.un}</td><td class="num">${money(t.tot)}</td><td class="num">${money(t.ab)}</td><td class="num">${money(t.lu)}</td><td class="num">${money(t.p?t.tot/t.p:0)}</td><td></td><td></td><td></td><td></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhum cliente encontrado.</td></tr></tbody>`;
 }
 
@@ -1411,8 +1411,8 @@ function abreFicha(id){
 
   const dias = diasSemComprar(r);
   const volta = $('#fichaVolta');
-  volta.hidden = !(dias!==null && dias>=45);
-  volta.textContent = dias!==null ? `Chamar de volta (${dias} dias)` : 'Chamar de volta';
+  volta.hidden = !r.nCompras;
+  volta.textContent = dias!==null ? `Oferecer novidade (${dias} d)` : 'Oferecer novidade';
   volta.onclick = ()=>{ if(precisaTel()) window.open(linkZap(cli, textoReativacao(cli,r)), '_blank'); };
   $('#fichaVendas').onclick = ()=>{
     $('#modalFicha').classList.remove('open');
@@ -2721,7 +2721,7 @@ const RELATORIOS = {
   can:{titulo:'Canais de venda', tabela:'#tCanal', contador:'#cntCan',
     filtros:()=>[['Situação',{acertar:'com valor a acertar',entregar:'com entrega pendente',quites:'sem pendência'}[fil.canSit]],['Período',periodo(fil.canDe,fil.canAte)],['Busca',fil.canQ]]},
   cli:{titulo:'Clientes', tabela:'#tCli', contador:'#cntCli',
-    filtros:()=>[['Situação',{devendo:'com saldo em aberto',quitado:'sem pendência',sumido:'sem comprar há 45+ dias',semtel:'sem WhatsApp'}[fil.cliSit]],['Busca',fil.cliQ]]},
+    filtros:()=>[['Situação',{devendo:'com saldo em aberto',quitado:'sem pendência',semtel:'sem WhatsApp'}[fil.cliSit]],['Busca',fil.cliQ]]},
   tes:{titulo:'Testers', tabela:'#tTes', contador:'#cntTes',
     filtros:()=>[['Gênero',fil.tesGen],['Busca',fil.tesQ]]},
   des:{titulo:'Despesas operacionais', tabela:'#tDes', contador:'#cntDes',
@@ -2773,7 +2773,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'erp-7 · 17/08';
+const VERSAO = 'erp-9 · 17/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
