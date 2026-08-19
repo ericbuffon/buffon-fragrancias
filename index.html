@@ -12,20 +12,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#FAF8F5; --card:#FFF; --ink:#211D1A; --ink-soft:#6B6058; --ink-faint:#9C9188;
-  --line:#E4DFD5; --accent:#A8462B; --accent-ink:#7A331E;
+  --paper:#F4F6F9; --card:#FFF; --ink:#12161C; --ink-soft:#4E5866; --ink-faint:#8A94A3;
+  --line:#DDE3EB; --line2:#EDF1F6; --accent:#C6341A; --accent-ink:#A32711; --accent-soft:#FDE4DE;
   /* paleta de significados — cada uso tem a sua cor */
-  --azul:#2C5F8D;     --azul-luz:#DEE9F3;
-  --rosa:#B0357A;     --rosa-luz:#F9DDEC;
-  --cinza:#655C52;    --cinza-luz:#EBE7DF;
-  --roxo:#65479A;     --roxo-luz:#E8E1F6;
-  --verde:#3B7A47;    --verde-luz:#DDEEE0;
-  --ambar:#9A6B12;    --ambar-luz:#F8E9C6;
-  --teal:#166E6E;     --teal-luz:#D5EDED;
-  --oliva:#5C7A1E;    --oliva-luz:#E9F1D2;
-  --laranja:#B35418;  --laranja-luz:#FBE2CF;
-  --vermelho:#A32E28; --vermelho-luz:#F8DCD9;
-  --terra:#8A5330;    --terra-luz:#F2E1D5;
+  --azul:#0B63CE;     --azul-luz:#DCEAFC;
+  --rosa:#B00966;     --rosa-luz:#FCDCEE;
+  --cinza:#5A6674;    --cinza-luz:#E6EAEF;
+  --roxo:#6E28D9;     --roxo-luz:#EADDFD;
+  --verde:#04703C;    --verde-luz:#D3F3E2;
+  --ambar:#8F5A02;    --ambar-luz:#FDEDC8;
+  --teal:#016361;     --teal-luz:#CDF0EF;
+  --oliva:#496B00;    --oliva-luz:#E7F5C9;
+  --laranja:#AD4600;  --laranja-luz:#FEE3CE;
+  --vermelho:#B01122; --vermelho-luz:#FDDCDF;
+  --terra:#8A4318;    --terra-luz:#F8E2D2;
 }
 *{box-sizing:border-box}
 html,body{max-width:100%;overflow-x:clip}
@@ -101,8 +101,16 @@ main,section,.twrap,.card,.kpis{min-width:0;max-width:100%}
 .kpi.verde{border-left-color:var(--verde)} .kpi.ambar{border-left-color:var(--ambar)}
 .kpi.vermelho{border-left-color:var(--vermelho)} .kpi.azul{border-left-color:var(--azul)}
 .kpi.roxo{border-left-color:var(--roxo)} .kpi.terra{border-left-color:var(--terra)}
-.kpi[title]{cursor:help}
-.kpi .lbl.temdica::after{content:' ?';font-weight:700;opacity:.45}
+.kpi{position:relative}
+.kpi .qm{position:absolute;top:7px;right:7px;width:19px;height:19px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);color:var(--ink-faint);
+  font-size:11px;font-weight:700;line-height:1;padding:0;display:grid;place-items:center}
+.kpi .qm:hover{border-color:var(--ink-faint);color:var(--ink)}
+.kpi.clicavel{cursor:pointer;transition:transform .1s,box-shadow .12s,border-color .12s}
+.kpi.clicavel:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(18,22,28,.09)}
+.kpi.clicavel::after{content:'→';position:absolute;bottom:8px;right:10px;color:var(--ink-faint);
+  font-size:13px;opacity:0;transition:opacity .12s}
+.kpi.clicavel:hover::after{opacity:1}
 .kpi .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:5px}
 .kpi .val{font-family:'Fraunces',serif;font-size:21px;font-weight:600}
 .kpi .sub{font-size:11.5px;color:var(--ink-faint);margin-top:3px}
@@ -219,8 +227,8 @@ body.publico{background:#fff}
 .twrap.fixa2 th:nth-child(1),.twrap.fixa2 td:nth-child(1){position:sticky;left:0;z-index:3;background:var(--card)}
 .twrap.fixa2 th:nth-child(2),.twrap.fixa2 td:nth-child(2){position:sticky;left:63px;z-index:3;background:var(--card)}
 .twrap.fixa2 thead th:nth-child(1),.twrap.fixa2 thead th:nth-child(2){z-index:5;background:var(--paper)}
-.twrap.fixa2 tfoot td:nth-child(1),.twrap.fixa2 tfoot td:nth-child(2){z-index:5;background:#F8F6F1}
-.twrap.fixa2 tbody tr:hover td:nth-child(1),.twrap.fixa2 tbody tr:hover td:nth-child(2){background:#FBFAF8}
+.twrap.fixa2 tfoot td:nth-child(1),.twrap.fixa2 tfoot td:nth-child(2){z-index:5;background:#EFF3F8}
+.twrap.fixa2 tbody tr:hover td:nth-child(1),.twrap.fixa2 tbody tr:hover td:nth-child(2){background:#F1F5FB}
 .twrap.fixa2 th:nth-child(2),.twrap.fixa2 td:nth-child(2){box-shadow:1px 0 0 var(--line)}
 .twrap.fixa2 th:nth-child(1){width:63px;min-width:63px}
 .compacto .op{display:none}
@@ -257,7 +265,11 @@ ul.simple{list-style:none;margin:0;padding:0}
 ul.simple li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 ul.simple li:last-child{border-bottom:none}
 ul.simple .val{font-weight:600;white-space:nowrap}
-ul.simple li[title]{cursor:help}
+ul.simple li[data-dica]{cursor:help}
+#balao{position:fixed;z-index:900;background:var(--ink);color:#fff;border-radius:8px;
+  padding:10px 13px;font-size:12.5px;line-height:1.55;white-space:pre-line;
+  box-shadow:0 6px 24px rgba(0,0,0,.28);pointer-events:none}
+#balao[hidden]{display:none}
 .dica{font-weight:700;color:var(--ink-faint);font-size:11px;vertical-align:super}
 ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-weight:600}
 .note{font-size:11px;color:var(--ink-faint);padding-top:7px;line-height:1.5}
@@ -426,6 +438,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
     <div class="save-state"><span class="dot" id="dot"></span><span id="saveTxt">dados salvos neste navegador</span></div>
     <span class="autostat" id="autoStat" hidden><span class="pt"></span><span id="autoTxt"></span></span>
     <span class="nuvemstat" id="nuvemStat" hidden><span class="pt"></span><span id="nuvemTxt"></span></span>
+    <button class="btn sm" id="btnVoltar" hidden>← Voltar</button>
     <button class="btn sm" id="btnNuvem">Nuvem</button>
     <button class="btn sm" id="btnAuto">Backup automático</button>
     <button class="btn sm" id="btnExport">Baixar backup</button>
@@ -1190,12 +1203,48 @@ document.addEventListener('click', e=>{
   fil[m[0]] = ''; m[1]();
 });
 
-function goTab(nome){
+const abaAtual = () => (document.querySelector('.tab.active')||{dataset:{}}).dataset.tab || 'dashboard';
+let voltando = false;
+
+/* O estado gravado pertence à tela de DESTINO. Ao voltar, o navegador nos
+   entrega o estado da tela anterior — é ele que restauramos. */
+function pintaAba(nome){
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===nome));
   document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));
-  $('#sec-'+nome).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
+  const s = $('#sec-'+nome); if(s) s.classList.add('active');
 }
+function goTab(nome){
+  if(!voltando && nome !== abaAtual()){
+    const n = (history.state && history.state.n || 0) + 1;
+    history.pushState({tab:nome, fil:{...fil}, n}, '', location.pathname + location.search);
+  }
+  pintaAba(nome);
+  window.scrollTo({top:0,behavior:'smooth'});
+  atualizaVoltar();
+}
+function atualizaVoltar(){
+  const b = $('#btnVoltar'); if(b) b.hidden = !(history.state && history.state.n > 0);
+}
+/* mantém os filtros da tela atual guardados no histórico */
+function guardaFiltros(){
+  if(voltando) return;
+  const st = history.state || {tab:abaAtual(), n:0};
+  history.replaceState({...st, tab:abaAtual(), fil:{...fil}}, '', location.pathname + location.search);
+}
+window.addEventListener('popstate', e=>{
+  const st = e.state || {tab:'dashboard', fil:{}, n:0};
+  voltando = true;
+  if(st.fil) Object.assign(fil, st.fil);
+  Object.keys(GRUPOS).forEach(g=>{
+    const G = GRUPOS[g];
+    G.campos.forEach(c=>{ const el = G.els && G.els[c] ? $(G.els[c]) : null; if(el) el.value = fil[c]||''; });
+    G.render();
+  });
+  pintaAba(st.tab || 'dashboard');
+  window.scrollTo({top:0,behavior:'smooth'});
+  atualizaVoltar();
+  voltando = false;
+});
 
 /* ---------------- limpar filtros ---------------- */
 const GRUPOS = {
@@ -1210,16 +1259,63 @@ const GRUPOS = {
   des:{campos:['desDe','desAte','desQ'], els:{desDe:'#filDesDe',desAte:'#filDesAte',desQ:'#filDesBusca'}, render:()=>renderDes()}
 };
 function limpaFiltros(g){
+  setTimeout(guardaFiltros,0);
   const G = GRUPOS[g]; if(!G) return;
   G.campos.forEach(c=>{ fil[c]=''; const el=$(G.els[c]); if(el) el.value=''; });
   G.render();
 }
 function aplicaFiltros(g, vals){
+  setTimeout(guardaFiltros,0);
   const G = GRUPOS[g]; if(!G) return;
   G.campos.forEach(c=>{ fil[c] = vals[c]||''; const el=$(G.els[c]); if(el) el.value=fil[c]; });
   G.render();
 }
 document.querySelectorAll('[data-limpa]').forEach(b=>b.addEventListener('click',()=>limpaFiltros(b.dataset.limpa)));
+
+/* ---------------- balão de explicação ----------------
+   O atributo title do navegador só aparece com o mouse parado em cima,
+   e no celular não existe. Este balão abre no toque e no passar do mouse. */
+const balao = document.createElement('div');
+balao.id = 'balao'; balao.hidden = true; document.body.appendChild(balao);
+let alvoBalao = null;
+function mostraBalao(el){
+  const t = el.getAttribute('data-dica'); if(!t) return;
+  alvoBalao = el;
+  balao.textContent = t; balao.hidden = false;
+  const r = el.getBoundingClientRect();
+  const larg = Math.min(300, window.innerWidth - 24);
+  balao.style.width = larg + 'px';
+  const alt = balao.offsetHeight;
+  let topo = r.bottom + 8;
+  if(topo + alt > window.innerHeight - 8) topo = Math.max(8, r.top - alt - 8);
+  let esq = r.left + r.width/2 - larg/2;
+  esq = Math.max(12, Math.min(esq, window.innerWidth - larg - 12));
+  balao.style.top = topo + 'px'; balao.style.left = esq + 'px';
+}
+function escondeBalao(){ balao.hidden = true; alvoBalao = null; }
+document.addEventListener('click', e=>{
+  const card = e.target.closest('[data-ir]');
+  if(card && !e.target.closest('[data-dica]')){
+    const ir = JSON.parse(card.getAttribute('data-ir'));
+    escondeBalao();
+    if(ir.f) aplicaFiltros(ir.g, ir.f); else if(ir.g) limpaFiltros(ir.g);
+    return goTab(ir.t);
+  }
+  const el = e.target.closest('[data-dica]');
+  if(!el){ if(!e.target.closest('#balao')) escondeBalao(); return; }
+  e.stopPropagation();
+  /* alternar só faz sentido no toque; com mouse o balão já abriu ao passar por cima */
+  const toque = matchMedia('(hover:none)').matches;
+  if(toque && alvoBalao === el) return escondeBalao();
+  mostraBalao(el);
+});
+document.addEventListener('mouseover', e=>{
+  if(matchMedia('(hover:none)').matches) return;      // celular: só no toque
+  const el = e.target.closest('[data-dica]');
+  if(el) mostraBalao(el); else if(!e.target.closest('#balao')) escondeBalao();
+});
+window.addEventListener('scroll', escondeBalao, true);
+window.addEventListener('resize', escondeBalao);
 
 /* ---------------- clientes ---------------- */
 function resumoCliente(nome){
@@ -1523,38 +1619,50 @@ function renderDash(){
   $('#kpi1').innerHTML = [
     kpi('Vendas totais',money(vendas),'azul',`Recebido ${money(recebido)}`,
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
-      +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`),
+      +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
+      {t:'vendas', g:'ven'}),
     kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status==='Pendente').length} em aberto`,
-      `Tudo que está marcado como Pendente, entregue ou não.`),
+      `Tudo que está marcado como Pendente, entregue ou não.`,
+      {t:'vendas', g:'ven', f:{venStat:'Pendente'}}),
     kpi('A receber entregue',money(inad.reduce((s,c)=>s+c.valor,0)),inad.length?'vermelho':'verde',`${inad.length} ${plural(inad.length,'responsável','responsáveis')}`,
       `Só o que já saiu da sua mão e não foi pago — o dinheiro realmente na rua.\n`
-      +`Do total a receber (${money(aReceber)}), ${money(aReceber-inad.reduce((s,c)=>s+c.valor,0))} ainda nem foi entregue.`),
+      +`Do total a receber (${money(aReceber)}), ${money(aReceber-inad.reduce((s,c)=>s+c.valor,0))} ainda nem foi entregue.`,
+      {t:'vendas', g:'ven', f:{venStat:'Pendente', venEnt:'Sim'}}),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
-      +`Não desconta as despesas operacionais (${money(desp)}).`),
+      +`Não desconta as despesas operacionais (${money(desp)}).`,
+      {t:'vendas', g:'ven'}),
     kpi('ROI',pct(roi),roi>=0?'verde':'vermelho',`Investimento ${money0(invest)}`,
       `Retorno sobre o investimento.\n`
       +`(lucro − despesas) ÷ investimento\n`
       +`(${money(lucro)} − ${money(desp)}) ÷ ${money(invest)} = ${pct(roi)}\n`
-      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`)].join('');
+      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`,
+      {t:'compras', g:'com'})].join('');
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
-      +`O valor ${money(valEst)} inclui o que está no parceiro, porque continua sendo seu.`),
+      +`O valor ${money(valEst)} inclui o que está no parceiro, porque continua sendo seu.`,
+      {t:'estoque', g:'est'}),
     kpi('Lucro potencial',money(lucroPot),'verde','estoque próprio',
       `Se você vender todo o estoque pelo preço cadastrado:\n`
       +`(em mãos + consignado) × preço − custo do estoque\n`
-      +`= ${money(lucroPot)}`),
+      +`= ${money(lucroPot)}`, {t:'estoque', g:'est'}),
     kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un',conAtivo.length?'terra':'verde',
-      `${[...new Set(conAtivo.map(c=>c.parceiro))].length} ${plural([...new Set(conAtivo.map(c=>c.parceiro))].length,'parceiro','parceiros')}`),
+      `${[...new Set(conAtivo.map(c=>c.parceiro))].length} ${plural([...new Set(conAtivo.map(c=>c.parceiro))].length,'parceiro','parceiros')}`,
+      'Unidades que estão com parceiros e ainda não foram vendidas nem devolvidas.\nContinuam sendo suas, mas não estão na prateleira.',
+      {t:'consignado', g:'con', f:{conSit:'Em consignação'}}),
     kpi('Compras a caminho',cam.reduce((s,c)=>s+Number(c.qtde),0)+' un',cam.length?'ambar':'verde',money(cam.reduce((s,c)=>s+Number(c.custoTotal),0)),
       `Compras lançadas e ainda não marcadas como recebidas.\n`
-      +`Já saiu do seu bolso, mas ainda não entrou no estoque em mãos.`),
-    kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0))),
+      +`Já saiu do seu bolso, mas ainda não entrou no estoque em mãos.`,
+      {t:'compras', g:'com', f:{comEnt:'Não'}}),
+    kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
+      'Vendas lançadas que ainda não foram entregues.\nSó baixam do estoque quando você marcar como entregue.',
+      {t:'vendas', g:'ven', f:{venEnt:'Não'}}),
     kpi('Testers recebidos',unTes+' un','roxo',money(custoTes),
       `Testers comprados e recebidos. Não entram no estoque de venda,\n`
-      +`mas o custo (${money(custoTes)}) entra no investimento total.`)].join('');
+      +`mas o custo (${money(custoTes)}) entra no investimento total.`,
+      {t:'testers', g:'tes'})].join('');
 
   $('#tInad').innerHTML = inad.length
     ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
@@ -1741,15 +1849,16 @@ function renderDash(){
   const precoRef = data.products.length?data.products.reduce((s,p)=>s+(Number(p.precoVenda)||90),0)/data.products.length:90;
   const unAdd = margem>0?Math.ceil(be/(margem*precoRef)):0;
   $('#lBE').innerHTML = `
-    <li title="${esc(money(invCompras))} em compras + ${esc(money(desp))} em despesas"><span>Investimento total <b class="dica">?</b></span><span class="val">${money(invest)}</span></li>
-    <li title="Soma do lucro de todas as vendas, sem descontar despesas"><span>Lucro bruto acumulado <b class="dica">?</b></span><span class="val">${money(lucro)}</span></li>
-    <li title="investimento − lucro = ${esc(money(invest))} − ${esc(money(lucro))}"><span>Falta para o break-even <b class="dica">?</b></span><span class="val">${money(be)}</span></li>
-    <li title="falta ÷ (margem × preço médio) = ${esc(money(be))} ÷ (${esc(pct(margem))} × ${esc(money(precoRef))})"><span>Unidades adicionais estimadas <b class="dica">?</b></span><span class="val">${unAdd}</span></li>
-    <li title="falta para o break-even − lucro potencial do estoque (${esc(money(lucroPot))})"><span>Falta depois de vender o estoque <b class="dica">?</b></span><span class="val">${money(Math.max(0,be-lucroPot))}</span></li>
+    <li data-dica="${esc(money(invCompras))} em compras + ${esc(money(desp))} em despesas"><span>Investimento total <b class="dica">?</b></span><span class="val">${money(invest)}</span></li>
+    <li data-dica="Soma do lucro de todas as vendas, sem descontar despesas"><span>Lucro bruto acumulado <b class="dica">?</b></span><span class="val">${money(lucro)}</span></li>
+    <li data-dica="investimento − lucro = ${esc(money(invest))} − ${esc(money(lucro))}"><span>Falta para o break-even <b class="dica">?</b></span><span class="val">${money(be)}</span></li>
+    <li data-dica="falta ÷ (margem × preço médio) = ${esc(money(be))} ÷ (${esc(pct(margem))} × ${esc(money(precoRef))})"><span>Unidades adicionais estimadas <b class="dica">?</b></span><span class="val">${unAdd}</span></li>
+    <li data-dica="falta para o break-even − lucro potencial do estoque (${esc(money(lucroPot))})"><span>Falta depois de vender o estoque <b class="dica">?</b></span><span class="val">${money(Math.max(0,be-lucroPot))}</span></li>
     <li class="note">Estimativa pela margem bruta atual e preço médio de venda cadastrado.</li>`;
 }
-const kpi = (l,v,c,s,dica) => `<div class="kpi ${c||''}"${dica?` title="${esc(dica)}"`:''}>`
-  + `<div class="lbl${dica?' temdica':''}">${l}</div><div class="val">${v}</div>`
+const kpi = (l,v,c,s,dica,ir) => `<div class="kpi ${c||''}${ir?' clicavel':''}"${ir?` data-ir='${esc(JSON.stringify(ir))}'`:''}>`
+  + `${dica?`<button class="qm" data-dica="${esc(dica)}" title="como é calculado" aria-label="como é calculado">?</button>`:''}`
+  + `<div class="lbl">${l}</div><div class="val">${v}</div>`
   + `${s?`<div class="sub">${s}</div>`:''}</div>`;
 
 $('#tTes').addEventListener('click', e=>{
@@ -1871,11 +1980,11 @@ function renderCom(){
     ['Valor a caminho', money(cCam.reduce((s,c)=>s+Number(c.custoTotal),0)), cCam.length?'am':'ok']
   ]);
   $('#tCom').innerHTML = rows.length
-    ? `<thead><tr>${chkTodos('com')}${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Tipo','tipo',st,'ctr')}${th('Situação','entregue',st,'ctr')}${th('Qtde','qtde',st,'num')}${th('Custo total','custoTotal',st,'num')}${th('Custo unit.','custoUnit',st,'num')}<th>Obs.</th><th></th></tr></thead><tbody>`+
-      rows.map(c=>`<tr>${chkLinha('com',c.id)}<td>${dt(c.data)}</td><td>${esc(c.produto)}</td><td class="ctr">${bGen(c.genero)}</td><td class="ctr">${bTipo(c.tipo)}</td>
+    ? `<thead><tr>${chkTodos('com')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Tipo','tipo',st,'ctr')}${th('Situação','entregue',st,'ctr')}${th('Qtde','qtde',st,'num')}${th('Custo total','custoTotal',st,'num')}${th('Custo unit.','custoUnit',st,'num')}<th>Obs.</th><th></th></tr></thead><tbody>`+
+      rows.map(c=>`<tr>${chkLinha('com',c.id)}<td class="ctr">${thumb(foto(c.produto),c.produto)}</td><td>${dt(c.data)}</td><td>${esc(c.produto)}</td><td class="ctr">${bGen(c.genero)}</td><td class="ctr">${bTipo(c.tipo)}</td>
         <td class="ctr">${bEntC(c.entregue)}</td><td class="num">${c.qtde}</td><td class="num">${money(c.custoTotal)}</td><td class="num">${money(c.custoUnit)}</td><td>${esc(c.observacao)||'—'}</td>
         <td><div class="rowacts"><button class="btn sm" data-ec="${c.id}">Editar</button><button class="btn sm ghost" data-dc="${c.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="6">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td colspan="3"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td colspan="3"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma compra encontrada.</td></tr></tbody>`;
   renderBulk('com');
 }
@@ -1909,13 +2018,13 @@ function renderVen(){
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
-    ? `<thead><tr>${chkTodos('ven')}${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
-      rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
+    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
+      rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td class="ctr">${thumb(foto(v.produto),v.produto)}</td><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
         <td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td>
         <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
         <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td>
         <td><div class="rowacts"><button class="btn sm" data-ev="${v.id}">Editar</button><button class="btn sm ghost" data-dv="${v.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="6">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
   renderBulk('ven');
 }
@@ -1953,7 +2062,7 @@ function renderEst(){
         <td class="num">${r.aEntregar?`<button class="numlink" data-ent="${esc(r.produto)}">${r.aEntregar}</button>`:'—'}</td>
         <td class="num">${r.consig?`<button class="numlink" data-con="${esc(r.produto)}">${r.consig}</button>`:'—'}</td>
         <td class="num">${r.saldo}</td>
-        <td class="num" title="comprado ${r.recebido+r.caminho} − vendido ${r.vendido+r.aEntregar}  ·  em mãos ${r.saldo} + consignado ${r.consig} + a caminho ${r.caminho} − a entregar ${r.aEntregar}">
+        <td class="num" data-dica="comprado ${r.recebido+r.caminho} − vendido ${r.vendido+r.aEntregar}${'\n'}em mãos ${r.saldo} + consignado ${r.consig} + a caminho ${r.caminho} − a entregar ${r.aEntregar}">
           <b>${r.previsto}</b></td>
         <td class="num op">${money(r.custoMedio)}</td><td class="num op">${money(r.custoEst)}</td><td class="num op">${money(r.lucroPot)}</td>
         <td class="num">${r.ideal}</td><td class="ctr">${bEst(r.status)}</td>
@@ -2007,12 +2116,12 @@ function renderCon(){
 
   const t = rows.reduce((a,r)=>({q:a.q+Number(r.qtde),v:a.v+r.vendida,d:a.d+r.devolvida,s:a.s+r.saldo}),{q:0,v:0,d:0,s:0});
   $('#tCon').innerHTML = rows.length
-    ? `<thead><tr>${chkTodos('con')}${th('Data','data',st)}${th('Parceiro','parceiro',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Tipo','tipo',st,'ctr')}${th('Enviado','qtde',st,'num')}${th('Vendido','vendida',st,'num')}${th('Devolvido','devolvida',st,'num')}${th('No parceiro','saldo',st,'num')}${th('Situação','situacao',st,'ctr')}<th>Obs.</th><th></th></tr></thead><tbody>`+
-      rows.map(c=>`<tr>${chkLinha('con',c.id)}<td>${dt(c.data)}</td><td>${esc(c.parceiro)}</td><td>${esc(c.produto)}</td><td class="ctr">${bGen(c.genero)}</td>
+    ? `<thead><tr>${chkTodos('con')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Parceiro','parceiro',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Tipo','tipo',st,'ctr')}${th('Enviado','qtde',st,'num')}${th('Vendido','vendida',st,'num')}${th('Devolvido','devolvida',st,'num')}${th('No parceiro','saldo',st,'num')}${th('Situação','situacao',st,'ctr')}<th>Obs.</th><th></th></tr></thead><tbody>`+
+      rows.map(c=>`<tr>${chkLinha('con',c.id)}<td class="ctr">${thumb(foto(c.produto),c.produto)}</td><td>${dt(c.data)}</td><td>${esc(c.parceiro)}</td><td>${esc(c.produto)}</td><td class="ctr">${bGen(c.genero)}</td>
         <td class="ctr">${bTipo(c.tipo)}</td><td class="num">${c.qtde}</td><td class="num">${c.vendida||'—'}</td>
         <td class="num">${c.devolvida||'—'}</td><td class="num">${c.saldo}</td><td class="ctr">${bCon(c.situacao)}</td><td>${esc(c.observacao)||'—'}</td>
         <td><div class="rowacts"><button class="btn sm" data-ecn="${c.id}">Editar</button><button class="btn sm ghost" data-dcn="${c.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="6">Total</td><td class="num">${t.q}</td><td class="num">${t.v}</td><td class="num">${t.d}</td><td class="num">${t.s}</td><td colspan="3"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${t.q}</td><td class="num">${t.v}</td><td class="num">${t.d}</td><td class="num">${t.s}</td><td colspan="3"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma consignação lançada. Use o formulário acima para registrar o que está na barbearia.</td></tr></tbody>`;
   renderBulk('con');
 }
@@ -2773,7 +2882,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'erp-9 · 17/08';
+const VERSAO = 'voltar-2 · 19/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
@@ -3144,6 +3253,7 @@ function nvBotoes(){
     }
   }
 }
+$('#btnVoltar').addEventListener('click', ()=>history.back());
 $('#btnNuvem').addEventListener('click', ()=>{
   $('#nvVersao').textContent = VERSAO;
   if(!NV.url && NV_URL_FIXA){ NV.set('url',NV_URL_FIXA); NV.set('key',NV_KEY_FIXA); }
@@ -3543,6 +3653,8 @@ const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
 if(paramC){ abreVitrine(qs.get('c')||''); } else {
 load(); renderAll();
 $('#comData').value = hoje(); $('#venData').value = hoje(); $('#desData').value = hoje();
+history.replaceState({tab:'dashboard', fil:{...fil}, n:0}, '', location.pathname + location.search);
+atualizaVoltar();
 retomaAuto().then(avisoBackup);
 nvBotoes();
 if(nvLigado()){ nvStatus('ok','conectado'); nvRenovar().finally(()=>nvSincronizar(true)); }
