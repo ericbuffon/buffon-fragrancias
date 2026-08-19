@@ -28,6 +28,7 @@
   --terra:#8A5330;    --terra-luz:#F2E1D5;
 }
 *{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:clip}
 body{margin:0;font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--paper);color:var(--ink);
   font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums;padding-bottom:3rem}
 h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:600;margin:0}
@@ -100,6 +101,8 @@ main,section,.twrap,.card,.kpis{min-width:0;max-width:100%}
 .kpi.verde{border-left-color:var(--verde)} .kpi.ambar{border-left-color:var(--ambar)}
 .kpi.vermelho{border-left-color:var(--vermelho)} .kpi.azul{border-left-color:var(--azul)}
 .kpi.roxo{border-left-color:var(--roxo)} .kpi.terra{border-left-color:var(--terra)}
+.kpi[title]{cursor:help}
+.kpi .lbl.temdica::after{content:' ?';font-weight:700;opacity:.45}
 .kpi .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:5px}
 .kpi .val{font-family:'Fraunces',serif;font-size:21px;font-weight:600}
 .kpi .sub{font-size:11.5px;color:var(--ink-faint);margin-top:3px}
@@ -109,8 +112,9 @@ button.kpi *{pointer-events:none}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.1rem 1.25rem;margin-bottom:1.2rem}
 .card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:11px}
-.two-col{display:grid;grid-template-columns:1.25fr 1fr;gap:1.2rem;align-items:start}
-@media(max-width:880px){.two-col{grid-template-columns:1fr}}
+.two-col{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:1.2rem;align-items:start}
+.two-col>*{min-width:0}
+@media(max-width:880px){.two-col{grid-template-columns:minmax(0,1fr)}}
 
 .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;align-items:end}
 .field label{display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:4px}
@@ -253,6 +257,8 @@ ul.simple{list-style:none;margin:0;padding:0}
 ul.simple li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 ul.simple li:last-child{border-bottom:none}
 ul.simple .val{font-weight:600;white-space:nowrap}
+ul.simple li[title]{cursor:help}
+.dica{font-weight:700;color:var(--ink-faint);font-size:11px;vertical-align:super}
 ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-weight:600}
 .note{font-size:11px;color:var(--ink-faint);padding-top:7px;line-height:1.5}
 .numlink{background:none;border:none;padding:0;font:inherit;color:var(--accent-ink);cursor:pointer;
@@ -1513,20 +1519,42 @@ function renderDash(){
   const conAtivo = data.consignments.filter(c=>saldoCon(c)>0);
   const inad = inadimplentes();
 
+  const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   $('#kpi1').innerHTML = [
-    kpi('Vendas totais',money(vendas),'azul',`Recebido ${money(recebido)}`),
-    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status==='Pendente').length} em aberto`),
-    kpi('A receber entregue',money(inad.reduce((s,c)=>s+c.valor,0)),inad.length?'vermelho':'verde',`${inad.length} ${plural(inad.length,'responsável','responsáveis')}`),
-    kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`),
-    kpi('ROI',pct(roi),roi>=0?'verde':'vermelho',`Investimento ${money0(invest)}`)].join('');
+    kpi('Vendas totais',money(vendas),'azul',`Recebido ${money(recebido)}`,
+      `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
+      +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`),
+    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status==='Pendente').length} em aberto`,
+      `Tudo que está marcado como Pendente, entregue ou não.`),
+    kpi('A receber entregue',money(inad.reduce((s,c)=>s+c.valor,0)),inad.length?'vermelho':'verde',`${inad.length} ${plural(inad.length,'responsável','responsáveis')}`,
+      `Só o que já saiu da sua mão e não foi pago — o dinheiro realmente na rua.\n`
+      +`Do total a receber (${money(aReceber)}), ${money(aReceber-inad.reduce((s,c)=>s+c.valor,0))} ainda nem foi entregue.`),
+    kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
+      `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
+      +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
+      +`Não desconta as despesas operacionais (${money(desp)}).`),
+    kpi('ROI',pct(roi),roi>=0?'verde':'vermelho',`Investimento ${money0(invest)}`,
+      `Retorno sobre o investimento.\n`
+      +`(lucro − despesas) ÷ investimento\n`
+      +`(${money(lucro)} − ${money(desp)}) ÷ ${money(invest)} = ${pct(roi)}\n`
+      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`)].join('');
   $('#kpi2').innerHTML = [
-    kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`),
-    kpi('Lucro potencial',money(lucroPot),'verde','estoque próprio'),
+    kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
+      `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
+      +`O valor ${money(valEst)} inclui o que está no parceiro, porque continua sendo seu.`),
+    kpi('Lucro potencial',money(lucroPot),'verde','estoque próprio',
+      `Se você vender todo o estoque pelo preço cadastrado:\n`
+      +`(em mãos + consignado) × preço − custo do estoque\n`
+      +`= ${money(lucroPot)}`),
     kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un',conAtivo.length?'terra':'verde',
       `${[...new Set(conAtivo.map(c=>c.parceiro))].length} ${plural([...new Set(conAtivo.map(c=>c.parceiro))].length,'parceiro','parceiros')}`),
-    kpi('Compras a caminho',cam.reduce((s,c)=>s+Number(c.qtde),0)+' un',cam.length?'ambar':'verde',money(cam.reduce((s,c)=>s+Number(c.custoTotal),0))),
+    kpi('Compras a caminho',cam.reduce((s,c)=>s+Number(c.qtde),0)+' un',cam.length?'ambar':'verde',money(cam.reduce((s,c)=>s+Number(c.custoTotal),0)),
+      `Compras lançadas e ainda não marcadas como recebidas.\n`
+      +`Já saiu do seu bolso, mas ainda não entrou no estoque em mãos.`),
     kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0))),
-    kpi('Testers recebidos',unTes+' un','roxo',money(custoTes))].join('');
+    kpi('Testers recebidos',unTes+' un','roxo',money(custoTes),
+      `Testers comprados e recebidos. Não entram no estoque de venda,\n`
+      +`mas o custo (${money(custoTes)}) entra no investimento total.`)].join('');
 
   $('#tInad').innerHTML = inad.length
     ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
@@ -1713,14 +1741,16 @@ function renderDash(){
   const precoRef = data.products.length?data.products.reduce((s,p)=>s+(Number(p.precoVenda)||90),0)/data.products.length:90;
   const unAdd = margem>0?Math.ceil(be/(margem*precoRef)):0;
   $('#lBE').innerHTML = `
-    <li><span>Investimento total</span><span class="val">${money(invest)}</span></li>
-    <li><span>Lucro bruto acumulado</span><span class="val">${money(lucro)}</span></li>
-    <li><span>Falta para o break-even</span><span class="val">${money(be)}</span></li>
-    <li><span>Unidades adicionais estimadas</span><span class="val">${unAdd}</span></li>
-    <li><span>Falta depois de vender o estoque</span><span class="val">${money(Math.max(0,be-lucroPot))}</span></li>
+    <li title="${esc(money(invCompras))} em compras + ${esc(money(desp))} em despesas"><span>Investimento total <b class="dica">?</b></span><span class="val">${money(invest)}</span></li>
+    <li title="Soma do lucro de todas as vendas, sem descontar despesas"><span>Lucro bruto acumulado <b class="dica">?</b></span><span class="val">${money(lucro)}</span></li>
+    <li title="investimento − lucro = ${esc(money(invest))} − ${esc(money(lucro))}"><span>Falta para o break-even <b class="dica">?</b></span><span class="val">${money(be)}</span></li>
+    <li title="falta ÷ (margem × preço médio) = ${esc(money(be))} ÷ (${esc(pct(margem))} × ${esc(money(precoRef))})"><span>Unidades adicionais estimadas <b class="dica">?</b></span><span class="val">${unAdd}</span></li>
+    <li title="falta para o break-even − lucro potencial do estoque (${esc(money(lucroPot))})"><span>Falta depois de vender o estoque <b class="dica">?</b></span><span class="val">${money(Math.max(0,be-lucroPot))}</span></li>
     <li class="note">Estimativa pela margem bruta atual e preço médio de venda cadastrado.</li>`;
 }
-const kpi = (l,v,c,s) => `<div class="kpi ${c||''}"><div class="lbl">${l}</div><div class="val">${v}</div>${s?`<div class="sub">${s}</div>`:''}</div>`;
+const kpi = (l,v,c,s,dica) => `<div class="kpi ${c||''}"${dica?` title="${esc(dica)}"`:''}>`
+  + `<div class="lbl${dica?' temdica':''}">${l}</div><div class="val">${v}</div>`
+  + `${s?`<div class="sub">${s}</div>`:''}</div>`;
 
 $('#tTes').addEventListener('click', e=>{
   const b=e.target.closest('[data-tcon]'); if(!b) return;
@@ -2323,9 +2353,9 @@ $('#fDes').addEventListener('submit',e=>{
     valor:Number($('#desVal').value)||0,observacao:$('#desObs').value.trim()};
   if(edit.des){ const i=data.expenses.findIndex(d=>d.id===edit.des); data.expenses[i]={...data.expenses[i],...payload}; cancDes(); }
   else data.expenses.push({id:uid(),...payload});
-  $('#fDes').reset(); save(); renderAll();
+  $('#fDes').reset(); $('#desData').value=hoje(); save(); renderAll();
 });
-function cancDes(){ edit.des=null; $('#fDes').reset(); $('#tDesForm').textContent='Nova despesa';
+function cancDes(){ edit.des=null; $('#fDes').reset(); $('#desData').value=hoje(); $('#tDesForm').textContent='Nova despesa';
   $('#bDes').textContent='Adicionar despesa'; $('#cancDes').hidden=true; }
 $('#cancDes').addEventListener('click',cancDes);
 $('#tDes').addEventListener('click',e=>{
@@ -2743,7 +2773,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'erp-5 · 17/08';
+const VERSAO = 'erp-7 · 17/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
@@ -3512,7 +3542,7 @@ const qs = new URLSearchParams(location.search);
 const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
 if(paramC){ abreVitrine(qs.get('c')||''); } else {
 load(); renderAll();
-$('#comData').value = hoje(); $('#venData').value = hoje();
+$('#comData').value = hoje(); $('#venData').value = hoje(); $('#desData').value = hoje();
 retomaAuto().then(avisoBackup);
 nvBotoes();
 if(nvLigado()){ nvStatus('ok','conectado'); nvRenovar().finally(()=>nvSincronizar(true)); }
