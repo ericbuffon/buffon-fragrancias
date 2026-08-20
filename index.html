@@ -2053,10 +2053,17 @@ function renderEst(){
     {rc:0,cm:0,vd:0,ae:0,cg:0,sl:0,pv:0,ce:0,lp:0,cp:0});
   t.cmed = t.sl+t.cg ? t.ce/(t.sl+t.cg) : 0;
   resumo('resEst', [
-    ['Em mãos', t.sl+' un'],
-    ['Saldo', t.pv+' un'],
-    ['A caminho', t.cm+' un', t.cm?'am':''],
-    ['Consignado', t.cg+' un', t.cg?'am':''],
+    ['Em mãos', t.sl+' un', '',
+      'O que está fisicamente com você.\nrecebido − vendido e entregue − consignado'],
+    ['+ Consignado', t.cg+' un', t.cg?'am':'',
+      'Está com o parceiro e ainda não foi vendido nem devolvido.\nContinua sendo seu.'],
+    ['+ A caminho', t.cm+' un', t.cm?'am':'',
+      'Comprado e ainda não recebido. Já pagou, mas não chegou.'],
+    ['− A entregar', t.ae+' un', t.ae?'am':'',
+      'Vendido e ainda não entregue. Está com você, mas já tem dono —\npor isso sai da conta do saldo.'],
+    ['= Saldo', t.pv+' un', '',
+      `${t.sl} em mãos + ${t.cg} consignado + ${t.cm} a caminho − ${t.ae} a entregar = ${t.pv}\n`
+      +`Outro caminho: tudo que comprou (${t.rc+t.cm}) − tudo que vendeu (${t.vd+t.ae}) = ${t.pv}`],
     ['Custo do estoque', money(t.ce)],
     ['Lucro potencial', money(t.lp), 'ok'],
     ['A repor', rows.filter(r=>r.status==='REPOR').length, rows.filter(r=>r.status==='REPOR').length?'al':'ok']
