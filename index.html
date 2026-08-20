@@ -63,6 +63,8 @@ nav.tabs{display:flex;gap:7px;padding:.7rem 1.1rem;background:var(--card);
 @media(min-width:960px){
   body{display:grid;grid-template-columns:228px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
     min-height:100vh;padding-bottom:0}
+  /* no link público não existe menu lateral: a vitrine ocupa a página toda */
+  body.publico{display:block}
   header.top{grid-column:1/-1;padding:.9rem 1.6rem}
   nav.tabs{grid-column:1;grid-row:2;flex-direction:column;flex-wrap:nowrap;gap:2px;
     padding:1rem .8rem 2rem;border-bottom:none;border-right:1px solid var(--line);
@@ -1377,6 +1379,17 @@ const contaProvador = itens => {
   const com = itens.filter(temProvador).length;
   return {com, todos: com===itens.length && com>0, algum: com>0};
 };
+/* Mensagem única do catálogo: manda o link publicado quando existe,
+   e cai para a lista em texto quando ainda não há link no ar. */
+function mensagemCatalogo(){
+  const id = data.config && data.config.catalogoId;
+  if(id && NV.url && NV.key){
+    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — perfumes La Rive.\n`
+      + `Dá para ver as fotos e as notas de cada fragrância aqui:\n${linkPublico(id)}\n\n`
+      + `Qualquer dúvida é só me chamar.`;
+  }
+  return textoCatalogo('');
+}
 function textoCatalogo(genero){
   const est = {}; estoque().forEach(r=>est[r.produto]=r.saldo+r.consig);
   /* manda o catálogo inteiro: o que não está em casa vai como encomenda,
@@ -1496,9 +1509,7 @@ function abreFicha(id){
 
   $('#fichaCat').onclick = ()=>{
     if(!precisaTel()) return;
-    const g = confirm('Mandar só as fragrâncias do gênero que ele costuma comprar?\n\nOK = só um gênero · Cancelar = catálogo completo')
-      ? (r.vendas.length ? (gen(r.vendas[0].produto)||'') : '') : '';
-    window.open(linkZap(cli, textoCatalogo(g)), '_blank');
+    window.open(linkZap(cli, mensagemCatalogo()), '_blank');
   };
 
   const dias = diasSemComprar(r);
@@ -2674,10 +2685,7 @@ $('#catCopiar').addEventListener('click', async ()=>{
   setTimeout(()=>b.textContent='Copiar link', 2500);
 });
 $('#catZap').addEventListener('click', ()=>{
-  const t = `Oi! Esse é o catálogo da *Buffon Fragrâncias* — perfumes La Rive.\n`
-    + `Dá para ver as fotos e as notas de cada fragrância aqui:\n${$('#catLink').value}\n\n`
-    + `Qualquer dúvida é só me chamar.`;
-  window.open('https://wa.me/?text='+encodeURIComponent(t), '_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(mensagemCatalogo()), '_blank');
 });
 $('#catAbrir').addEventListener('click', ()=>window.open($('#catLink').value,'_blank'));
 $('#catTirar').addEventListener('click', async ()=>{
@@ -2873,7 +2881,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'texto-1 · 20/08';
+const VERSAO = 'vitrine-pc · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
