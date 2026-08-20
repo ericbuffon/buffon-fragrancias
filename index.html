@@ -478,6 +478,18 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   <div class="sec-head"><h2>Visão geral</h2><p>Tudo recalculado a cada lançamento.</p></div>
   <div class="kpis" id="kpi1"></div>
   <div class="kpis" id="kpi2"></div>
+  <div class="card">
+        <div class="card-title">Sugestão de compra
+          <select id="sugHoriz" style="width:auto;display:inline-block;margin-left:10px;padding:3px 8px;font-size:12px">
+            <option value="30">cobrir 30 dias</option>
+            <option value="45">cobrir 45 dias</option>
+            <option value="60" selected>cobrir 60 dias</option>
+            <option value="90">cobrir 90 dias</option>
+          </select></div>
+        <div class="twrap" style="max-height:none"><table id="tSug"></table></div>
+        <p class="note" id="sugNota"></p>
+      </div>
+
   <div class="two-col">
     <div>
       <div class="card"><div class="card-title">A receber — entregue e não pago</div>
@@ -486,7 +498,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
       </div>
       <div class="card"><div class="card-title">Situação do estoque</div>
         <div class="kpis" id="kpiEst" style="margin-bottom:0"></div>
-        <p class="note">Clique em uma situação para abrir a lista filtrada. "Repor" já desconta o que está a caminho.</p>
+        <p class="note">Clique em uma situação para abrir a lista filtrada. O estoque sugerido vem do ritmo de venda, e "Repor" já desconta o que está a caminho e o consignado.</p>
       </div>
       <div class="card"><div class="card-title">Resultado por mês</div>
         <div class="twrap"><table id="tMes"></table></div>
@@ -517,7 +529,6 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
         <div class="field"><label for="pInsp">Inspiração</label><input id="pInsp"></div>
         <div class="field"><label for="pMarca">Marca da inspiração</label><input id="pMarca" placeholder="Ex.: Dior"></div>
         <div class="field"><label for="pGen">Gênero</label><select id="pGen"><option>Masculino</option><option>Feminino</option></select></div>
-        <div class="field"><label for="pIdeal">Estoque ideal</label><input type="number" id="pIdeal" min="0" step="1" value="1"></div>
         <div class="field"><label for="pPreco">Preço de venda (R$)</label><input type="number" id="pPreco" min="0" step="0.01" value="90"></div>
       </div>
       <div class="fgrid" style="margin-top:10px">
@@ -686,11 +697,11 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 </section>
 
 <section id="sec-estoque">
-  <div class="sec-head"><h2>Estoque</h2><p><b>Em mãos</b> é o que está fisicamente com você: recebido − vendido e entregue − consignado. <b>Saldo</b> é a posição total: tudo que você comprou menos tudo que vendeu, incluindo o que está a caminho, consignado ou ainda por entregar. É o Saldo que define a situação e a quantidade a comprar.</p></div>
+  <div class="sec-head"><h2>Estoque</h2><p><b>Estoque sugerido</b> = o que as vendas dos últimos 90 dias pedem para o período escolhido no dashboard — nada é digitado à mão. <b>Em mãos</b> é o que está fisicamente com você: recebido − vendido e entregue − consignado. <b>Saldo</b> é a posição total: tudo que comprou menos tudo que vendeu, incluindo o que está a caminho, consignado ou por entregar. A situação e a coluna Comprar saem da diferença entre o sugerido e o saldo.</p></div>
   <div class="resumo" id="resEst"></div>
   <div class="filters">
     <select id="filEstGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
-    <select id="filEstStat"><option value="">Toda situação</option><option value="REPOR">Repor</option><option value="NORMAL">Normal</option><option value="EXCESSO">Excesso</option></select>
+    <select id="filEstStat"><option value="">Toda situação</option><option value="REPOR">Repor</option><option value="NORMAL">Normal</option><option value="EXCESSO">Excesso</option><option value="NOVO">Novo no catálogo</option></select>
     <input id="filEstBusca" placeholder="Buscar produto…">
     <label class="chk" style="display:flex;align-items:center;gap:6px;font-size:12.5px;white-space:nowrap">
       <input type="checkbox" id="estCompacto" style="width:auto"> Menos colunas</label>
@@ -1053,6 +1064,21 @@ const modoProvador = p => (p.temTester==='sim'||p.temTester==='nao') ? 'manual' 
 const consignadoAtivo = (nome,tipo) => data.consignments
   .filter(c=>c.produto===nome && c.tipo===tipo).reduce((s,c)=>s+saldoCon(c),0);
 
+let HORIZ = Number(localStorage.getItem('perfumes.horiz')||60);
+const JANELA_DEM = 90;
+/* unidades vendidas por dia nos últimos 90 dias */
+function ritmoDia(nome){
+  const corte = Date.now() - JANELA_DEM*86400000;
+  const un = data.sales.filter(v=>v.produto===nome && v.data &&
+    Date.parse(v.data+'T00:00:00') >= corte).reduce((s,v)=>s+Number(v.qtde),0);
+  return un / JANELA_DEM;
+}
+/* Quando o produto entrou no catálogo — usamos a compra mais antiga como referência */
+function entrouEm(nome){
+  const d = data.purchases.filter(c=>c.produto===nome && c.data).map(c=>c.data).sort()[0];
+  return d ? Date.parse(d+'T00:00:00') : null;
+}
+const DIAS_NOVO = 90;
 function estoque(){
   return data.products.map(p=>{
     const lac = data.purchases.filter(c=>c.produto===p.nome && c.tipo==='Lacrado');
@@ -1064,14 +1090,26 @@ function estoque(){
     const consig = consignadoAtivo(p.nome,'Lacrado');
     const saldo = Math.max(0, recebido - vendido - consig);
     const cm = custoMedio(p.nome), preco = Number(p.precoVenda)||90;
-    const custoEst = (saldo+consig)*cm, ideal = Number(p.estoqueIdeal)||0;
+    const custoEst = (saldo+consig)*cm;
     /* previsto considera o que já está comprado (a caminho) e o que está consignado,
        e desconta o que já foi vendido mas ainda não entregue */
     const previsto = saldo + consig + caminho - aEntregar;
+    /* O estoque sugerido vem só do histórico de vendas — nada digitado à mão. */
+    const porDia = ritmoDia(p.nome);
+    const necessidade = Math.ceil(porDia * HORIZ);
+    const comprar = necessidade - previsto;
+    /* Produto recém-incluído e ainda sem venda não é excesso: é catálogo novo,
+       que precisa de tempo para mostrar giro. */
+    const entrada = entrouEm(p.nome);
+    const nuncaVendeu = !data.sales.some(v=>v.produto===p.nome);
+    const novo = nuncaVendeu && entrada !== null &&
+                 (Date.now() - entrada) <= DIAS_NOVO*86400000;
     return {produto:p.nome,genero:p.genero,recebido,caminho,vendido,aEntregar,consig,saldo,previsto,
-      custoMedio:cm,custoEst,lucroPot:(saldo+consig)*preco-custoEst,ideal,
-      status: previsto<ideal?'REPOR':(previsto>ideal?'EXCESSO':'NORMAL'),
-      comprar: ideal-previsto};        /* negativo = sobra */
+      custoMedio:cm,custoEst,lucroPot:(saldo+consig)*preco-custoEst,
+      porDia, necessidade,
+      novo, diasCatalogo: entrada===null?null:Math.floor((Date.now()-entrada)/86400000),
+      status: novo?'NOVO':(comprar>0?'REPOR':(comprar<0?'EXCESSO':'NORMAL')),
+      comprar: novo?0:comprar};        /* negativo = sobra */
   });
 }
 /* só testers já recebidos */
@@ -1093,7 +1131,9 @@ const bTipo  = v => v==='Tester'?'<span class="badge roxo">Tester</span>':'<span
 const bEntC  = v => v==='Não'?'<span class="badge ambar">A caminho</span>':'<span class="badge verde">Recebida</span>';
 const bPag   = v => v==='Pendente'?'<span class="badge vermelho">Pendente</span>':'<span class="badge teal">Pago</span>';
 const bEntV  = v => v==='Não'?'<span class="badge laranja">Não entregue</span>':'<span class="badge oliva">Entregue</span>';
-const bEst   = v => v==='REPOR'?'<span class="badge vermelho">Repor</span>':v==='EXCESSO'?'<span class="badge ambar">Excesso</span>':'<span class="badge verde">Normal</span>';
+const bEst   = v => v==='REPOR'?'<span class="badge vermelho">Repor</span>'
+  : v==='NOVO'?'<span class="badge azul">Novo</span>'
+  : v==='EXCESSO'?'<span class="badge ambar">Excesso</span>':'<span class="badge verde">Normal</span>';
 const bCon   = v => v==='Encerrada'?'<span class="badge teal">Encerrada</span>':'<span class="badge terra">Em consignação</span>';
 const bSitT  = v => v==='Bonificado'?'<span class="badge ambar">Bonificado</span>':'<span class="badge verde">Com custo</span>';
 const thumb  = (src,alt) => src?`<img class="thumb" src="${src}" alt="${esc(alt)}" data-zoom="${esc(alt)}">`:`<div class="thumb-none" title="Sem foto">·</div>`;
@@ -1591,6 +1631,62 @@ $('#tCanal').addEventListener('click', e=>{
   aplicaFiltros('ven', {venCanal:b.dataset.canal}); goTab('vendas');
 });
 
+/* ---------------- sugestão de compra ----------------
+   Estatística sobre os seus dados: ritmo de venda dos últimos 90 dias,
+   posição atual e quantos dias você quer cobrir. Sem adivinhação. */
+function renderSugestao(est){
+  const dias = Number(($('#sugHoriz')||{}).value || 60);
+  const hoje = Date.now(), JANELA = 90;
+  const corte = hoje - JANELA*86400000;
+
+  const vendasRecentes = {};
+  data.sales.filter(v=>v.data && Date.parse(v.data+'T00:00:00') >= corte)
+    .forEach(v=>{ vendasRecentes[v.produto] = (vendasRecentes[v.produto]||0) + Number(v.qtde); });
+  const vendasTotais = {};
+  data.sales.forEach(v=>{ vendasTotais[v.produto] = (vendasTotais[v.produto]||0) + Number(v.qtde); });
+
+  const linhas = est.map(r=>{
+    const un90 = vendasRecentes[r.produto] || 0;
+    const cobertura = r.porDia > 0 ? r.previsto / r.porDia : (r.previsto > 0 ? Infinity : 0);
+    const comprar = Math.max(0, r.comprar);              // mesmo número da aba Estoque
+    return {...r, un90, cobertura, comprar,
+      custo: comprar * (r.custoMedio || 0),
+      semGiro: !vendasTotais[r.produto]};
+  });
+
+  const comprar = linhas.filter(l=>l.comprar > 0)
+    .sort((a,b)=> (a.cobertura - b.cobertura) || (b.un90 - a.un90));
+  const parados = linhas.filter(l=>l.semGiro && l.previsto > 0 && !l.novo);
+  const novos = linhas.filter(l=>l.novo);
+  const total = comprar.reduce((s,l)=>s+l.custo, 0);
+
+  $('#tSug').innerHTML = comprar.length
+    ? `<thead><tr><th>Produto</th><th class="num">Vendeu 90d</th><th class="num">Por mês</th>`
+      + `<th class="num">Saldo</th><th class="num">Sugerido</th><th class="num">Cobre</th><th class="num">Comprar</th><th class="num">Custo</th></tr></thead><tbody>`
+      + comprar.slice(0,12).map(l=>`<tr>
+          <td>${esc(l.produto)}${l.previsto<=0?' <span class="badge vermelho">zerado</span>':''}</td>
+          <td class="num">${l.un90} un</td>
+          <td class="num">${(l.porDia*30).toFixed(1)}</td>
+          <td class="num">${l.previsto}</td>
+          <td class="num">${l.necessidade}</td>
+          <td class="num">${l.cobertura===Infinity?'—':Math.round(l.cobertura)+' d'}</td>
+          <td class="num"><b>${l.comprar}</b></td>
+          <td class="num">${money(l.custo)}</td></tr>`).join('')
+      + `</tbody><tfoot><tr><td colspan="6">Total sugerido</td>`
+      + `<td class="num">${comprar.reduce((s,l)=>s+l.comprar,0)}</td>`
+      + `<td class="num">${money(total)}</td></tr></tfoot>`
+    : `<tbody><tr><td class="empty">Nada a repor para cobrir ${dias} dias no ritmo atual.</td></tr></tbody>`;
+
+  $('#sugNota').innerHTML = `Ritmo medido nos últimos 90 dias de vendas com data. `
+    + `<b>Estoque sugerido</b> = ritmo de venda × ${dias} dias. `
+    + `"Cobre" é quantos dias o saldo dura no ritmo atual — quanto menor, mais urgente. `
+    + `É o mesmo número da coluna Comprar da aba Estoque.`
+    + (novos.length ? `<br><b>${novos.length} ${plural(novos.length,'produto novo','produtos novos')} no catálogo</b> ainda sem histórico de venda — sem sugestão até criarem giro.` : '')
+    + (parados.length ? `<br><b>Não sugerido:</b> ${parados.length} ${plural(parados.length,'produto','produtos')} com estoque, no catálogo há mais de ${DIAS_NOVO} dias e sem nenhuma venda`
+        + ` (${money(parados.reduce((s,l)=>s+l.previsto*l.custoMedio,0))} parados). Antes de comprar mais, vale escoar esses.` : '')
+    + `<br><i>Isto é estatística sobre o seu histórico, não previsão. Você conhece o cliente; o número é só o ponto de partida.</i>`;
+}
+
 /* ---------------- dashboard ---------------- */
 /* Agrupa por quem responde pelo dinheiro: o comprador nas vendas diretas,
    o canal quando quem vendeu foi a barbearia ou outra pessoa. */
@@ -1798,7 +1894,7 @@ function renderDash(){
   // ----- dinheiro parado: estoque sem giro -----
   const ultimaVenda = {};
   data.sales.filter(v=>v.data).forEach(v=>{ if(!ultimaVenda[v.produto]||v.data>ultimaVenda[v.produto]) ultimaVenda[v.produto]=v.data; });
-  const parados = est.filter(r=>r.saldo+r.consig>0).map(r=>{
+  const parados = est.filter(r=>r.saldo+r.consig>0 && !r.novo).map(r=>{
     const u = ultimaVenda[r.produto];
     return {...r, dias: u ? Math.floor((Date.now()-Date.parse(u+'T00:00:00'))/86400000) : null,
             valor: (r.saldo+r.consig)*r.custoMedio};
@@ -1808,8 +1904,11 @@ function renderDash(){
     ? `<li><span>Produtos sem giro</span><span class="val">${parados.length} de ${est.filter(r=>r.saldo+r.consig>0).length}</span></li>`
       + `<li><span>Custo empatado</span><span class="val" style="color:var(--vermelho)">${money(totParado)}</span></li>`
       + parados.slice(0,5).map(r=>`<li><span>${esc(r.produto)}</span><span class="val">${money(r.valor)} · ${r.dias===null?'nunca vendeu':r.dias+' d'}</span></li>`).join('')
-      + `<li class="note">Com estoque e sem venda há 45 dias ou mais. É o capital que não está girando.</li>`
+      + `<li class="note">Com estoque e sem venda há 45 dias ou mais. Produtos novos no catálogo (até ${DIAS_NOVO} dias) ficam de fora.</li>`
     : `<li><span class="empty">Tudo com estoque teve venda nos últimos 45 dias.</span></li>`;
+
+  // ----- sugestão de compra a partir do histórico -----
+  renderSugestao(est);
 
   // ----- curva ABC: quais produtos concentram o faturamento -----
   const fatProd = {};
@@ -1926,7 +2025,7 @@ function renderProd(){
     ['Preço médio', money(rows.length?rows.reduce((s,p)=>s+Number(p.precoVenda),0)/rows.length:0)]
   ]);
   $('#tProd').innerHTML = rows.length
-    ? `<thead><tr>${th('Foto','temFoto',st,'ctr')}${th('Produto','nome',st)}${th('Inspiração','inspiracao',st)}${th('Família','familia',st)}${th('Provador','provador',st,'ctr')}${th('Gênero','genero',st,'ctr')}${th('Ideal','estoqueIdeal',st,'num')}${th('Preço','precoVenda',st,'num')}<th></th></tr></thead><tbody>`+
+    ? `<thead><tr>${th('Foto','temFoto',st,'ctr')}${th('Produto','nome',st)}${th('Inspiração','inspiracao',st)}${th('Família','familia',st)}${th('Provador','provador',st,'ctr')}${th('Gênero','genero',st,'ctr')}${th('Preço','precoVenda',st,'num')}<th></th></tr></thead><tbody>`+
       rows.map(p=>`<tr><td class="ctr">${thumb(p.foto,p.nome)}</td><td>${esc(p.nome)}</td>
         <td><div class="inspcell">${thumb(p.fotoInsp,'Inspiração de '+p.nome)}<span>${esc(p.inspiracao)||'—'}</span></div></td>
         <td>${esc(p.familia)||'—'}</td>
@@ -1935,7 +2034,7 @@ function renderProd(){
           : (modoProvador(p)==='auto' && testerAcaminho(p.nome)
               ? `<span class="badge ambar">A caminho</span>`
               : `<span class="badge cinza">Não</span>`)}${modoProvador(p)==='manual'?' <span class="badge cinza">fixo</span>':''}</td>
-        <td class="ctr">${bGen(p.genero)}</td><td class="num">${p.estoqueIdeal}</td><td class="num">${money(p.precoVenda)}</td>
+        <td class="ctr">${bGen(p.genero)}</td><td class="num">${money(p.precoVenda)}</td>
         <td><div class="rowacts"><button class="btn sm" data-ep="${p.id}">Editar</button><button class="btn sm ghost" data-dp="${p.id}">Excluir</button></div></td></tr>`).join('')+`</tbody>`
     : `<tbody><tr><td class="empty">Nenhum produto encontrado.</td></tr></tbody>`;
   const bytes = data.products.reduce((s,p)=>s+(p.foto?p.foto.length:0)+(p.fotoInsp?p.fotoInsp.length:0),0);
@@ -2076,7 +2175,7 @@ function renderEst(){
     ['A repor', rows.filter(r=>r.status==='REPOR').length, rows.filter(r=>r.status==='REPOR').length?'al':'ok']
   ]);
   $('#tEst').innerHTML = rows.length
-    ? `<thead><tr><th class="ctr">Foto</th>${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr op')}${th('Recebido','recebido',st,'num op')}${th('A caminho','caminho',st,'num')}${th('Vendido','vendido',st,'num op')}${th('A entregar','aEntregar',st,'num')}${th('Consignado','consig',st,'num')}${th('Em mãos','saldo',st,'num')}${th('Saldo','previsto',st,'num')}${th('Custo médio','custoMedio',st,'num op')}${th('Custo estoque','custoEst',st,'num op')}${th('Lucro potencial','lucroPot',st,'num op')}${th('Ideal','ideal',st,'num')}${th('Situação','status',st,'ctr')}${th('Comprar','comprar',st,'num')}</tr></thead><tbody>`+
+    ? `<thead><tr><th class="ctr">Foto</th>${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr op')}${th('Recebido','recebido',st,'num op')}${th('A caminho','caminho',st,'num')}${th('Vendido','vendido',st,'num op')}${th('A entregar','aEntregar',st,'num')}${th('Consignado','consig',st,'num')}${th('Em mãos','saldo',st,'num')}${th('Saldo','previsto',st,'num')}${th('Custo médio','custoMedio',st,'num op')}${th('Custo estoque','custoEst',st,'num op')}${th('Lucro potencial','lucroPot',st,'num op')}${th('Sugerido','necessidade',st,'num')}${th('Situação','status',st,'ctr')}${th('Comprar','comprar',st,'num')}</tr></thead><tbody>`+
       rows.map(r=>`<tr><td class="ctr">${thumb(foto(r.produto),r.produto)}</td><td>${esc(r.produto)}</td><td class="ctr op">${bGen(r.genero)}</td>
         <td class="num op">${r.recebido}</td>
         <td class="num">${r.caminho?`<button class="numlink" data-cam="${esc(r.produto)}">${r.caminho}</button>`:'—'}</td>
@@ -2087,7 +2186,9 @@ function renderEst(){
         <td class="num" data-dica="comprado ${r.recebido+r.caminho} − vendido ${r.vendido+r.aEntregar}${'\n'}em mãos ${r.saldo} + consignado ${r.consig} + a caminho ${r.caminho} − a entregar ${r.aEntregar}">
           <b>${r.previsto}</b></td>
         <td class="num op">${money(r.custoMedio)}</td><td class="num op">${money(r.custoEst)}</td><td class="num op">${money(r.lucroPot)}</td>
-        <td class="num">${r.ideal}</td><td class="ctr">${bEst(r.status)}</td>
+        <td class="num" data-dica="${(r.porDia*30).toFixed(1)} un por mês no ritmo dos últimos 90 dias.\nEstoque sugerido = ritmo × ${HORIZ} dias.">
+          <b>${r.necessidade}</b></td>
+        <td class="ctr">${bEst(r.status)}</td>
         <td class="num">${r.comprar>0?`<b>${r.comprar}</b>`
           : r.comprar<0?`<span style="color:var(--ambar)">${r.comprar}</span>` : '—'}</td></tr>`).join('')+
       `</tbody><tfoot><tr><td></td><td>Total</td><td class="op"></td><td class="num op">${t.rc}</td><td class="num">${t.cm}</td><td class="num op">${t.vd}</td><td class="num">${t.ae}</td><td class="num">${t.cg}</td><td class="num">${t.sl}</td><td class="num">${t.pv}</td><td class="num op">${money(t.cmed)}</td><td class="num op">${money(t.ce)}</td><td class="num op">${money(t.lp)}</td><td></td><td></td><td class="num">${t.cp>0?t.cp:'—'}</td></tr></tfoot>`
@@ -2308,7 +2409,7 @@ $('#fProd').addEventListener('submit',e=>{
     notasCoracao:$('#pCoracao').value.trim(), notasFundo:$('#pFundo').value.trim(),
     concentracao:$('#pConc').value, volume:$('#pVol').value.trim(), temTester:$('#pTester').value,
     genero:$('#pGen').value,
-    estoqueIdeal:Number($('#pIdeal').value)||0,precoVenda:Number($('#pPreco').value)||90,
+    precoVenda:Number($('#pPreco').value)||90,
     foto:fotos.prod, fotoInsp:fotos.insp};
   if(edit.prod){
     const i=data.products.findIndex(p=>p.id===edit.prod), old=data.products[i].nome;
@@ -2320,7 +2421,7 @@ $('#fProd').addEventListener('submit',e=>{
   } else data.products.push({id:uid(),...payload});
   resetProd(); save(); renderAll();
 });
-function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino'; $('#pIdeal').value=1; $('#pPreco').value=90;
+function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino';  $('#pPreco').value=90;
   setFotoPrev('prod',''); setFotoPrev('insp',''); }
 function cancProd(){ edit.prod=null; resetProd(); $('#tProdForm').textContent='Novo produto';
   $('#bProd').textContent='Adicionar produto'; $('#cancProd').hidden=true; }
@@ -2333,7 +2434,7 @@ $('#tProd').addEventListener('click',e=>{
     $('#pTopo').value=p.notasTopo||''; $('#pCoracao').value=p.notasCoracao||'';
     $('#pFundo').value=p.notasFundo||''; $('#pConc').value=p.concentracao||'';
     $('#pVol').value=p.volume||''; $('#pTester').value=modoProvador(p)==='manual'?p.temTester:'auto'; $('#pGen').value=p.genero;
-    $('#pIdeal').value=p.estoqueIdeal; $('#pPreco').value=p.precoVenda;
+     $('#pPreco').value=p.precoVenda;
     setFotoPrev('prod',p.foto||''); setFotoPrev('insp',p.fotoInsp||'');
     $('#tProdForm').textContent='Editando: '+p.nome; $('#bProd').textContent='Salvar alterações'; $('#cancProd').hidden=false;
     window.scrollTo({top:0,behavior:'smooth'}); }
@@ -2900,7 +3001,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'msg-1 · 20/08';
+const VERSAO = 'sugerido · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
@@ -3271,6 +3372,11 @@ function nvBotoes(){
     }
   }
 }
+$('#sugHoriz').addEventListener('change', e=>{
+  HORIZ = Number(e.target.value);
+  try{ localStorage.setItem('perfumes.horiz', String(HORIZ)); }catch(x){}
+  renderAll();                       /* estoque e sugestão passam a usar o mesmo alvo */
+});
 $('#btnVoltar').addEventListener('click', ()=>history.back());
 $('#btnNuvem').addEventListener('click', ()=>{
   $('#nvVersao').textContent = VERSAO;
@@ -3669,7 +3775,9 @@ function desenhaVitrine(c){
 const qs = new URLSearchParams(location.search);
 const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
 if(paramC){ abreVitrine(qs.get('c')||''); } else {
-load(); renderAll();
+load();
+{ const sel = $('#sugHoriz'); if(sel) sel.value = String(HORIZ); }
+renderAll();
 $('#comData').value = hoje(); $('#venData').value = hoje(); $('#desData').value = hoje();
 history.replaceState({tab:'dashboard', fil:{...fil}, n:0}, '', location.pathname + location.search);
 atualizaVoltar();
