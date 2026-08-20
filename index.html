@@ -266,6 +266,7 @@ ul.simple li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;b
 ul.simple li:last-child{border-bottom:none}
 ul.simple .val{font-weight:600;white-space:nowrap}
 ul.simple li[data-dica]{cursor:help}
+.resumo div[data-dica]{cursor:help}
 #balao{position:fixed;z-index:900;background:var(--ink);color:#fff;border-radius:8px;
   padding:10px 13px;font-size:12.5px;line-height:1.55;white-space:pre-line;
   box-shadow:0 6px 24px rgba(0,0,0,.28);pointer-events:none}
@@ -651,7 +652,6 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
         <button type="button" class="btn" id="cancCli" hidden>Cancelar edição</button></div>
     </form>
   </div>
-  <div class="kpis" id="kpiCli"></div>
   <div class="filters">
     <select id="filCliSit"><option value="">Todos</option><option value="devendo">Com saldo em aberto</option><option value="quitado">Sem pendência</option><option value="semtel">Sem WhatsApp</option></select>
     <input id="filCliBusca" placeholder="Buscar cliente…">
@@ -666,7 +666,6 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 <section id="sec-canais">
   <div class="sec-head"><h2>Canais de venda</h2><p>Quem vendeu: você, a barbearia, outra pessoa. Serve para saber o que cada canal traz e o que cada um ainda tem para acertar com você. Em vendas por canal o comprador final costuma não ser identificado — isso é normal e não atrapalha as contas.</p></div>
   <div class="resumo" id="resCan"></div>
-  <div class="kpis" id="kpiCanal"></div>
   <div class="filters">
     <select id="filCanSit"><option value="">Todos os canais</option><option value="acertar">Com valor a acertar</option><option value="entregar">Com entrega pendente</option><option value="quites">Sem pendência</option></select>
     <input type="date" id="filCanDe" title="Data inicial"><span class="sep">até</span><input type="date" id="filCanAte" title="Data final">
@@ -718,7 +717,6 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
         <button type="button" class="btn" id="cancCon" hidden>Cancelar edição</button></div>
     </form>
   </div>
-  <div class="kpis" id="kpiCon"></div>
   <div class="filters">
     <select id="filConParc"><option value="">Todos os parceiros</option></select>
     <select id="filConTipo"><option value="">Todos os tipos</option><option>Lacrado</option><option>Tester</option></select>
@@ -1097,8 +1095,9 @@ const thumb  = (src,alt) => src?`<img class="thumb" src="${src}" alt="${esc(alt)
 /* barra de números no topo de cada tela, sempre sobre o que está filtrado */
 function resumo(id, itens){
   const el = $('#'+id); if(!el) return;
-  el.innerHTML = itens.filter(Boolean).map(([r,v,c])=>
-    `<div><div class="r">${r}</div><div class="v ${c||''}">${v}</div></div>`).join('');
+  el.innerHTML = itens.filter(Boolean).map(([r,v,c,dica])=>
+    `<div${dica?` data-dica="${esc(dica)}"`:''}><div class="r">${r}${dica?' <b class="dica">?</b>':''}</div>`
+    + `<div class="v ${c||''}">${v}</div></div>`).join('');
 }
 
 function ord(rows, st){
@@ -1435,32 +1434,29 @@ function renderCli(){
   const st = sort.cli;
   $('#cntCli').textContent = `${rows.length} de ${total}`;
   const cDev = rows.filter(c=>c.emAberto>0);
+  const maior = cDev.slice().sort((a,b)=>b.emAberto-a.emAberto)[0];
   resumo('resCli', [
     ['Clientes', rows.length],
-    ['Pedidos', rows.reduce((s,c)=>s+c.pedidos,0)],
+    ['Pedidos', rows.reduce((s,c)=>s+c.pedidos,0), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.'],
+    ['Lançamentos', rows.reduce((s,c)=>s+c.nCompras,0), '', 'Cada linha lançada na aba Vendas.'],
+    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades vendidas.'],
     ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
-    ['Em aberto', money(cDev.reduce((s,c)=>s+c.emAberto,0)), cDev.length?'al':'ok'],
-    ['Ticket médio', money(rows.reduce((s,c)=>s+c.total,0)/Math.max(1,rows.reduce((s,c)=>s+c.pedidos,0)))],
-    ['Recorrentes', rows.filter(c=>c.pedidos>1).length, 'ok']
+    ['Em aberto', money(cDev.reduce((s,c)=>s+c.emAberto,0)), cDev.length?'al':'ok',
+      `${cDev.length} ${plural(cDev.length,'cliente','clientes')} com pedido entregue e não pago.`],
+    ['Maior devedor', maior ? `${maior.nome} · ${money(maior.emAberto)}` : '—', maior?'al':'ok'],
+    ['Ticket médio', money(rows.reduce((s,c)=>s+c.total,0)/Math.max(1,rows.reduce((s,c)=>s+c.pedidos,0))), '', 'Faturado ÷ pedidos.'],
+    ['Recorrentes', rows.filter(c=>c.pedidos>1).length, 'ok', 'Clientes que voltaram em outro pedido.'],
+    ['Sem WhatsApp', rows.filter(c=>!soDigitos(c.telefone)).length, rows.some(c=>!soDigitos(c.telefone))?'am':'ok',
+      'Sem telefone não dá para cobrar nem oferecer novidade.']
   ]);
 
   const todos = clientesRows();
   const devendo = todos.filter(c=>c.emAberto>0);
-  $('#kpiCli').innerHTML = [
-    kpi('Clientes', todos.length, 'azul', `${todos.filter(c=>c.nCompras>1).length} com mais de uma compra`),
-    kpi('Em aberto', money(devendo.reduce((s,c)=>s+c.emAberto,0)), devendo.length?'vermelho':'verde',
-        `${devendo.length} ${plural(devendo.length,'cliente','clientes')}`),
-    kpi('Maior devedor', devendo.length ? devendo.sort((a,b)=>b.emAberto-a.emAberto)[0].nome : '—', 'ambar',
-        devendo.length ? money(devendo[0].emAberto) : ''),
-    kpi('Ticket médio', money(todos.reduce((s,c)=>s+c.total,0) / Math.max(1, todos.reduce((s,c)=>s+c.pedidos,0))), 'verde', 'por pedido'),
-    kpi('Recorrentes', todos.filter(c=>c.pedidos>1).length, 'verde', 'compraram mais de uma vez'),
-    kpi('Sem WhatsApp', todos.filter(c=>!soDigitos(c.telefone)).length, 'cinza', 'não dá para chamar')
-  ].join('');
 
   const t = rows.reduce((a,c)=>({p:a.p+c.pedidos,n:a.n+c.nCompras,un:a.un+c.unidades,
     tot:a.tot+c.total,ab:a.ab+c.emAberto,lu:a.lu+c.lucro}),{p:0,n:0,un:0,tot:0,ab:0,lu:0});
   $('#tCli').innerHTML = rows.length
-    ? `<thead><tr>${th('Cliente','nome',st)}${th('WhatsApp','telefone',st)}${th('Pedidos','pedidos',st,'num')}${th('Itens','nCompras',st,'num')}${th('Unidades','unidades',st,'num')}${th('Total','total',st,'num')}${th('Em aberto','emAberto',st,'num')}${th('Lucro','lucro',st,'num')}${th('Ticket','ticket',st,'num')}${th('Última','ultima',st)}${th('Última compra há','diasSem',st,'num')}${th('Preferido','favorito',st)}<th></th></tr></thead><tbody>`+
+    ? `<thead><tr>${th('Cliente','nome',st)}${th('WhatsApp','telefone',st)}${th('Pedidos','pedidos',st,'num')}${th('Lançam.','nCompras',st,'num')}${th('Unidades','unidades',st,'num')}${th('Total','total',st,'num')}${th('Em aberto','emAberto',st,'num')}${th('Lucro','lucro',st,'num')}${th('Ticket','ticket',st,'num')}${th('Última','ultima',st)}${th('Última compra há','diasSem',st,'num')}${th('Preferido','favorito',st)}<th></th></tr></thead><tbody>`+
       rows.map(c=>`<tr><td><button class="linkcli" data-ficha="${c.id}">${esc(c.nome)}</button></td>
         <td>${esc(c.telefone)||'—'}</td><td class="num">${c.pedidos}</td><td class="num">${c.nCompras}</td><td class="num">${c.unidades}</td>
         <td class="num">${money(c.total)}</td>
@@ -1552,24 +1548,20 @@ function renderCanal(){
   $('#cntCan').textContent = `${rows.length} de ${total}`;
   resumo('resCan', [
     ['Canais', rows.length],
-    ['Pedidos', rows.reduce((s,c)=>s+c.n,0)],
+    ['Pedidos', rows.reduce((s,c)=>s+c.n,0), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.'],
+    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades vendidas.'],
     ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
     ['Lucro', money(rows.reduce((s,c)=>s+c.lucro,0)), 'ok'],
-    ['A acertar', money(rows.reduce((s,c)=>s+c.aAcertar,0)), rows.some(c=>c.aAcertar>0)?'al':'ok']
+    ['A acertar', money(rows.reduce((s,c)=>s+c.aAcertar,0)), rows.some(c=>c.aAcertar>0)?'al':'ok',
+      'Vendas do canal já entregues e ainda não pagas — é o que ele tem para acertar com você.'],
+    ['Maior canal', rows.length ? rows.slice().sort((a,b)=>b.total-a.total)[0].canal : '—'],
+    ['Melhor margem', rows.length ? rows.slice().sort((a,b)=>b.margem-a.margem)[0].canal : '—', 'ok']
   ]);
   const tot = rows.reduce((a,c)=>({n:a.n+c.n,it:a.it+c.itens,t:a.t+c.total,l:a.l+c.lucro,ac:a.ac+c.aAcertar}),{n:0,it:0,t:0,l:0,ac:0});
   const todos = canaisRows().slice().sort((a,b)=>b.total-a.total);
   const devendo = todos.filter(c=>c.aAcertar>0);
-  $('#kpiCanal').innerHTML = [
-    kpi('Canais ativos', todos.length, 'azul'),
-    kpi('Maior canal', todos[0]?todos[0].canal:'—', 'verde', todos[0]?money(todos[0].total):''),
-    kpi('A acertar', money(todos.reduce((s,c)=>s+c.aAcertar,0)), devendo.length?'vermelho':'verde',
-        `${devendo.length} ${plural(devendo.length,'canal','canais')}`),
-    kpi('Melhor margem', todos.length?todos.slice().sort((a,b)=>b.margem-a.margem)[0].canal:'—','roxo',
-        todos.length?pct(todos.slice().sort((a,b)=>b.margem-a.margem)[0].margem):'')
-  ].join('');
   $('#tCanal').innerHTML = rows.length
-    ? `<thead><tr>${th('Canal','canal',st)}${th('Pedidos','n',st,'num')}${th('Itens','itens',st,'num')}${th('Unidades','unidades',st,'num')}${th('Faturado','total',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Ticket','ticket',st,'num')}${th('A acertar','aAcertar',st,'num')}${th('A entregar','aEntregar',st,'num')}${th('Não identificado','semNome',st,'num')}${th('Última','ultima',st)}</tr></thead><tbody>`+
+    ? `<thead><tr>${th('Canal','canal',st)}${th('Pedidos','n',st,'num')}${th('Lançam.','itens',st,'num')}${th('Unidades','unidades',st,'num')}${th('Faturado','total',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Ticket','ticket',st,'num')}${th('A acertar','aAcertar',st,'num')}${th('A entregar','aEntregar',st,'num')}${th('Não identificado','semNome',st,'num')}${th('Última','ultima',st)}</tr></thead><tbody>`+
       rows.map(c=>`<tr><td><button class="linkcli" data-canal="${esc(c.canal)}">${esc(c.canal)}</button></td>
         <td class="num">${c.n}</td><td class="num">${c.itens}</td><td class="num">${c.unidades}</td><td class="num">${money(c.total)}</td>
         <td class="num">${money(c.lucro)}</td><td class="num">${pct(c.margem)}</td><td class="num">${money(c.ticket)}</td>
@@ -2009,8 +2001,9 @@ function renderVen(){
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
-    ['Pedidos', contaPedidos(rows)],
-    ['Itens', rows.length],
+    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDois perfumes na mesma tarde contam como um só.'],
+    ['Lançamentos', rows.length, '', 'Cada linha da tabela. Um pedido com três perfumes\nvira três lançamentos.'],
+    ['Unidades', tq, '', 'Soma das quantidades. Um lançamento com 2 frascos\nconta como 2 unidades — é este o número do rodapé.'],
     ['Faturado', money(tv)],
     ['Lucro', money(tl), 'ok'],
     ['Margem', tv?pct(tl/tv):'—'],
@@ -2087,13 +2080,19 @@ function renderCon(){
   rows = ord(rows, sort.con);
   const st = sort.con;
   $('#cntCon').textContent = `${rows.length} de ${data.consignments.length}`;
+  const lacr = rows.filter(c=>c.tipo==='Lacrado').reduce((s,c)=>s+c.saldo,0);
+  const tst  = rows.filter(c=>c.tipo==='Tester').reduce((s,c)=>s+c.saldo,0);
+  const parc = [...new Set(rows.filter(c=>c.saldo>0).map(c=>c.parceiro))];
   resumo('resCon', [
-    ['Registros', rows.length],
-    ['Enviado', rows.reduce((s,c)=>s+Number(c.qtde),0)+' un'],
-    ['No parceiro', rows.reduce((s,c)=>s+c.saldo,0)+' un', 'am'],
-    ['Vendido', rows.reduce((s,c)=>s+c.vendida,0)+' un', 'ok'],
+    ['No parceiro', rows.reduce((s,c)=>s+c.saldo,0)+' un', 'am',
+      'Ainda com o parceiro: enviado − vendido − devolvido.\nContinua sendo seu, mas fora da prateleira.'],
+    ['Lacrados', lacr+' un'],
+    ['Testers', tst+' un', 'roxo'],
+    ['Vendido', rows.reduce((s,c)=>s+c.vendida,0)+' un', 'ok', 'Acumulado desde o início da consignação.'],
     ['Devolvido', rows.reduce((s,c)=>s+c.devolvida,0)+' un'],
-    ['Custo no parceiro', money(rows.reduce((s,c)=>s+c.saldo*custoMedio(c.produto),0))]
+    ['Custo no parceiro', money(rows.reduce((s,c)=>s+c.saldo*custoMedio(c.produto),0))],
+    ['Parceiros', parc.length ? parc.join(', ') : '—'],
+    ['Lançamentos', rows.length, '', 'Cada linha da tabela. Um mesmo produto pode ter várias consignações.']
   ]);
 
   const todos = data.consignments;
@@ -2105,14 +2104,6 @@ function renderCon(){
   todos.forEach(c=>{ const s=saldoCon(c); if(!s) return;
     if(!porParc[c.parceiro]) porParc[c.parceiro]={lac:0,tes:0};
     porParc[c.parceiro][c.tipo==='Tester'?'tes':'lac'] += s; });
-  $('#kpiCon').innerHTML = [
-    kpi('No parceiro agora',saldoTotal+' un',saldoTotal?'terra':'verde',money(custoAtivo)+' em custo'),
-    kpi('Lacrados no parceiro',todos.filter(c=>c.tipo==='Lacrado').reduce((s,c)=>s+saldoCon(c),0)+' un','cinza'),
-    kpi('Testers no parceiro',todos.filter(c=>c.tipo==='Tester').reduce((s,c)=>s+saldoCon(c),0)+' un','roxo'),
-    kpi('Vendidos pelo parceiro',vendTotal+' un','teal','acumulado'),
-    kpi('Devolvidos',devTotal+' un',devTotal?'laranja':'verde'),
-    ...Object.entries(porParc).map(([p,o])=>kpi(p,(o.lac+o.tes)+' un','terra',`${o.lac} lacrado(s) · ${o.tes} tester(s)`))
-  ].join('');
 
   const t = rows.reduce((a,r)=>({q:a.q+Number(r.qtde),v:a.v+r.vendida,d:a.d+r.devolvida,s:a.s+r.saldo}),{q:0,v:0,d:0,s:0});
   $('#tCon').innerHTML = rows.length
@@ -2882,7 +2873,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'voltar-2 · 19/08';
+const VERSAO = 'sem-duplo · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
