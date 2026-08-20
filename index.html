@@ -1427,7 +1427,7 @@ function textoReativacao(cli, r){
   return `Oi, ${nome}! Tudo bem?\n\n`
     + (d ? `Sua última compra foi em ${dt(r.ultima)}.\n\n` : '')
     + (ref ? ref + `\n\n` : '')
-    + `Chegaram reposições na Buffon Fragrâncias.\n`
+    + `Chegaram novidades na *Buffon Fragrâncias*.\n`
     + `Quer que eu te mande o catálogo atualizado?`;
 }
 const diasSemComprar = r => r.ultima ? Math.floor((Date.now()-Date.parse(r.ultima+'T00:00:00'))/86400000) : null;
@@ -2900,7 +2900,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'caminho-tipo · 20/08';
+const VERSAO = 'msg-1 · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
