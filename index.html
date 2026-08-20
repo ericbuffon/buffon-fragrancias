@@ -341,7 +341,11 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 #catalogo .topo .rive{font-family:'Fraunces',Georgia,serif;font-size:11.5px;letter-spacing:.3em;
   font-weight:600;border:1px solid var(--tinta);padding:1.2mm 3.4mm}
 #catalogo .pe{margin-top:auto;padding-top:2.6mm;border-top:.8px solid var(--fio);
-  text-align:center;font-size:10px;letter-spacing:.14em;color:var(--suave);flex:none;font-weight:500}
+  display:flex;align-items:baseline;font-size:10px;letter-spacing:.14em;color:var(--suave);
+  flex:none;font-weight:500}
+#catalogo .pe .nota{flex:1;text-align:center;padding-left:14mm}
+#catalogo .pe .pag{flex:none;width:14mm;text-align:right;font-variant-numeric:tabular-nums;
+  letter-spacing:.08em;color:var(--fraco)}
 
 /* entradas */
 #catalogo .lista{flex:1;display:flex;flex-direction:column;gap:0}
@@ -2623,7 +2627,8 @@ function montaFolhas(itens, opt){
     html += `<div class="pagina">
       <div class="topo">${logoImg(LOGO_P)}<div class="rive">LA RIVE</div></div>
       <div class="lista">${folha.map((p,k)=>itemHTML(p, fi*POR_PAGINA+k+1, opt)).join('')}</div>
-      <div class="pe">${notaRodape(opt)} &nbsp;·&nbsp; ${String(fi+2).padStart(2,'0')} / ${String(totalPag).padStart(2,'0')}</div>
+      <div class="pe"><span class="nota">${notaRodape(opt)}</span>
+        <span class="pag">${String(fi+2).padStart(2,'0')} / ${String(totalPag).padStart(2,'0')}</span></div>
     </div>`;
   });
 
@@ -2881,7 +2886,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'vitrine-pc · 20/08';
+const VERSAO = 'rodape-cat · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
