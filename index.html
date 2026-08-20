@@ -1438,8 +1438,8 @@ function renderCli(){
   resumo('resCli', [
     ['Clientes', rows.length],
     ['Pedidos', rows.reduce((s,c)=>s+c.pedidos,0), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.'],
-    ['Lançamentos', rows.reduce((s,c)=>s+c.nCompras,0), '', 'Cada linha lançada na aba Vendas.'],
-    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades vendidas.'],
+    ['Lançamentos', rows.reduce((s,c)=>s+c.nCompras,0), '', 'Cada linha lançada na aba Vendas — um produto por linha.'],
+    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades — frascos, não linhas.'],
     ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
     ['Em aberto', money(cDev.reduce((s,c)=>s+c.emAberto,0)), cDev.length?'al':'ok',
       `${cDev.length} ${plural(cDev.length,'cliente','clientes')} com pedido entregue e não pago.`],
@@ -1549,7 +1549,7 @@ function renderCanal(){
   resumo('resCan', [
     ['Canais', rows.length],
     ['Pedidos', rows.reduce((s,c)=>s+c.n,0), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.'],
-    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades vendidas.'],
+    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades — frascos, não linhas.'],
     ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
     ['Lucro', money(rows.reduce((s,c)=>s+c.lucro,0)), 'ok'],
     ['A acertar', money(rows.reduce((s,c)=>s+c.aAcertar,0)), rows.some(c=>c.aAcertar>0)?'al':'ok',
@@ -2001,9 +2001,9 @@ function renderVen(){
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
-    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDois perfumes na mesma tarde contam como um só.'],
-    ['Lançamentos', rows.length, '', 'Cada linha da tabela. Um pedido com três perfumes\nvira três lançamentos.'],
-    ['Unidades', tq, '', 'Soma das quantidades. Um lançamento com 2 frascos\nconta como 2 unidades — é este o número do rodapé.'],
+    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDuas compras da mesma pessoa no mesmo dia contam como um só.'],
+    ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
+    ['Unidades', tq, '', 'Soma das quantidades — frascos, não linhas.\nUm lançamento com 3 frascos conta 3 unidades.\nÉ este o número que aparece no rodapé da tabela.'],
     ['Faturado', money(tv)],
     ['Lucro', money(tl), 'ok'],
     ['Margem', tv?pct(tl/tv):'—'],
@@ -2092,7 +2092,7 @@ function renderCon(){
     ['Devolvido', rows.reduce((s,c)=>s+c.devolvida,0)+' un'],
     ['Custo no parceiro', money(rows.reduce((s,c)=>s+c.saldo*custoMedio(c.produto),0))],
     ['Parceiros', parc.length ? parc.join(', ') : '—'],
-    ['Lançamentos', rows.length, '', 'Cada linha da tabela. Um mesmo produto pode ter várias consignações.']
+    ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nO mesmo produto pode ter várias consignações.']
   ]);
 
   const todos = data.consignments;
@@ -2873,7 +2873,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'sem-duplo · 20/08';
+const VERSAO = 'texto-1 · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
