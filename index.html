@@ -271,6 +271,9 @@ ul.simple li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;b
 ul.simple li:last-child{border-bottom:none}
 ul.simple .val{font-weight:600;white-space:nowrap}
 ul.simple li[data-dica]{cursor:help}
+ul.simple li.clic{cursor:pointer} ul.simple li.clic:hover{background:var(--paper)}
+ul.simple li[data-abc]{cursor:pointer} ul.simple li[data-abc]:hover{background:var(--paper)}
+.chip[hidden]{display:none}
 .resumo div[data-dica]{cursor:help}
 #balao{position:fixed;z-index:900;background:var(--ink);color:#fff;border-radius:8px;
   padding:10px 13px;font-size:12.5px;line-height:1.55;white-space:pre-line;
@@ -702,6 +705,10 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 <section id="sec-estoque">
   <div class="sec-head"><h2>Estoque</h2><p><b>Estoque sugerido</b> = o que as vendas dos últimos 90 dias pedem para o período escolhido no dashboard — nada é digitado à mão. <b>Em mãos</b> é o que está fisicamente com você: recebido − vendido e entregue − consignado. <b>Saldo</b> é a posição total: tudo que comprou menos tudo que vendeu, incluindo o que está a caminho, consignado ou por entregar. A situação e a coluna Comprar saem da diferença entre o sugerido e o saldo.</p></div>
   <div class="resumo" id="resEst"></div>
+  <details class="card" style="margin-bottom:1rem">
+    <summary class="card-title" style="cursor:pointer">Curva ABC — concentração do faturamento</summary>
+    <ul class="simple" id="lABCest" style="margin-top:.6rem"></ul>
+  </details>
   <div class="filters">
     <select id="filEstGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
     <select id="filEstStat"><option value="">Toda situação</option><option value="REPOR">Repor</option><option value="NORMAL">Normal</option><option value="EXCESSO">Excesso</option><option value="NOVO">Novo no catálogo</option></select>
@@ -712,6 +719,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
     <button class="btn sm" data-rel="est">Imprimir relatório</button>
     <button class="btn sm" data-xls="est">Exportar Excel</button>
     <span class="chip" id="chipEst" hidden></span>
+    <span class="chip" id="chipEstAbc" hidden></span>
     <span class="count" id="cntEst"></span>
   </div>
   <div class="twrap fixa2"><table id="tEst"></table></div>
@@ -898,7 +906,7 @@ let fil = {
   prodGen:'',prodFoto:'',prodQ:'',prodTester:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
   venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',
-  estGen:'',estStat:'',estQ:'',estProdX:'',
+  estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
   desDe:'',desAte:'',desQ:''
@@ -1248,7 +1256,8 @@ document.addEventListener('click', e=>{
   const b = e.target.closest('.chip button'); if(!b) return;
   const id = b.closest('.chip').id;
   const mapa = {chipCom:['comProdX',renderCom], chipVen:['venProdX',renderVen],
-                chipCon:['conProdX',renderCon], chipEst:['estProdX',renderEst]};
+                chipCon:['conProdX',renderCon], chipEst:['estProdX',renderEst],
+                chipEstAbc:['estClasseAbc',renderEst]};
   const m = mapa[id]; if(!m) return;
   fil[m[0]] = ''; m[1]();
 });
@@ -1301,7 +1310,7 @@ const GRUPOS = {
   prod:{campos:['prodGen','prodFoto','prodQ','prodTester'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
   ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
-  est:{campos:['estGen','estStat','estQ','estProdX'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca'}, render:()=>renderEst()},
+  est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
   cli:{campos:['cliSit','cliQ'], els:{cliSit:'#filCliSit',cliQ:'#filCliBusca'}, render:()=>renderCli()},
@@ -1705,6 +1714,50 @@ function inadimplentes(){
   });
   return Object.values(m).sort((a,b)=>b.valor-a.valor);
 }
+/* ---------------- curva ABC ----------------
+   Reaproveitada no dashboard e na aba Estoque. */
+function calculaABC(){
+  const fatProd = {};
+  data.sales.forEach(v=>{ fatProd[v.produto]=(fatProd[v.produto]||0)+Number(v.valorVenda); });
+  const rank = Object.entries(fatProd).map(([p,f])=>({p,f})).sort((a,b)=>b.f-a.f);
+  const totFat = rank.reduce((s,r)=>s+r.f,0);
+  let acum=0; const classes={A:[],B:[],C:[]};
+  rank.forEach(r=>{ acum+=r.f; const pctAcum = totFat ? acum/totFat : 0;
+    r.classe = pctAcum<=0.8 ? 'A' : pctAcum<=0.95 ? 'B' : 'C';
+    classes[r.classe].push(r); });
+  const porProduto = {}; rank.forEach(r=>porProduto[r.p]=r.classe);
+  const semVenda = data.products.filter(p=>!fatProd[p.nome]).map(p=>p.nome);
+  return {rank, totFat, classes, porProduto, semVenda};
+}
+function renderABC(id, opt){
+  opt = opt || {};
+  const {rank, totFat, classes, semVenda} = calculaABC();
+  const el = $('#'+id); if(!el) return;
+  const linhaABC = (c, rot, cor) => {
+    const l = classes[c], f = l.reduce((s,r)=>s+r.f,0);
+    return `<li data-abc="${c}"><span><span class="badge ${cor}">${c}</span> ${rot}</span>
+      <span class="val">${l.length} ${plural(l.length,'produto','produtos')} · ${money(f)} · ${totFat?pct(f/totFat):'—'}</span></li>`;
+  };
+  el.innerHTML = rank.length
+    ? linhaABC('A','os que sustentam o negócio','verde')
+      + linhaABC('B','importância média','ambar')
+      + linhaABC('C','cauda longa','cinza')
+      + (semVenda.length?`<li data-abc="—"><span><span class="badge vermelho">—</span> nunca venderam</span><span class="val">${semVenda.length} ${plural(semVenda.length,'produto','produtos')}</span></li>`:'')
+      + `<li class="note">A = até 80% do faturamento, B = até 95%, C = o resto. Os A merecem nunca faltar; os C você compra sob encomenda.</li>`
+      + rank.slice(0, opt.top||5).map((r,i)=>`<li data-abcprod="${esc(r.p)}"><span><b class="pos">${i+1}.</b> ${esc(r.p)}</span><span class="val">${money(r.f)} · ${pct(totFat?r.f/totFat:0)}</span></li>`).join('')
+    : `<li><span class="empty">Nenhuma venda lançada.</span></li>`;
+  el.querySelectorAll('[data-abcprod]').forEach(li=>li.classList.add('clic'));
+  if(!el.dataset.ligado){
+    el.dataset.ligado = '1';
+    el.addEventListener('click', e=>{
+      const lip = e.target.closest('[data-abcprod]');
+      if(lip){ aplicaFiltros('ven', {venProdX:lip.dataset.abcprod}); return goTab('vendas'); }
+      const lic = e.target.closest('[data-abc]');
+      if(lic){ aplicaFiltros('est', {estClasseAbc:lic.dataset.abc}); return goTab('estoque'); }
+    });
+  }
+}
+
 function renderDash(){
   const vendas = data.sales.reduce((s,v)=>s+Number(v.valorVenda),0);
   const recebido = data.sales.filter(v=>v.status==='Pago').reduce((s,v)=>s+Number(v.valorVenda),0);
@@ -1916,29 +1969,9 @@ function renderDash(){
   // ----- sugestão de compra a partir do histórico -----
   renderSugestao(est);
 
-  // ----- curva ABC: quais produtos concentram o faturamento -----
-  const fatProd = {};
-  data.sales.forEach(v=>{ fatProd[v.produto]=(fatProd[v.produto]||0)+Number(v.valorVenda); });
-  const rank = Object.entries(fatProd).map(([p,f])=>({p,f})).sort((a,b)=>b.f-a.f);
-  const totFat = rank.reduce((s,r)=>s+r.f,0);
-  let acum=0; const classes={A:[],B:[],C:[]};
-  rank.forEach(r=>{ acum+=r.f; const pctAcum=acum/totFat;
-    r.classe = pctAcum<=0.8 ? 'A' : pctAcum<=0.95 ? 'B' : 'C';
-    classes[r.classe].push(r); });
-  const semVenda = data.products.filter(p=>!fatProd[p.nome]).length;
-  const linhaABC = (c, rot, cor) => {
-    const l = classes[c], f = l.reduce((s,r)=>s+r.f,0);
-    return `<li><span><span class="badge ${cor}">${c}</span> ${rot}</span>
-      <span class="val">${l.length} ${plural(l.length,'produto','produtos')} · ${money(f)} · ${totFat?pct(f/totFat):'—'}</span></li>`;
-  };
-  $('#lABC').innerHTML = rank.length
-    ? linhaABC('A','os que sustentam o negócio','verde')
-      + linhaABC('B','importância média','ambar')
-      + linhaABC('C','cauda longa','cinza')
-      + (semVenda?`<li><span><span class="badge vermelho">—</span> nunca venderam</span><span class="val">${semVenda} ${plural(semVenda,'produto','produtos')}</span></li>`:'')
-      + `<li class="note">A = até 80% do faturamento, B = até 95%, C = o resto. Os A merecem nunca faltar; os C você compra sob encomenda.</li>`
-      + rank.slice(0,5).map((r,i)=>`<li><span><b class="pos">${i+1}.</b> ${esc(r.p)}</span><span class="val">${money(r.f)} · ${pct(r.f/totFat)}</span></li>`).join('')
-    : `<li><span class="empty">Nenhuma venda lançada.</span></li>`;
+  renderABC('lABC');
+
+
 
   // ----- tempo entre comprar e vender -----
   const giro = [];
@@ -2120,6 +2153,7 @@ function renderVen(){
   if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
   if(fil.venQ) rows = rows.filter(v=>norm(v.produto).includes(norm(fil.venQ))||norm(v.cliente).includes(norm(fil.venQ)));
   chipProduto('ven','venProdX');
+
   rows = ord(rows, sort.ven);
   const st = sort.ven;
   const tq = rows.reduce((s,v)=>s+Number(v.qtde),0);
@@ -2151,13 +2185,19 @@ function renderVen(){
 
 /* ---------------- estoque ---------------- */
 function renderEst(){
-  let rows = estoque();
+  renderABC('lABCest', {top:8});
+  const abcMapa = calculaABC().porProduto;
+  let rows = estoque().map(r=>({...r, classeAbc: abcMapa[r.produto]||''}));
   const total = rows.length;
   if(fil.estGen) rows = rows.filter(r=>r.genero===fil.estGen);
   if(fil.estStat) rows = rows.filter(r=>r.status===fil.estStat);
   if(fil.estProdX) rows = rows.filter(r=>r.produto===fil.estProdX);
+  if(fil.estClasseAbc) rows = rows.filter(r=>(r.classeAbc||'')===fil.estClasseAbc || (fil.estClasseAbc==='—' && !r.classeAbc));
   if(fil.estQ) rows = rows.filter(r=>norm(r.produto).includes(norm(fil.estQ)));
   chipProduto('est','estProdX');
+  { const el=$('#chipEstAbc'); const v=fil.estClasseAbc;
+    el.hidden = !v;
+    if(v) el.innerHTML = `Classe ${v==='—'?'sem venda':v} <button title="remover">×</button>`; }
   rows = ord(rows, sort.est);
   const st = sort.est;
   $('#cntEst').textContent = `${rows.length} de ${total}`;
@@ -2183,7 +2223,7 @@ function renderEst(){
     ['A repor', rows.filter(r=>r.status==='REPOR').length, rows.filter(r=>r.status==='REPOR').length?'al':'ok']
   ]);
   $('#tEst').innerHTML = rows.length
-    ? `<thead><tr><th class="ctr">Foto</th>${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr op')}${th('Recebido','recebido',st,'num op')}${th('A caminho','caminho',st,'num')}${th('Vendido','vendido',st,'num op')}${th('A entregar','aEntregar',st,'num')}${th('Consignado','consig',st,'num')}${th('Em mãos','saldo',st,'num')}${th('Saldo','previsto',st,'num')}${th('Custo médio','custoMedio',st,'num op')}${th('Custo estoque','custoEst',st,'num op')}${th('Lucro potencial','lucroPot',st,'num op')}${th('Sugerido','necessidade',st,'num')}${th('Situação','status',st,'ctr')}${th('Comprar','comprar',st,'num')}</tr></thead><tbody>`+
+    ? `<thead><tr><th class="ctr">Foto</th>${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr op')}${th('Recebido','recebido',st,'num op')}${th('A caminho','caminho',st,'num')}${th('Vendido','vendido',st,'num op')}${th('A entregar','aEntregar',st,'num')}${th('Consignado','consig',st,'num')}${th('Em mãos','saldo',st,'num')}${th('Saldo','previsto',st,'num')}${th('Custo médio','custoMedio',st,'num op')}${th('Custo estoque','custoEst',st,'num op')}${th('Lucro potencial','lucroPot',st,'num op')}${th('ABC','classeAbc',st,'ctr')}${th('Sugerido','necessidade',st,'num')}${th('Situação','status',st,'ctr')}${th('Comprar','comprar',st,'num')}</tr></thead><tbody>`+
       rows.map(r=>`<tr><td class="ctr">${thumb(foto(r.produto),r.produto)}</td><td>${esc(r.produto)}</td><td class="ctr op">${bGen(r.genero)}</td>
         <td class="num op">${r.recebido}</td>
         <td class="num">${r.caminho?`<button class="numlink" data-cam="${esc(r.produto)}">${r.caminho}</button>`:'—'}</td>
@@ -2194,12 +2234,13 @@ function renderEst(){
         <td class="num" data-dica="comprado ${r.recebido+r.caminho} − vendido ${r.vendido+r.aEntregar}${'\n'}em mãos ${r.saldo} + consignado ${r.consig} + a caminho ${r.caminho} − a entregar ${r.aEntregar}">
           <b>${r.previsto}</b></td>
         <td class="num op">${money(r.custoMedio)}</td><td class="num op">${money(r.custoEst)}</td><td class="num op">${money(r.lucroPot)}</td>
+        <td class="ctr">${r.classeAbc?`<span class="badge ${{'A':'verde','B':'ambar','C':'cinza'}[r.classeAbc]}">${r.classeAbc}</span>`:'—'}</td>
         <td class="num" data-dica="${(r.porDia*30).toFixed(1)} un por mês no ritmo dos últimos 90 dias.\nEstoque sugerido = ritmo × ${HORIZ} dias.">
           <b>${r.necessidade}</b></td>
         <td class="ctr">${bEst(r.status)}</td>
         <td class="num">${r.comprar>0?`<b>${r.comprar}</b>`
           : r.comprar<0?`<span style="color:var(--ambar)">${r.comprar}</span>` : '—'}</td></tr>`).join('')+
-      `</tbody><tfoot><tr><td></td><td>Total</td><td class="op"></td><td class="num op">${t.rc}</td><td class="num">${t.cm}</td><td class="num op">${t.vd}</td><td class="num">${t.ae}</td><td class="num">${t.cg}</td><td class="num">${t.sl}</td><td class="num">${t.pv}</td><td class="num op">${money(t.cmed)}</td><td class="num op">${money(t.ce)}</td><td class="num op">${money(t.lp)}</td><td></td><td></td><td class="num">${t.cp>0?t.cp:'—'}</td></tr></tfoot>`
+      `</tbody><tfoot><tr><td></td><td>Total</td><td class="op"></td><td class="num op">${t.rc}</td><td class="num">${t.cm}</td><td class="num op">${t.vd}</td><td class="num">${t.ae}</td><td class="num">${t.cg}</td><td class="num">${t.sl}</td><td class="num">${t.pv}</td><td class="num op">${money(t.cmed)}</td><td class="num op">${money(t.ce)}</td><td class="num op">${money(t.lp)}</td><td class="ctr"></td><td></td><td></td><td class="num">${t.cp>0?t.cp:'—'}</td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhum produto encontrado.</td></tr></tbody>`;
 }
 
@@ -3009,7 +3050,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'atalho-sug · 20/08';
+const VERSAO = 'abc-p-estoque · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
