@@ -1612,6 +1612,8 @@ function renderCanal(){
   if(fil.canSit==='entregar') rows = rows.filter(c=>c.aEntregar>0);
   if(fil.canSit==='quites') rows = rows.filter(c=>c.aAcertar===0 && c.aEntregar===0);
   if(fil.canQ) rows = rows.filter(c=>norm(c.canal).includes(norm(fil.canQ)));
+  const fatGeralOrd = canaisRows().reduce((s,c)=>s+c.total,0);
+  rows.forEach(c=>c.pctFat = fatGeralOrd?c.total/fatGeralOrd:0);
   rows = ord(rows, sort.can);
   const st = sort.can;
   $('#cntCan').textContent = `${rows.length} de ${total}`;
@@ -1629,15 +1631,18 @@ function renderCanal(){
   const tot = rows.reduce((a,c)=>({n:a.n+c.n,it:a.it+c.itens,t:a.t+c.total,l:a.l+c.lucro,ac:a.ac+c.aAcertar}),{n:0,it:0,t:0,l:0,ac:0});
   const todos = canaisRows().slice().sort((a,b)=>b.total-a.total);
   const devendo = todos.filter(c=>c.aAcertar>0);
+  const fatGeral = todos.reduce((s,c)=>s+c.total,0);   // % sempre sobre o total geral, não sobre o filtrado
   $('#tCanal').innerHTML = rows.length
-    ? `<thead><tr>${th('Canal','canal',st)}${th('Pedidos','n',st,'num')}${th('Lançam.','itens',st,'num')}${th('Unidades','unidades',st,'num')}${th('Faturado','total',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Ticket','ticket',st,'num')}${th('A acertar','aAcertar',st,'num')}${th('A entregar','aEntregar',st,'num')}${th('Não identificado','semNome',st,'num')}${th('Última','ultima',st)}</tr></thead><tbody>`+
+    ? `<thead><tr>${th('Canal','canal',st)}${th('Pedidos','n',st,'num')}${th('Lançam.','itens',st,'num')}${th('Unidades','unidades',st,'num')}${th('Faturado','total',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Ticket','ticket',st,'num')}${th('% do faturamento','pctFat',st,'num')}${th('A acertar','aAcertar',st,'num')}${th('A entregar','aEntregar',st,'num')}${th('Não identificado','semNome',st,'num')}${th('Última','ultima',st)}</tr></thead><tbody>`+
       rows.map(c=>`<tr><td><button class="linkcli" data-canal="${esc(c.canal)}">${esc(c.canal)}</button></td>
         <td class="num">${c.n}</td><td class="num">${c.itens}</td><td class="num">${c.unidades}</td><td class="num">${money(c.total)}</td>
         <td class="num">${money(c.lucro)}</td><td class="num">${pct(c.margem)}</td><td class="num">${money(c.ticket)}</td>
+        <td class="num">${fatGeral?pct(c.total/fatGeral):'—'}</td>
         <td class="num">${c.aAcertar>0?`<b style="color:var(--vermelho)">${money(c.aAcertar)}</b>`:'—'}</td>
         <td class="num">${c.aEntregar>0?money(c.aEntregar):'—'}</td>
         <td class="num">${c.semNome||'—'}</td><td>${dt(c.ultima)}</td></tr>`).join('')+
-      `</tbody><tfoot><tr><td>Total</td><td class="num">${tot.n}</td><td class="num">${tot.it}</td><td></td><td class="num">${money(tot.t)}</td><td class="num">${money(tot.l)}</td><td colspan="2"></td><td class="num">${money(tot.ac)}</td><td colspan="3"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td>Total</td><td class="num">${tot.n}</td><td class="num">${tot.it}</td><td></td><td class="num">${money(tot.t)}</td><td class="num">${money(tot.l)}</td><td></td><td></td>
+        <td class="num">${fatGeral?pct(tot.t/fatGeral):'—'}</td><td class="num">${money(tot.ac)}</td><td colspan="3"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhum canal encontrado com esses filtros.</td></tr></tbody>`;
 }
 $('#tCanal').addEventListener('click', e=>{
@@ -3050,7 +3055,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'abc-p-estoque · 20/08';
+const VERSAO = 'canal-pct · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
