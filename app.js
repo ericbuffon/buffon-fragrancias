@@ -2446,11 +2446,11 @@ const idPublico = () => {
   return data.config.catalogoId;
 };
 function linkPublico(id){
-  const base = location.origin + location.pathname;
+  const base = location.origin;
   if(NV_URL_FIXA && NV_KEY_FIXA && NV_URL_FIXA===NV.url && NV_KEY_FIXA===NV.key)
-    return base + '?c=' + id;                       // curto: só o código
+    return base + '/' + id;                       // Retorna o link limpo (ex: /catalogo)
   const ref = (NV.url||'').replace('https://','').replace('.supabase.co','');
-  return base + '?p=' + ref + '&k=' + NV.key + '&i=' + id;
+  return base + location.pathname + '?p=' + ref + '&k=' + NV.key + '&i=' + id;
 }
 async function publicaCatalogo(opt){
   const id = idPublico();
