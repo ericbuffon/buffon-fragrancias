@@ -456,45 +456,23 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 }
 
 /* ---------- Tabelas em Cards no Celular ---------- */
+/* ---------- Ajuste para Telas Pequenas ---------- */
 @media (max-width: 600px) {
-  .twrap table, .twrap thead, .twrap tbody, .twrap tfoot, .twrap th, .twrap td, .twrap tr {
-    display: block;
+  /* No mobile, as tabelas continuam como tabelas (igual no computador),
+     e o scroll horizontal natural da .twrap já garante a responsividade. */
+  
+  /* Ajusta o tamanho da foto fixa para ganhar espaço na tela do celular */
+  .twrap.fixa2 th:nth-child(1), .twrap.fixa2 td:nth-child(1) {
+    min-width: 48px;
+    width: 48px;
+    padding-left: 6px;
+    padding-right: 6px;
   }
-  .twrap thead { display: none; }
-  .twrap tr {
-    margin-bottom: 15px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 10px;
-    background: var(--card);
-  }
-  .twrap td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--line2);
-    padding: 8px 0;
-    text-align: right;
-  }
-  .twrap td:empty, .twrap td:has(> .rowacts:empty) {
-    display: none;
-  }
-  .twrap td:last-child { border-bottom: none; }
-  .twrap td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--ink-soft);
-    text-align: left;
-    flex-basis: 45%;
-  }
-  .twrap tfoot tr {
-    background: var(--paper);
-    border: 1px solid var(--ink);
-  }
-  /* Remove a trava das colunas laterais no mobile para evitar quebras */
-  .twrap.fixa2 th:nth-child(1), .twrap.fixa2 td:nth-child(1),
+  .thumb { width: 32px; height: 32px; }
+  .thumb-none { width: 32px; height: 32px; font-size: 13px; }
+  
+  /* Ajusta o espaçamento do nome do produto fixo */
   .twrap.fixa2 th:nth-child(2), .twrap.fixa2 td:nth-child(2) {
-    position: static; 
-    box-shadow: none;
+    left: 48px; 
   }
 }
