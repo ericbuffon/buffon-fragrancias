@@ -2442,10 +2442,7 @@ function montaPublico(opt){
    publicando do computador ou do celular. */
 const idPublico = () => {
   data.config = data.config || {};
-  if(!data.config.catalogoId){
-    const antigo = localStorage.getItem('perfumes.nv.catid');   // migra quem já publicou antes
-    data.config.catalogoId = antigo || ('cat_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4));
-  }
+  data.config.catalogoId = 'catalogo';
   return data.config.catalogoId;
 };
 function linkPublico(id){
