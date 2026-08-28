@@ -3029,21 +3029,7 @@ function aplicarLabelsMobile() {
 }
 
 
-/* ---------- Tema Escuro ---------- */
-const btnTheme = document.getElementById('btnTheme');
-if(btnTheme) {
-    if(localStorage.getItem('perfumes.theme') === 'dark') {
-        document.body.classList.add('dark');
-        btnTheme.textContent = '☀️ Tema';
-    }
-    btnTheme.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const isDark = document.body.classList.contains('dark');
-        localStorage.setItem('perfumes.theme', isDark ? 'dark' : 'light');
-        btnTheme.textContent = isDark ? '☀️ Tema' : '🌙 Tema';
-        renderCharts(); // Redraw charts for colors
-    });
-}
+
 
 /* ---------- Carrinho Vitrine ---------- */
 let cart = {}; // { 'Nome do Perfume': qtd }
@@ -3099,9 +3085,8 @@ let chartGenInstance = null;
 
 function renderCharts() {
     if(!document.getElementById('chartFin')) return;
-    const isDark = document.body.classList.contains('dark');
-    const textColor = isDark ? '#a1aab5' : '#4E5866';
-    const gridColor = isDark ? '#2d333b' : '#DDE3EB';
+    const textColor = '#4E5866';
+    const gridColor = '#DDE3EB';
 
     // Preparar dados financeiros (Últimos 6 meses)
     const mesesSet = new Set();

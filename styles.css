@@ -476,22 +476,6 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
     left: 48px; 
   }
 }
-/* ---------- Tema Escuro ---------- */
-body.dark {
-  --paper: #0f1115;
-  --card: #181b21;
-  --ink: #e1e7ef;
-  --ink-soft: #8A94A3;
-  --ink-faint: #606b77;
-  --line: #2d333b;
-  --line2: #22272e;
-  --accent-soft: #3d1b15;
-  --accent-ink: #ff8b73;
-}
-body.dark tbody tr:hover { background: #1c2026; }
-body.dark .twrap.fixa2 tfoot td:nth-child(1), body.dark .twrap.fixa2 tfoot td:nth-child(2) { background: #181b21; }
-body.dark .twrap.fixa2 tbody tr:hover td:nth-child(1), body.dark .twrap.fixa2 tbody tr:hover td:nth-child(2) { background: #1c2026; }
-
 /* ---------- Carrinho Flutuante (Vitrine) ---------- */
 #cartFloat {
   position: fixed;
@@ -533,10 +517,4 @@ body.dark .twrap.fixa2 tbody tr:hover td:nth-child(1), body.dark .twrap.fixa2 tb
 .vitrine-add:hover {
   background: var(--accent);
   color: #fff;
-}
-
-body.dark img.logo {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 4px 12px;
-  border-radius: 6px;
 }
