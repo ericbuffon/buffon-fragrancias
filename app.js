@@ -1080,6 +1080,8 @@ function renderDash(){
   renderSugestao(est);
 
   renderABC('lABC');
+  renderCharts();
+
 
 
 
@@ -3024,4 +3026,139 @@ function aplicarLabelsMobile() {
       });
     });
   });
+}
+
+
+/* ---------- Tema Escuro ---------- */
+const btnTheme = document.getElementById('btnTheme');
+if(btnTheme) {
+    if(localStorage.getItem('perfumes.theme') === 'dark') {
+        document.body.classList.add('dark');
+        btnTheme.textContent = '☀️ Tema';
+    }
+    btnTheme.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('perfumes.theme', isDark ? 'dark' : 'light');
+        btnTheme.textContent = isDark ? '☀️ Tema' : '🌙 Tema';
+        renderCharts(); // Redraw charts for colors
+    });
+}
+
+/* ---------- Carrinho Vitrine ---------- */
+let cart = {}; // { 'Nome do Perfume': qtd }
+window.addToCart = (nome, preco) => {
+    cart[nome] = (cart[nome] || 0) + 1;
+    updateCartUI();
+};
+function updateCartUI() {
+    const totalItems = Object.values(cart).reduce((a,b)=>a+b, 0);
+    const cartFloat = document.getElementById('cartFloat');
+    if(cartFloat) {
+        if(totalItems > 0) {
+            cartFloat.classList.add('show');
+            document.getElementById('cartCount').textContent = totalItems;
+        } else {
+            cartFloat.classList.remove('show');
+        }
+    }
+}
+const cartFloat = document.getElementById('cartFloat');
+if(cartFloat) {
+    cartFloat.addEventListener('click', () => {
+        // Obter número do config
+        const contato = data.config && data.config.contato ? data.config.contato : '';
+        const num = (contato || '').replace(/\D/g,'');
+        if(!num) {
+            alert('O catálogo ainda não tem um número de WhatsApp configurado pelo vendedor.');
+            return;
+        }
+        
+        let texto = "Olá! Dei uma olhada no seu catálogo e gostaria de encomendar:\n\n";
+        let total = 0;
+        for(let nome in cart) {
+            const qtd = cart[nome];
+            const p = data.products.find(x => x.nome === nome);
+            const preco = p ? (Number(p.precoVenda)||90) : 90;
+            const sub = qtd * preco;
+            total += sub;
+            texto += `• ${qtd}x ${nome} (R$ ${preco.toFixed(2)})\n`;
+        }
+        texto += `\n*Total estimado: R$ ${total.toFixed(2)}*\n\nComo podemos combinar a entrega?`;
+        
+        const zapLink = `https://wa.me/55${num}?text=${encodeURIComponent(texto)}`;
+        window.open(zapLink, '_blank');
+        cart = {}; // Limpa carrinho após enviar
+        updateCartUI();
+    });
+}
+
+/* ---------- Gráficos ---------- */
+let chartFinInstance = null;
+let chartGenInstance = null;
+
+function renderCharts() {
+    if(!document.getElementById('chartFin')) return;
+    const isDark = document.body.classList.contains('dark');
+    const textColor = isDark ? '#a1aab5' : '#4E5866';
+    const gridColor = isDark ? '#2d333b' : '#DDE3EB';
+
+    // Preparar dados financeiros (Últimos 6 meses)
+    const mesesSet = new Set();
+    const vpm = {};
+    data.sales.filter(v=>v.data).forEach(v=>{ 
+        const k=v.data.slice(0,7); mesesSet.add(k);
+        if(!vpm[k]) vpm[k]={f:0,l:0}; 
+        vpm[k].f+=Number(v.valorVenda); vpm[k].l+=calcVenda(v).lucro; 
+    });
+    const meses = [...mesesSet].sort().slice(-6); // Últimos 6
+    const labelsFin = meses.map(k => rotuloMes(k));
+    const dataFat = meses.map(k => vpm[k].f);
+    const dataLuc = meses.map(k => vpm[k].l);
+
+    const ctxFin = document.getElementById('chartFin').getContext('2d');
+    if(chartFinInstance) chartFinInstance.destroy();
+    chartFinInstance = new Chart(ctxFin, {
+        type: 'bar',
+        data: {
+            labels: labelsFin,
+            datasets: [
+                { label: 'Faturamento', data: dataFat, backgroundColor: '#0B63CE', borderRadius: 4 },
+                { label: 'Lucro', data: dataLuc, backgroundColor: '#04703C', borderRadius: 4 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: textColor } } },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { display: false } },
+                y: { ticks: { color: textColor }, grid: { color: gridColor } }
+            }
+        }
+    });
+
+    // Preparar dados de Gênero
+    let masc = 0, fem = 0;
+    data.sales.forEach(v => {
+        const g = gen(v.produto);
+        if(g === 'Masculino') masc += Number(v.qtde);
+        if(g === 'Feminino') fem += Number(v.qtde);
+    });
+    const ctxGen = document.getElementById('chartGen').getContext('2d');
+    if(chartGenInstance) chartGenInstance.destroy();
+    chartGenInstance = new Chart(ctxGen, {
+        type: 'doughnut',
+        data: {
+            labels: ['Masculinos', 'Femininos'],
+            datasets: [{
+                data: [masc, fem],
+                backgroundColor: ['#0B63CE', '#B00966'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { color: textColor } } }
+        }
+    });
 }
