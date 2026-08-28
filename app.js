@@ -574,7 +574,7 @@ function textoCatalogo(genero){
     linhas.splice(i,1); cortou++; corpo = linhas.join('\n');
   }
   return `*Buffon Fragrâncias* — perfumes La Rive\n`
-    + `Fragrâncias inspiradas nos grandes lançamentos da perfumaria.\n${corpo}\n`
+    + `As melhores inspirações da perfumaria internacional.\n${corpo}\n`
     + (cortou?`\n_(e mais ${cortou} disponíveis)_\n`:'')
 
     + `\nSe preferir, envio o catálogo completo em PDF, com as fotos e as notas de cada fragrância. É só me pedir.`;
@@ -2930,7 +2930,7 @@ function desenhaVitrine(c){
     <div class="topo">
       ${logoImg(LOGO_M)}
       <div class="rive">LA RIVE</div>
-      <p>Fragrâncias inspiradas nos grandes lançamentos da perfumaria.</p>
+      <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
     <div class="filtros">
       <button class="fbtn on" data-f="">Todas (${itens.length})</button>
