@@ -1080,6 +1080,7 @@ function renderDash(){
   renderSugestao(est);
 
   renderABC('lABC');
+  renderCharts();
 
 
 
@@ -2905,6 +2906,7 @@ async function abreVitrine(cfg){
   }
 }
 function desenhaVitrine(c){
+  window.vitrineContato = c.contato || '';
   const itens = c.itens||[];
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
@@ -2923,8 +2925,7 @@ function desenhaVitrine(c){
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
         ${p.tester?'<span class="badge roxo">tem provador</span>':''}
       </div>
-      ${zapNum?`<a class="zap" style="margin-top:10px;text-align:center;padding:8px 14px;font-size:13px"
-         href="${zapLink('Oi! Tenho interesse no '+p.nome+'. Ainda tem disponível?')}" target="_blank">${ICO_ZAP(15,'#fff')} Tenho interesse</a>`:''}
+      <button class="vitrine-add" onclick="window.addToCart(this.dataset.nome, this.dataset.preco)" data-nome="${esc(p.nome)}" data-preco="${p.preco||0}">Adicionar ao carrinho</button>
     </div></div>`;
   $('#vitrine').innerHTML = `
     <div class="topo">
@@ -3023,5 +3024,120 @@ function aplicarLabelsMobile() {
         colIndex += span;
       });
     });
+  });
+}
+
+
+/* ---------- Carrinho Vitrine ---------- */
+let cart = {}; // { 'Nome do Perfume': { qtd } }
+window.vitrineContato = ''; // Guardará o contato quando a vitrine for desenhada
+window.addToCart = (nome) => {
+    if (!cart[nome]) {
+        cart[nome] = { qtd: 0 };
+    }
+    cart[nome].qtd += 1;
+    updateCartUI();
+};
+function updateCartUI() {
+    const totalItems = Object.values(cart).reduce((a,b)=>a+b.qtd, 0);
+    const cartFloat = document.getElementById('cartFloat');
+    if(cartFloat) {
+        if(totalItems > 0) {
+            cartFloat.classList.add('show');
+            document.getElementById('cartCount').textContent = totalItems;
+        } else {
+            cartFloat.classList.remove('show');
+        }
+    }
+}
+const cartFloat = document.getElementById('cartFloat');
+if(cartFloat) {
+    cartFloat.addEventListener('click', () => {
+        const contato = window.vitrineContato || (data.config && data.config.contato ? data.config.contato : '');
+        const num = (contato || '').replace(/\D/g,'');
+        if(!num) {
+            alert('O catálogo ainda não tem um número de WhatsApp configurado pelo vendedor.');
+            return;
+        }
+        
+        let texto = "Olá! Dei uma olhada no seu catálogo e gostaria de encomendar:\n\n";
+        for(let nome in cart) {
+            const item = cart[nome];
+            texto += `• ${item.qtd}x ${nome}\n`;
+        }
+        texto += `\nComo podemos combinar a entrega e o pagamento?`;
+        
+        const zapLink = `https://wa.me/55${num}?text=${encodeURIComponent(texto)}`;
+        window.open(zapLink, '_blank');
+        cart = {}; // Limpa carrinho após enviar
+        updateCartUI();
+    });
+}
+
+/* ---------- Gráficos ---------- */
+let myChartFin = null;
+let myChartGen = null;
+function renderCharts(){
+  if(typeof Chart === 'undefined') return;
+  const ctxFin = document.getElementById('chartFin');
+  const ctxGen = document.getElementById('chartGen');
+  if(!ctxFin || !ctxGen) return;
+
+  // 1. Gráfico de Faturamento vs Lucro (Últimos 6 meses)
+  const mesesSet = new Set();
+  const vpm = {};
+  data.sales.filter(v=>v.data).forEach(v=>{
+    const k=v.data.slice(0,7); 
+    mesesSet.add(k);
+    if(!vpm[k]) vpm[k]={f:0,l:0}; 
+    vpm[k].f+=Number(v.valorVenda); 
+    vpm[k].l+=calcVenda(v).lucro; 
+  });
+  const meses = [...mesesSet].sort().slice(-6); // Últimos 6 meses
+  const labelsMeses = meses.map(rotuloMes);
+  const dataFat = meses.map(m => vpm[m].f);
+  const dataLucro = meses.map(m => vpm[m].l);
+
+  if(myChartFin) myChartFin.destroy();
+  myChartFin = new Chart(ctxFin, {
+    type: 'bar',
+    data: {
+      labels: labelsMeses,
+      datasets: [
+        { label: 'Faturamento', data: dataFat, backgroundColor: '#0B63CE', borderRadius: 4 },
+        { label: 'Lucro Bruto', data: dataLucro, backgroundColor: '#04703C', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'R$ ' + value; } } } },
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+
+  // 2. Gráfico de Vendas por Gênero (Geral)
+  let mCount = 0, fCount = 0;
+  data.sales.forEach(v => {
+    const g = gen(v.produto);
+    if(g === 'Masculino') mCount += Number(v.qtde);
+    else if(g === 'Feminino') fCount += Number(v.qtde);
+  });
+
+  if(myChartGen) myChartGen.destroy();
+  myChartGen = new Chart(ctxGen, {
+    type: 'doughnut',
+    data: {
+      labels: ['Masculino', 'Feminino'],
+      datasets: [{
+        data: [mCount, fCount],
+        backgroundColor: ['#0B63CE', '#B00966'],
+        borderWidth: 2, borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      cutout: '65%'
+    }
   });
 }

@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <header class="top">
@@ -72,6 +73,11 @@
         <div class="twrap" style="max-height:none"><table id="tSug"></table></div>
         <p class="note" id="sugNota"></p>
       </div>
+
+  <div class="two-col" style="margin-bottom: 1.2rem;">
+    <div class="card"><div class="card-title">Faturamento vs Lucro</div><div style="position: relative; height: 220px; width: 100%;"><canvas id="chartFin"></canvas></div></div>
+    <div class="card"><div class="card-title">Vendas por Gênero</div><div style="position: relative; height: 220px; width: 100%;"><canvas id="chartGen"></canvas></div></div>
+  </div>
 
   <div class="two-col">
     <div>
@@ -465,6 +471,7 @@
     <p class="note" id="catNota">O link mostra só nome, inspiração, notas, foto e preço. Custo, estoque, vendas e clientes não vão junto. Republicar atualiza o mesmo link.</p>
   </div>
 </div></div>
+<button id="cartFloat" hidden>🛒 <span id="cartCount">0</span> itens - Pedir pelo WhatsApp</button>
 <div id="vitrine"></div>
 <div id="catalogo"></div>
 <div id="relatorio"></div>
