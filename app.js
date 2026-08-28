@@ -2887,7 +2887,7 @@ async function abreVitrine(cfg){
   let c;
   if(q.get('p')){                                    // formato compacto
     c = {u:'https://'+q.get('p')+'.supabase.co', k:q.get('k'), i:q.get('i')};
-  } else if(cfg && cfg.startsWith('cat_')){          // formato curto
+  } else if(cfg && (cfg.startsWith('cat_') || cfg === 'catalogo')){          // formato curto
     c = {u:NV_URL_FIXA, k:NV_KEY_FIXA, i:cfg};
   } else {
     try{ c = JSON.parse(decodeURIComponent(escape(atob(cfg)))); }
@@ -2968,9 +2968,14 @@ function desenhaVitrine(c){
 // Inicialização do sistema
 document.addEventListener('DOMContentLoaded', () => {
   const qs = new URLSearchParams(location.search);
-  const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
+  let paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
+  
+  if (!paramC && location.pathname.length > 1) {
+    paramC = location.pathname.substring(1);
+  }
+
   if(paramC){ 
-    abreVitrine(qs.get('c')||''); 
+    abreVitrine(paramC); 
   } else {
     load();
     { const sel = $('#sugHoriz'); if(sel) sel.value = String(HORIZ); }

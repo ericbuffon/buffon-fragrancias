@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/catalogo",
-      "destination": "/?c=catalogo"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
