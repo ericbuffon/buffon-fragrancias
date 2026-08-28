@@ -124,63 +124,28 @@ function aplicaPatchFamilia(){
   return n;
 }
 
-async function load(){
+function load(){
   try{
-    localforage.config({
-      name: 'BuffonFragrancias',
-      storeName: 'sistema_data'
-    });
-    
-    // Tenta carregar do IndexedDB primeiro
-    let raw = await localforage.getItem(KEY);
-    
-    // Fallback de migração: se não tem no IndexedDB, tenta pegar do localStorage antigo
-    if(!raw) {
-       raw = localStorage.getItem(KEY);
-       if(raw) {
-           await localforage.setItem(KEY, raw); // Salva no novo banco
-           localStorage.removeItem(KEY); // Limpa o velho para liberar espaço
-       }
-    }
-
-    if(raw){ 
-      data = Object.assign({products:[],purchases:[],sales:[],expenses:[],consignments:[]}, JSON.parse(raw));
-      migra(); 
-      const a=aplicaPatchCompras(), b=aplicaPatchFicha(), c=aplicaPatchFamilia(); 
-      if(a||b||c) save(); 
-      // renderAll(); // Movido para dentro do load() assincrono
-      return; 
-    }
-  }catch(e){ 
-      console.error(e);
-      flag('vermelho','este navegador bloqueou o salvamento — use backup'); 
-  }
-  
+    const raw = localStorage.getItem(KEY);
+    if(raw){ data = Object.assign({products:[],purchases:[],sales:[],expenses:[],consignments:[]}, JSON.parse(raw));
+      migra(); const a=aplicaPatchCompras(), b=aplicaPatchFicha(), c=aplicaPatchFamilia(); if(a||b||c) save(); return; }
+  }catch(e){ flag('vermelho','este navegador bloqueou o salvamento — use backup'); }
   data = JSON.parse(JSON.stringify(SEED));
-  migra(); aplicaPatchCompras(); aplicaPatchFicha(); aplicaPatchFamilia(); 
-  save();
-  // renderAll(); // Movido para dentro do load() assincrono
+  migra(); aplicaPatchCompras(); aplicaPatchFicha(); aplicaPatchFamilia(); save();
 }
-
-// Inicia o carregamento (agora é assíncrono)
 function flag(c,t){ $('#dot').style.background=`var(--${c})`; $('#saveTxt').textContent=t; }
 let tmr;
 function save(){
   flag('ambar','salvando…');
   clearTimeout(tmr);
-  tmr = setTimeout(async ()=>{
-    try{ 
-      await localforage.setItem(KEY, JSON.stringify(data));
-      localStorage.setItem('perfumes.nv.local', String(Date.now()));   // Mantém a flag de sync no localstorage por ser pequeno
+  tmr = setTimeout(()=>{
+    try{ localStorage.setItem(KEY, JSON.stringify(data));
+      localStorage.setItem('perfumes.nv.local', String(Date.now()));   // houve alteração aqui
       flag('verde','dados salvos neste navegador');
       if(typeof agendaGravacao==='function') agendaGravacao();
-      if(typeof agendaNuvem==='function') agendaNuvem(); 
-    }
-    catch(e){ 
-      console.error(e);
-      flag('vermelho','erro ao salvar os dados');
-      alert('Não foi possível salvar os dados no banco do navegador.\nVerifique se você não está em aba anônima restrita.'); 
-    }
+      if(typeof agendaNuvem==='function') agendaNuvem(); }
+    catch(e){ flag('vermelho','memória cheia — baixe um backup');
+      alert('Não foi possível salvar: o espaço deste navegador encheu.\n\nAs fotos são o que mais ocupa. Remova algumas ou baixe um backup antes de continuar.'); }
   },200);
 }
 
@@ -2424,7 +2389,7 @@ async function nvSincronizar(inicial){
         migra(); localStorage.setItem(KEY, JSON.stringify(data));
         NV.set('carimbo', String(tRemoto));
         localStorage.setItem('perfumes.nv.local', String(tRemoto));
-        marcaBackup(); // renderAll(); // Movido para dentro do load() assincrono avisoBackup(); nvStatus('ok','atualizado da nuvem');
+        marcaBackup(); renderAll(); avisoBackup(); nvStatus('ok','atualizado da nuvem');
         return;
       }
     }
@@ -2543,7 +2508,7 @@ async function nvRestauraCopia(id){
   await nvCriaCopia('antes de restaurar');           // rede de segurança
   data = Object.assign({products:[],purchases:[],sales:[],expenses:[],consignments:[],clients:[]}, r[0].conteudo);
   migra(); localStorage.setItem(KEY, JSON.stringify(data));
-  await nvEnviar(); marcaBackup(); // renderAll(); // Movido para dentro do load() assincrono avisoBackup();
+  await nvEnviar(); marcaBackup(); renderAll(); avisoBackup();
   return true;
 }
 
@@ -2595,7 +2560,7 @@ function preencheCompra(produto, qtde){
 $('#sugHoriz').addEventListener('change', e=>{
   HORIZ = Number(e.target.value);
   try{ localStorage.setItem('perfumes.horiz', String(HORIZ)); }catch(x){}
-  // renderAll(); // Movido para dentro do load() assincrono                       /* estoque e sugestão passam a usar o mesmo alvo */
+  renderAll();                       /* estoque e sugestão passam a usar o mesmo alvo */
 });
 $('#btnVoltar').addEventListener('click', ()=>history.back());
 $('#btnNuvem').addEventListener('click', ()=>{
@@ -3002,16 +2967,29 @@ function desenhaVitrine(c){
   });
 }
 
-const qs = new URLSearchParams(location.search);
-const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
-if(paramC){ abreVitrine(qs.get('c')||''); } else {
-{ const sel = $('#sugHoriz'); if(sel) sel.value = String(HORIZ); }
-// renderAll(); // Movido para dentro do load() assincrono
-$('#comData').value = hoje(); $('#venData').value = hoje(); $('#desData').value = hoje();
-history.replaceState({tab:'dashboard', fil:{...fil}, n:0}, '', location.pathname + location.search);
-atualizaVoltar();
-retomaAuto().then(avisoBackup);
-nvBotoes();
-if(nvLigado()){ nvStatus('ok','conectado'); nvRenovar().finally(()=>nvSincronizar(true)); }
-else nvStatus('','');
-}
+
+// Inicialização do sistema
+document.addEventListener('DOMContentLoaded', () => {
+  const qs = new URLSearchParams(location.search);
+  const paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
+  if(paramC){ 
+    abreVitrine(qs.get('c')||''); 
+  } else {
+    load();
+    { const sel = $('#sugHoriz'); if(sel) sel.value = String(HORIZ); }
+    renderAll();
+    if($('#comData')) $('#comData').value = hoje(); 
+    if($('#venData')) $('#venData').value = hoje(); 
+    if($('#desData')) $('#desData').value = hoje();
+    history.replaceState({tab:'dashboard', fil:{...fil}, n:0}, '', location.pathname + location.search);
+    atualizaVoltar();
+    if(typeof retomaAuto === 'function') retomaAuto().then(avisoBackup);
+    if(typeof nvBotoes === 'function') nvBotoes();
+    if(typeof nvLigado === 'function' && nvLigado()){ 
+      nvStatus('ok','conectado'); 
+      if(typeof nvRenovar === 'function') nvRenovar().finally(()=>nvSincronizar(true)); 
+    } else if(typeof nvStatus === 'function') {
+      nvStatus('','');
+    }
+  }
+});
