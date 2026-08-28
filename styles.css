@@ -457,7 +457,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 /* ---------- Tabelas em Cards no Celular ---------- */
 @media (max-width: 600px) {
-  .twrap table, .twrap thead, .twrap tbody, .twrap th, .twrap td, .twrap tr {
+  .twrap table, .twrap thead, .twrap tbody, .twrap tfoot, .twrap th, .twrap td, .twrap tr {
     display: block;
   }
   .twrap thead { display: none; }
@@ -476,6 +476,9 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
     padding: 8px 0;
     text-align: right;
   }
+  .twrap td:empty, .twrap td:has(> .rowacts:empty) {
+    display: none;
+  }
   .twrap td:last-child { border-bottom: none; }
   .twrap td::before {
     content: attr(data-label);
@@ -483,6 +486,10 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
     color: var(--ink-soft);
     text-align: left;
     flex-basis: 45%;
+  }
+  .twrap tfoot tr {
+    background: var(--paper);
+    border: 1px solid var(--ink);
   }
   /* Remove a trava das colunas laterais no mobile para evitar quebras */
   .twrap.fixa2 th:nth-child(1), .twrap.fixa2 td:nth-child(1),
