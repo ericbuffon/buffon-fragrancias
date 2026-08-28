@@ -1473,7 +1473,7 @@ function primeiroUso(){
   $('#pu2').addEventListener('click', ()=>$('#btnImport').click());
   return true;
 }
-function renderAll(){ renderDash(); renderProd(); fillSelects(); renderCom(); renderVen(); renderEst(); renderCon(); renderTes(); renderDes(); renderCli(); renderCanal(); }
+function renderAll(){ renderDash(); renderProd(); fillSelects(); renderCom(); renderVen(); renderEst(); renderCon(); renderTes(); renderDes(); renderCli(); renderCanal(); aplicarLabelsMobile();}
 
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
 bindSort('#tCanal', sort.can, renderCanal);
@@ -2993,3 +2993,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+function toast(mensagem, tipo = 'sucesso') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const t = document.createElement('div');
+  t.className = `toast ${tipo}`;
+  t.textContent = mensagem;
+  container.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function aplicarLabelsMobile() {
+  document.querySelectorAll('.twrap table').forEach(tabela => {
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent.replace(/[▲▼↕]/g, '').trim());
+    tabela.querySelectorAll('tbody tr').forEach(tr => {
+      Array.from(tr.children).forEach((td, i) => {
+        if (headers[i]) td.setAttribute('data-label', headers[i]);
+      });
+    });
+  });
+}

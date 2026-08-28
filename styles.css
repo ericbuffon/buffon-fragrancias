@@ -425,3 +425,69 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 @media(max-width:640px){header.top,nav.tabs,main{padding-left:1rem;padding-right:1rem}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+/* ---------- Alertas Toast ---------- */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast {
+  background-color: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 14px;
+  font-weight: 500;
+  animation: fadeInOut 3s forwards;
+}
+.toast.sucesso { border-left: 4px solid var(--verde); }
+.toast.erro { border-left: 4px solid var(--vermelho); }
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(100%); }
+  10% { opacity: 1; transform: translateX(0); }
+  90% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+/* ---------- Tabelas em Cards no Celular ---------- */
+@media (max-width: 600px) {
+  .twrap table, .twrap thead, .twrap tbody, .twrap th, .twrap td, .twrap tr {
+    display: block;
+  }
+  .twrap thead { display: none; }
+  .twrap tr {
+    margin-bottom: 15px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    background: var(--card);
+  }
+  .twrap td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--line2);
+    padding: 8px 0;
+    text-align: right;
+  }
+  .twrap td:last-child { border-bottom: none; }
+  .twrap td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-align: left;
+    flex-basis: 45%;
+  }
+  /* Remove a trava das colunas laterais no mobile para evitar quebras */
+  .twrap.fixa2 th:nth-child(1), .twrap.fixa2 td:nth-child(1),
+  .twrap.fixa2 th:nth-child(2), .twrap.fixa2 td:nth-child(2) {
+    position: static; 
+    box-shadow: none;
+  }
+}
