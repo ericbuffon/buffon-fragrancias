@@ -1824,7 +1824,7 @@ function catalogoItens(opt){
   return [...bloco('Masculino'), ...bloco('Feminino')];
 }
 const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:relative">${src
-  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<span style="position:absolute; bottom:2px; right:3px; font-size:4.5px; color:var(--ink); opacity:0.45; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; text-align:right; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</span>' : ''}`
+  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<span style="position:absolute; bottom:2px; left:0; right:0; font-size:4.5px; color:var(--ink); opacity:0.45; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; text-align:center; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</span>' : ''}`
   : `<div class="vazio">${ICO.frasco}<span>sem foto</span></div>`}</div>`;
 
 /* pirâmide olfativa: topo estreito, coração médio, fundo largo */
