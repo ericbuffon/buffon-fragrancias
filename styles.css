@@ -82,7 +82,7 @@ main,section,.twrap,.card,.kpis{min-width:0;max-width:100%}
 .resumo div{flex:1 1 130px;padding:9px 14px;border-right:1px solid var(--line2);min-width:0}
 .resumo div:last-child{border-right:none}
 .resumo .r{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
-.resumo .v{font-size:15px;font-weight:700;margin-top:1px;white-space:nowrap}
+.resumo .v{font-size:15px;font-weight:700;margin-top:1px;white-space:normal;word-break:break-word;}
 .resumo .v.al{color:var(--vermelho)} .resumo .v.ok{color:var(--verde)} .resumo .v.am{color:var(--ambar)}
 
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;margin-bottom:1.1rem}
