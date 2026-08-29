@@ -1823,8 +1823,8 @@ function catalogoItens(opt){
   const bloco = g => itens.filter(p=>p.genero===g).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   return [...bloco('Masculino'), ...bloco('Feminino')];
 }
-const plate = (cls,src,alt) => `<div class="plate ${cls}">${src
-  ? `<img src="${src}" alt="${esc(alt)}">`
+const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:relative">${src
+  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<span style="position:absolute; bottom:2px; right:3px; font-size:4.5px; color:var(--ink); opacity:0.45; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; text-align:right; line-height:1.1;">Referência<br>Olfativa</span>' : ''}`
   : `<div class="vazio">${ICO.frasco}<span>sem foto</span></div>`}</div>`;
 
 /* pirâmide olfativa: topo estreito, coração médio, fundo largo */
@@ -1869,7 +1869,7 @@ function itemHTML(p, n, opt){
       <div class="insp">${esc(p.inspiracao)}</div>
       ${p.marca?`<div class="marca">${esc(p.marca)}</div>`:''}
     </div>`:''}
-    <div class="dir">${plate('p2', p.fotoInsp, p.inspiracao||'referência')}
+    <div class="dir">${plate('p2', p.fotoInsp, p.inspiracao||'referência', true)}
       <div class="cap">referência</div></div>
   </div>`;
 }
@@ -2953,8 +2953,8 @@ function desenhaVitrine(c){
     /* mesma diagramação que a dona usa: capa, 3 por página, pirâmide */
     const n = montaFolhas(itens, {preco:!!c.preco, marcaTester:true, contato:c.contato||''});
     if(!n) return;
-    document.body.classList.add('pr-cat'); document.body.classList.remove('publico');
-    const limpa = ()=>{ document.body.classList.remove('pr-cat'); document.body.classList.add('publico'); window.removeEventListener('afterprint',limpa); };
+    document.body.classList.add('pr-cat');
+    const limpa = ()=>{ document.body.classList.remove('pr-cat'); window.removeEventListener('afterprint',limpa); };
     window.addEventListener('afterprint', limpa);
     setTimeout(()=>{ window.print(); setTimeout(limpa,1500); }, 200);
   });

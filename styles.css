@@ -140,7 +140,7 @@ button.kpi *{pointer-events:none}
   font-size:11px;line-height:1.5;overflow:auto;max-height:150px;margin:.5rem 0 0}
 #vitrine{display:none;max-width:940px;margin:0 auto;padding:2rem 1.1rem 4rem}
 #vitrine.on{display:block}
-body.publico>*:not(#vitrine):not(#cartFloatWrap){display:none!important}
+body.publico:not(.pr-cat)>*:not(#vitrine):not(#cartFloatWrap){display:none!important}
 body.publico{background:#fff}
 #vitrine .topo{text-align:center;padding:1rem 0 1.6rem;border-bottom:1px solid var(--line)}
 #vitrine .topo img{height:52px;width:auto;display:block;margin:0 auto}
