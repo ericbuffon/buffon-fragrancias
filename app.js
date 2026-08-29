@@ -2925,7 +2925,9 @@ function desenhaVitrine(c){
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
         ${p.tester?'<span class="badge roxo">tem provador</span>':''}
       </div>
-      <button class="vitrine-add" onclick="window.addToCart(this.dataset.nome, this.dataset.preco)" data-nome="${esc(p.nome)}" data-preco="${p.preco||0}">Adicionar ao carrinho</button>
+      <div class="cart-item-wrap" data-nome="${esc(p.nome)}">
+        ${cart[p.nome] ? `<div class="qtd-ctrl"><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, -1)">-</button><span class="qtd-num">${cart[p.nome].qtd}</span><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">+</button></div>` : `<button class="vitrine-add" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">Adicionar ao carrinho</button>`}
+      </div>
     </div></div>`;
   $('#vitrine').innerHTML = `
     <div class="topo">
@@ -3031,28 +3033,53 @@ function aplicarLabelsMobile() {
 /* ---------- Carrinho Vitrine ---------- */
 let cart = {}; // { 'Nome do Perfume': { qtd } }
 window.vitrineContato = ''; // Guardará o contato quando a vitrine for desenhada
-window.addToCart = (nome) => {
-    if (!cart[nome]) {
-        cart[nome] = { qtd: 0 };
-    }
-    cart[nome].qtd += 1;
+
+window.updateItemQtd = (nome, delta) => {
+    if (!cart[nome]) cart[nome] = { qtd: 0 };
+    cart[nome].qtd += delta;
+    if (cart[nome].qtd <= 0) delete cart[nome];
     updateCartUI();
 };
+
+window.clearCart = () => {
+    if (confirm('Tem certeza que deseja esvaziar o carrinho?')) {
+        cart = {};
+        updateCartUI();
+    }
+};
+
 function updateCartUI() {
     const totalItems = Object.values(cart).reduce((a,b)=>a+b.qtd, 0);
-    const cartFloat = document.getElementById('cartFloat');
-    if(cartFloat) {
+    const wrap = document.getElementById('cartFloatWrap');
+    if(wrap) {
         if(totalItems > 0) {
-            cartFloat.classList.add('show');
+            wrap.classList.add('show');
             document.getElementById('cartCount').textContent = totalItems;
         } else {
-            cartFloat.classList.remove('show');
+            wrap.classList.remove('show');
         }
     }
+    
+    // Atualiza os cartões dinamicamente
+    document.querySelectorAll('.cart-item-wrap').forEach(el => {
+        const nome = el.dataset.nome;
+        const item = cart[nome];
+        if (item && item.qtd > 0) {
+            el.innerHTML = `
+                <div class="qtd-ctrl">
+                    <button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, -1)">-</button>
+                    <span class="qtd-num">${item.qtd}</span>
+                    <button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">+</button>
+                </div>`;
+        } else {
+            el.innerHTML = `<button class="vitrine-add" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">Adicionar ao carrinho</button>`;
+        }
+    });
 }
-const cartFloat = document.getElementById('cartFloat');
-if(cartFloat) {
-    cartFloat.addEventListener('click', () => {
+
+const cartFloatBtn = document.getElementById('cartFloatBtn');
+if(cartFloatBtn) {
+    cartFloatBtn.addEventListener('click', () => {
         const contato = window.vitrineContato || (data.config && data.config.contato ? data.config.contato : '');
         const num = (contato || '').replace(/\D/g,'');
         if(!num) {
@@ -3072,6 +3099,10 @@ if(cartFloat) {
         cart = {}; // Limpa carrinho após enviar
         updateCartUI();
     });
+}
+const cartClearBtn = document.getElementById('cartClear');
+if(cartClearBtn) {
+    cartClearBtn.addEventListener('click', window.clearCart);
 }
 
 /* ---------- Gráficos ---------- */

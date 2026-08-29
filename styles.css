@@ -140,7 +140,7 @@ button.kpi *{pointer-events:none}
   font-size:11px;line-height:1.5;overflow:auto;max-height:150px;margin:.5rem 0 0}
 #vitrine{display:none;max-width:940px;margin:0 auto;padding:2rem 1.1rem 4rem}
 #vitrine.on{display:block}
-body.publico>*:not(#vitrine):not(#cartFloat){display:none!important}
+body.publico>*:not(#vitrine):not(#cartFloatWrap){display:none!important}
 body.publico{background:#fff}
 #vitrine .topo{text-align:center;padding:1rem 0 1.6rem;border-bottom:1px solid var(--line)}
 #vitrine .topo img{height:52px;width:auto;display:block;margin:0 auto}
@@ -477,34 +477,91 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   }
 }
 /* ---------- Carrinho Flutuante (Vitrine) ---------- */
-#cartFloat {
+#cartFloatWrap {
   position: fixed;
   bottom: 20px;
   right: 20px;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+#cartFloatWrap.show {
+  display: flex !important;
+}
+#cartFloatBtn {
   background: #1F7A44;
   color: #fff;
   padding: 12px 24px;
   border-radius: 30px;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 100;
   cursor: pointer;
-  display: none;
+  display: flex;
   align-items: center;
   gap: 8px;
   border: none;
   font-size: 14px;
+  transition: transform 0.2s ease;
 }
-#cartFloat.show {
-  display: flex !important;
-}
-#cartFloat:hover {
+#cartFloatBtn:hover {
   background: #176034;
   transform: translateY(-2px);
-  transition: all 0.2s ease;
+}
+#cartClear {
+  background: #fff;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  font-size: 18px;
+}
+#cartClear:hover {
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+.cart-item-wrap {
+  margin-top: 10px;
+  width: 100%;
+}
+.qtd-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--line);
+  border-radius: 8px;
+  padding: 4px;
+}
+.qtd-btn {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qtd-btn:hover {
+  background: var(--line2);
+}
+.qtd-num {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
 }
 .vitrine-add {
-  margin-top: 10px;
   width: 100%;
   border-radius: 8px;
   background: var(--line);
