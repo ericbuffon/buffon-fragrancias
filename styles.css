@@ -367,7 +367,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 #catalogo .inspcol .lbl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--suave);font-weight:600}
 #catalogo .inspcol .fio{width:12mm;height:1px;background:var(--acc);margin:2mm auto}
-#catalogo .inspcol .insp{font-family:'Fraunces',Georgia,serif;font-size:14px;font-weight:600;
+#catalogo .inspcol .insp{font-family:'Fraunces',Georgia,serif;font-size:13.5px;font-weight:600;
   line-height:1.2;color:var(--tinta)}
 #catalogo .inspcol .marca{font-size:9px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--suave);margin-top:1.2mm}
