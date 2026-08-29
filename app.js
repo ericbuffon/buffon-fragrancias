@@ -2910,9 +2910,9 @@ function desenhaVitrine(c){
   const itens = c.itens||[];
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
-  const foto = (src,alt) => src ? `<div><img src="${src}" alt="${esc(alt)}"></div>` : `<div><span class="vazio">sem foto</span></div>`;
+  const foto = (src, alt, isRef) => src ? `<div style="position:relative"><img src="${src}" alt="${esc(alt)}">${isRef ? '<span style="position:absolute; bottom:6px; right:6px; font-size:9px; color:var(--ink-soft); opacity:0.75; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; background:rgba(255,255,255,0.6); padding:2px 4px; border-radius:3px;">Referência</span>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
   const card = p => `<div class="item" data-g="${p.genero}">
-    <div class="fotos">${foto(p.foto,p.nome)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||''):''}</div>
+    <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
@@ -2953,8 +2953,8 @@ function desenhaVitrine(c){
     /* mesma diagramação que a dona usa: capa, 3 por página, pirâmide */
     const n = montaFolhas(itens, {preco:!!c.preco, marcaTester:true, contato:c.contato||''});
     if(!n) return;
-    document.body.classList.add('pr-cat');
-    const limpa = ()=>{ document.body.classList.remove('pr-cat'); window.removeEventListener('afterprint',limpa); };
+    document.body.classList.add('pr-cat'); document.body.classList.remove('publico');
+    const limpa = ()=>{ document.body.classList.remove('pr-cat'); document.body.classList.add('publico'); window.removeEventListener('afterprint',limpa); };
     window.addEventListener('afterprint', limpa);
     setTimeout(()=>{ window.print(); setTimeout(limpa,1500); }, 200);
   });
