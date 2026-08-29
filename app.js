@@ -8,10 +8,10 @@ let data = {products:[],purchases:[],sales:[],expenses:[],consignments:[]};
 let edit = {prod:null,com:null,ven:null,des:null,con:null,cli:null};
 let fotos = {prod:'', insp:''};
 let fil = {
-  prodGen:'',prodFoto:'',prodQ:'',prodTester:'',
+  prodGen:'',prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
   venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',
-  estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',
+  estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
   desDe:'',desAte:'',desQ:''
@@ -221,7 +221,7 @@ function estoque(){
     const nuncaVendeu = !data.sales.some(v=>v.produto===p.nome);
     const novo = nuncaVendeu && entrada !== null &&
                  (Date.now() - entrada) <= DIAS_NOVO*86400000;
-    return {produto:p.nome,genero:p.genero,recebido,caminho,vendido,aEntregar,consig,saldo,previsto,
+    return {produto:p.nome,genero:p.genero,familia:p.familia,recebido,caminho,vendido,aEntregar,consig,saldo,previsto,
       custoMedio:cm,custoEst,lucroPot:(saldo+consig)*preco-custoEst,
       porDia, necessidade,
       novo, diasCatalogo: entrada===null?null:Math.floor((Date.now()-entrada)/86400000),
@@ -412,10 +412,10 @@ window.addEventListener('popstate', e=>{
 
 /* ---------------- limpar filtros ---------------- */
 const GRUPOS = {
-  prod:{campos:['prodGen','prodFoto','prodQ','prodTester'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester'}, render:()=>renderProd()},
+  prod:{campos:['prodGen','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
   ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
-  est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca'}, render:()=>renderEst()},
+  est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
   cli:{campos:['cliSit','cliQ'], els:{cliSit:'#filCliSit',cliQ:'#filCliBusca'}, render:()=>renderCli()},
@@ -1154,6 +1154,7 @@ $('#tInad').addEventListener('click', e=>{
 function renderProd(){
   let rows = data.products.map(p=>({...p, temFoto:p.foto?1:0, temInsp:p.fotoInsp?1:0, provador: temProvador(p)?1:0}));
   if(fil.prodGen) rows = rows.filter(p=>p.genero===fil.prodGen);
+  if(fil.prodFam) rows = rows.filter(p=>p.familia===fil.prodFam);
   if(fil.prodTester==='sim') rows = rows.filter(p=>temProvador(p));
   if(fil.prodTester==='nao') rows = rows.filter(p=>!temProvador(p));
   if(fil.prodTester==='caminho') rows = rows.filter(p=>!temProvador(p) && testerAcaminho(p.nome));
@@ -1204,7 +1205,15 @@ function fillSelects(){
     .map(s=>(s||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   $('#listaClientes').innerHTML = clientes.map(c=>`<option value="${esc(c)}">`).join('');
   const familias = [...new Set(data.products.map(p=>(p.familia||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  
   $('#listaFamilias').innerHTML = familias.map(f=>`<option value="${esc(f)}">`).join('');
+  const curProdFam = fil.prodFam;
+  $('#filProdFam').innerHTML = '<option value="">Todas as famílias</option>' + familias.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('');
+  $('#filProdFam').value = curProdFam;
+  const curEstFam = fil.estFam;
+  $('#filEstFam').innerHTML = '<option value="">Todas as famílias</option>' + familias.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('');
+  $('#filEstFam').value = curEstFam;
+
   const canais = [...new Set([...data.sales.map(v=>canalDe(v)), 'Direto',
     ...data.consignments.map(c=>c.parceiro)].map(s=>(s||'').trim()).filter(Boolean))]
     .sort((a,b)=>a.localeCompare(b,'pt-BR'));
@@ -1301,6 +1310,7 @@ function renderEst(){
   let rows = estoque().map(r=>({...r, classeAbc: abcMapa[r.produto]||''}));
   const total = rows.length;
   if(fil.estGen) rows = rows.filter(r=>r.genero===fil.estGen);
+  if(fil.estFam) rows = rows.filter(r=>r.familia===fil.estFam);
   if(fil.estStat) rows = rows.filter(r=>r.status===fil.estStat);
   if(fil.estProdX) rows = rows.filter(r=>r.produto===fil.estProdX);
   if(fil.estClasseAbc) rows = rows.filter(r=>(r.classeAbc||'')===fil.estClasseAbc || (fil.estClasseAbc==='—' && !r.classeAbc));
@@ -1768,13 +1778,14 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lightbox').cla
 /* filtros */
 const LIGA = [
   ['#filProdTester','prodTester','change',renderProd],
+  ['#filProdFam','prodFam','change',renderProd],
   ['#filProdGen','prodGen','change',renderProd],['#filProdFoto','prodFoto','change',renderProd],['#filProdBusca','prodQ','input',renderProd],
   ['#filComGen','comGen','change',renderCom],['#filComTipo','comTipo','change',renderCom],['#filComEnt','comEnt','change',renderCom],
   ['#filComDe','comDe','change',renderCom],['#filComAte','comAte','change',renderCom],['#filComBusca','comQ','input',renderCom],
   ['#filVenCanal','venCanal','change',renderVen],
   ['#filVenGen','venGen','change',renderVen],['#filVenStat','venStat','change',renderVen],['#filVenEnt','venEnt','change',renderVen],
   ['#filVenDe','venDe','change',renderVen],['#filVenAte','venAte','change',renderVen],['#filVenBusca','venQ','input',renderVen],
-  ['#filEstGen','estGen','change',renderEst],['#filEstStat','estStat','change',renderEst],['#filEstBusca','estQ','input',renderEst],
+  ['#filEstGen','estGen','change',renderEst],['#filEstStat','estStat','change',renderEst],['#filEstFam','estFam','change',renderEst],['#filEstBusca','estQ','input',renderEst],
   ['#filConParc','conParc','change',renderCon],['#filConTipo','conTipo','change',renderCon],['#filConSit','conSit','change',renderCon],
   ['#filConDe','conDe','change',renderCon],['#filConAte','conAte','change',renderCon],['#filConBusca','conQ','input',renderCon],
   ['#filCanSit','canSit','change',renderCanal],['#filCanDe','canDe','change',renderCanal],
@@ -2096,13 +2107,13 @@ function exportaXlsx(g){
 /* ---------------- relatórios por tela ---------------- */
 const RELATORIOS = {
   prod:{titulo:'Catálogo de produtos', tabela:'#tProd', contador:'#cntProd',
-    filtros:()=>[['Gênero',fil.prodGen],['Provador',{sim:'só com provador',nao:'só sem provador'}[fil.prodTester]],['Fotos',{semProd:'sem foto do produto',semInsp:'sem foto da inspiração',semAmbas:'sem nenhuma foto',comAmbas:'com as duas fotos'}[fil.prodFoto]],['Busca',fil.prodQ]]},
+    filtros:()=>[['Gênero',fil.prodGen],['Família',fil.prodFam],['Provador',{sim:'só com provador',nao:'só sem provador'}[fil.prodTester]],['Fotos',{semProd:'sem foto do produto',semInsp:'sem foto da inspiração',semAmbas:'sem nenhuma foto',comAmbas:'com as duas fotos'}[fil.prodFoto]],['Busca',fil.prodQ]]},
   com:{titulo:'Compras', tabela:'#tCom', contador:'#cntCom',
     filtros:()=>[['Gênero',fil.comGen],['Tipo',fil.comTipo],['Situação',fil.comEnt==='Sim'?'recebidas':fil.comEnt==='Não'?'a caminho':''],['Período',periodo(fil.comDe,fil.comAte)],['Busca',fil.comQ]]},
   ven:{titulo:'Vendas', tabela:'#tVen', contador:'#cntVen',
     filtros:()=>[['Canal',fil.venCanal],['Gênero',fil.venGen],['Pagamento',fil.venStat],['Entrega',fil.venEnt==='Sim'?'entregues':fil.venEnt==='Não'?'não entregues':''],['Período',periodo(fil.venDe,fil.venAte)],['Busca',fil.venQ]]},
   est:{titulo:'Posição de estoque', tabela:'#tEst', contador:'#cntEst',
-    filtros:()=>[['Gênero',fil.estGen],['Situação',fil.estStat],['Busca',fil.estQ]]},
+    filtros:()=>[['Gênero',fil.estGen],['Família',fil.estFam],['Situação',fil.estStat],['Busca',fil.estQ]]},
   con:{titulo:'Estoque consignado', tabela:'#tCon', contador:'#cntCon',
     filtros:()=>[['Parceiro',fil.conParc],['Tipo',fil.conTipo],['Situação',fil.conSit],['Período',periodo(fil.conDe,fil.conAte)],['Busca',fil.conQ]]},
   can:{titulo:'Canais de venda', tabela:'#tCanal', contador:'#cntCan',
