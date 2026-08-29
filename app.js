@@ -1869,8 +1869,7 @@ function itemHTML(p, n, opt){
       <div class="insp">${esc(p.inspiracao)}</div>
       ${p.marca?`<div class="marca">${esc(p.marca)}</div>`:''}
     </div>`:''}
-    <div class="dir">${plate('p2', p.fotoInsp, p.inspiracao||'referência', true)}
-      <div class="cap">referência</div></div>
+    <div class="dir">${plate('p2', p.fotoInsp, p.inspiracao||'referência', true)}</div>
   </div>`;
 }
 
