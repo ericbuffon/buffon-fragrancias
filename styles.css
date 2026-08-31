@@ -619,3 +619,20 @@ input[type="date"] {
   min-width: 0 !important;
   width: auto !important;
 }
+/* ---------- Correção de Impressão (PDF) para o iPhone ---------- */
+@media print {
+  /* 1. Remove a escala (transform) da tela do celular que o iOS "vaza" para a impressão */
+  body.publico.pr-cat #catalogo,
+  body.pr-cat #catalogo {
+    transform: none !important;
+    width: 100% !important;
+  }
+
+  /* 2. Aplica a correção de largura da página SOMENTE para o iOS (iPhone/Safari).
+        O Android e o PC ignoram essa regra e mantêm os 210mm originais intactos. */
+  @supports (-webkit-touch-callout: none) {
+    #catalogo .pagina {
+      width: 100% !important;
+    }
+  }
+}
