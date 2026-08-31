@@ -600,9 +600,13 @@ body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direc
   display: none !important;
 }
 
-/* 2. Padroniza a altura de todos os campos de data no iOS */
+/* 2. Remove o visual nativo inflado do iOS e força altura igual para os campos */
 input[type="date"] {
-  min-height: 34px;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  box-sizing: border-box;
 }
 
 /* 3. Força a largura dos campos de data nos filtros para o iOS não encolher */
