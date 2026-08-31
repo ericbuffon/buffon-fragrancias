@@ -594,3 +594,18 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 #scrollControls { display: none; }
 body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direction: column; }
+
+/* 1. Força o CSS a respeitar o atributo 'hidden' do HTML para as bolinhas de status */
+.autostat[hidden], .nuvemstat[hidden], .chip[hidden], #balao[hidden] {
+  display: none !important;
+}
+
+/* 2. Padroniza a altura de todos os campos de data no iOS */
+input[type="date"] {
+  min-height: 34px;
+}
+
+/* 3. Força a largura dos campos de data nos filtros para o iOS não encolher */
+.filters input[type="date"] {
+  width: 145px;
+}
