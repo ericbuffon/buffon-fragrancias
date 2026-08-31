@@ -1987,11 +1987,7 @@ $('#catTirar').addEventListener('click', async ()=>{
 
 $('#catGerar').addEventListener('click',()=>{
   const opt = opcoesCat();
-  const n = montaCatalogo(opt);
-  if(!n) return alert('Nenhuma fragrância atende a esses filtros. Ajuste as opções e tente de novo.');
-  data.config = Object.assign({}, data.config, {contato:opt.contato.trim()}); save();
-  $('#modalCat').classList.remove('open');
-  imprime('pr-cat');
+  baixarCatalogoPDF(opt);
 });
 
 /* ---------------- exportação para Excel ----------------
@@ -2960,13 +2956,8 @@ function desenhaVitrine(c){
     </div>`;
   const bp = $('#vitPdf');
   if(bp) bp.addEventListener('click', ()=>{
-    /* mesma diagramação que a dona usa: capa, 3 por página, pirâmide */
-    const n = montaFolhas(itens, {preco:!!c.preco, marcaTester:true, contato:c.contato||''});
-    if(!n) return;
-    document.body.classList.add('pr-cat');
-    const limpa = ()=>{ document.body.classList.remove('pr-cat'); window.removeEventListener('afterprint',limpa); };
-    window.addEventListener('afterprint', limpa);
-    setTimeout(()=>{ window.print(); setTimeout(limpa,1500); }, 200);
+    const opt = {genero:'', soFoto:false, preco:!!c.preco, soEstoque:false, soTester:false, marcaTester:true, contato:c.contato||''};
+    baixarCatalogoPDFVitrine(itens, opt);
   });
   $('#vitrine').addEventListener('click', e=>{
     const b=e.target.closest('.fbtn'); if(!b) return;
@@ -3207,3 +3198,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 });
+
+
+function executaHtml2Pdf() {
+  const element = $('#catalogo');
+  element.style.display = 'block';
+
+  toast('Gerando PDF, aguarde um instante...', 'sucesso');
+
+  const optPdf = {
+    margin:       0,
+    filename:     'buffon-catalogo.pdf',
+    image:        { type: 'jpeg', quality: 0.95 },
+    html2canvas:  { scale: 2, useCORS: true, letterRendering: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().from(element).set(optPdf).save().then(() => {
+    element.style.display = 'none';
+    toast('Catálogo baixado com sucesso!');
+  }).catch(err => {
+    element.style.display = 'none';
+    alert('Erro ao gerar o PDF: ' + err.message);
+  });
+}
+
+function baixarCatalogoPDF(opt) {
+  const n = montaCatalogo(opt);
+  if(!n) return alert('Nenhuma fragrância atende a esses filtros. Ajuste as opções e tente de novo.');
+  data.config = Object.assign({}, data.config, {contato:opt.contato.trim()}); save();
+  $('#modalCat').classList.remove('open');
+  executaHtml2Pdf();
+}
+
+function baixarCatalogoPDFVitrine(itens, opt) {
+  const n = montaFolhas(itens, opt);
+  if(!n) return alert('Nenhuma fragrância atende a esses filtros.');
+  executaHtml2Pdf();
+}
