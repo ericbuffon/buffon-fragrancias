@@ -3214,13 +3214,15 @@ function executaHtml2Pdf() {
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
-  html2pdf().from(element).set(optPdf).save().then(() => {
-    element.style.display = 'none';
-    toast('Catálogo baixado com sucesso!');
-  }).catch(err => {
-    element.style.display = 'none';
-    alert('Erro ao gerar o PDF: ' + err.message);
-  });
+  setTimeout(() => {
+    html2pdf().from(element).set(optPdf).save().then(() => {
+      element.style.display = 'none';
+      toast('Catálogo baixado com sucesso!');
+    }).catch(err => {
+      element.style.display = 'none';
+      alert('Erro ao gerar o PDF: ' + err.message);
+    });
+  }, 800);
 }
 
 function baixarCatalogoPDF(opt) {
