@@ -342,8 +342,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 /* entradas */
 #catalogo .lista{flex:1;display:flex;flex-direction:column;gap:0}
-#catalogo .item{display:flex;align-items:center;gap:4mm;padding:4mm 0 4mm 5mm;position:relative;
-  break-inside:avoid;page-break-inside:avoid;height:76mm}
+#catalogo .item{display:flex;align-items:center;gap:4mm;padding:4mm 0 4mm 5mm;position:relative;break-inside:avoid;page-break-inside:avoid;height:76mm;max-height:76mm;overflow:hidden;}
 #catalogo .item::before{content:'';position:absolute;left:0;top:5mm;bottom:5mm;width:2mm;background:var(--acc)}
 #catalogo .item+.item{border-top:.8px solid var(--fio2)}
 
@@ -580,9 +579,15 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   color: #fff;
 }
 
+
+
 @media screen and (max-width: 840px) {
-    #catalogo {
-        zoom: calc(100vw / 840);
-        transform-origin: top left;
-    }
+  body.publico.pr-cat #catalogo {
+    width: 210mm;
+    transform: scale(calc(100vw / 210mm));
+    transform-origin: top left;
+  }
+  body.publico.pr-cat {
+    overflow-x: hidden;
+  }
 }
