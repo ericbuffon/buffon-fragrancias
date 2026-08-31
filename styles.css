@@ -620,26 +620,43 @@ input[type="date"] {
   width: auto !important;
 }
 
-/* ---------- Correção de Impressão (PDF) para o iPhone (Ajuste Final) ---------- */
+/* ---------- Correção de Impressão (PDF) para o iPhone (Área Segura) ---------- */
 @media print {
-  /* 1. Remove a escala (zoom) da versão mobile, mas MANTÉM a largura física de 210mm.
-        Isso garante que o iPhone identifique o documento como Retrato (Portrait) e não deite a página. */
-  body.publico.pr-cat #catalogo,
-  body.pr-cat #catalogo {
-    transform: none !important;
-    width: 210mm !important;
-  }
-
-  /* 2. Ajuste exclusivo para iOS/Safari */
   @supports (-webkit-touch-callout: none) {
-    /* O iOS insere margens forçadas na impressão que não podem ser removidas via código.
-       A altura original de 296mm transborda esse limite, gerando páginas em branco extras (indo para 32 pág).
-       Reduzindo a altura para 275mm, o conteúdo (que ocupa ~268mm) encaixa com perfeição, 
-       mantendo a proporção vertical e evitando as quebras falsas. */
+    /* O iOS impõe margens físicas de impressão (aprox. 5 a 6mm) que não podem ser 
+       sobrescritas por código. O tamanho exato do A4 (210x297mm) transborda essa área, 
+       fazendo o Safari empurrar o excesso para uma página seguinte 
+       (é por isso que a página 2 tem apenas um fio de borda e o total vai a 32).
+       
+       A solução é delimitar a página a uma "área segura" de 190x275mm. O Flexbox 
+       interno absorve essa pequena redução sem cortar o conteúdo e mantendo na mesma folha. */
+    
+    body.publico.pr-cat #catalogo,
+    body.pr-cat #catalogo {
+      transform: none !important;
+      width: 100% !important;
+    }
+
     #catalogo .pagina {
-      width: 210mm !important;
+      width: 190mm !important;
       height: 275mm !important;
       max-height: 275mm !important;
+      padding: 10mm 10mm 10mm !important;
+      box-sizing: border-box !important;
+      margin: 0 auto !important;
+      page-break-after: always !important;
+    }
+
+    /* Ajuste da moldura da capa para não encostar na nova margem */
+    #catalogo .capa .moldura {
+      inset: 4mm !important;
+    }
+
+    /* Ajuste do rodapé para alinhar na nova largura */
+    #catalogo .pe {
+      left: 10mm !important;
+      right: 10mm !important;
+      bottom: 10mm !important;
     }
   }
 }
