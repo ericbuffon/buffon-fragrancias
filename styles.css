@@ -591,3 +591,5 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
     overflow-x: hidden;
   }
 }
+
+@media print { #btnScroll { display: none !important; } }
