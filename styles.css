@@ -619,29 +619,3 @@ input[type="date"] {
   min-width: 0 !important;
   width: auto !important;
 }
-
-/* Correção de impressão para iOS / iPhone */
-@media print {
-  /* Anula a escala de tela que o iOS Safari herda incorretamente na impressão */
-  body.publico.pr-cat #catalogo,
-  body.pr-cat #catalogo {
-    transform: none !important;
-    width: 100% !important;
-  }
-  
-  /* Permite que o iOS ajuste o tamanho da folha nativamente sem cortar as bordas */
-  #catalogo .pagina {
-    width: 100% !important;
-    height: auto !important;
-    max-width: 100% !important;
-    overflow: visible !important;
-    padding: 10mm 5mm !important; 
-    box-sizing: border-box !important;
-  }
-  
-  /* Reforça a proteção contra quebra de linha no meio dos itens */
-  #catalogo .item {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-}
