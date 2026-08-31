@@ -290,8 +290,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- impressão ---------- */
 #catalogo,#relatorio{display:none}
 #catalogo *,#relatorio *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-@page{size:A4 portrait;margin:0}
-@page paisagem{size:A4 landscape;margin:0}
+
 @media print{
   html,body{margin:0!important;padding:0!important;background:#fff!important}
   body.publico.pr-cat>*:not(#catalogo){display:none!important}
@@ -620,7 +619,7 @@ input[type="date"] {
   width: auto !important;
 }
 
-/* ---------- Correção de Impressão (PDF) para o iPhone (Safe Break) ---------- */
+/* ---------- Correção de Impressão (PDF) para o iPhone (Ocultar cabeçalhos) ---------- */
 @media print {
   /* 1. Reset completo para mobile e desktop */
   body.publico.pr-cat #catalogo,
@@ -646,4 +645,14 @@ input[type="date"] {
     page-break-after: auto !important;
     break-after: auto !important;
   }
+}
+
+/* 4. Oculta a URL, data e número de página nativos do navegador */
+@page {
+  size: A4 portrait;
+  margin: 0 !important; /* Isso desativa os cabeçalhos/rodapés do navegador */
+}
+@page paisagem {
+  size: A4 landscape;
+  margin: 0 !important; /* Desativa para os relatórios também */
 }
