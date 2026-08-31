@@ -620,44 +620,26 @@ input[type="date"] {
   width: auto !important;
 }
 
-/* ---------- Correção de Impressão (PDF) para o iPhone (Definitivo) ---------- */
+/* ---------- Correção de Impressão (PDF) para o iPhone (Ajuste Final) ---------- */
 @media print {
+  /* 1. Remove a escala (zoom) da versão mobile, mas MANTÉM a largura física de 210mm.
+        Isso garante que o iPhone identifique o documento como Retrato (Portrait) e não deite a página. */
+  body.publico.pr-cat #catalogo,
+  body.pr-cat #catalogo {
+    transform: none !important;
+    width: 210mm !important;
+  }
+
+  /* 2. Ajuste exclusivo para iOS/Safari */
   @supports (-webkit-touch-callout: none) {
-    /* 1. Remove o zoom herdado da visualização mobile */
-    body.publico.pr-cat #catalogo,
-    body.pr-cat #catalogo {
-      transform: none !important;
-      width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    /* 2. O iOS cria páginas em branco extras e corta o layout porque "296mm"
-          ultrapassa a área imprimível dele (que possui margens não removíveis). 
-          Ao usar 100%, ele encaixa perfeitamente na folha. */
+    /* O iOS insere margens forçadas na impressão que não podem ser removidas via código.
+       A altura original de 296mm transborda esse limite, gerando páginas em branco extras (indo para 32 pág).
+       Reduzindo a altura para 275mm, o conteúdo (que ocupa ~268mm) encaixa com perfeição, 
+       mantendo a proporção vertical e evitando as quebras falsas. */
     #catalogo .pagina {
-      width: 100% !important;
-      height: 100% !important;
-      max-height: 100% !important;
-      padding: 10mm 12mm 10mm !important;
-      box-sizing: border-box !important;
-      page-break-after: always !important;
-      page-break-inside: avoid !important;
-      overflow: hidden !important;
-    }
-
-    /* 3. Ajuste fino da moldura da capa e rodapé para a nova altura flexível */
-    #catalogo .capa .moldura {
-      top: 5mm !important;
-      bottom: 5mm !important;
-      left: 5mm !important;
-      right: 5mm !important;
-    }
-    
-    #catalogo .pe {
-      bottom: 10mm !important;
-      left: 12mm !important;
-      right: 12mm !important;
+      width: 210mm !important;
+      height: 275mm !important;
+      max-height: 275mm !important;
     }
   }
 }
