@@ -290,7 +290,8 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- impressão ---------- */
 #catalogo,#relatorio{display:none}
 #catalogo *,#relatorio *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-
+@page{size:A4 portrait;margin:0}
+@page paisagem{size:A4 landscape;margin:0}
 @media print{
   html,body{margin:0!important;padding:0!important;background:#fff!important}
   body.publico.pr-cat>*:not(#catalogo){display:none!important}
@@ -619,40 +620,64 @@ input[type="date"] {
   width: auto !important;
 }
 
-/* ---------- Correção de Impressão (PDF) para o iPhone (Ocultar cabeçalhos) ---------- */
+/* ---------- Correção de Impressão (PDF) para o iPhone (Tamanhos Físicos Reduzidos) ---------- */
 @media print {
-  /* 1. Reset completo para mobile e desktop */
-  body.publico.pr-cat #catalogo,
-  body.pr-cat #catalogo {
-    transform: none !important;
-    width: 100% !important;
-  }
+  @supports (-webkit-touch-callout: none) {
+    /* Desativa qualquer escala vinda da visualização de tela */
+    body.publico.pr-cat #catalogo,
+    body.pr-cat #catalogo {
+      transform: none !important;
+    }
 
-  /* 2. Forçamos a página a se adaptar ao conteúdo e quebrar no lugar certo */
-  #catalogo .pagina {
-    width: 100% !important;
-    height: auto !important; /* Deixa o Safari definir a altura sem transbordar */
-    min-height: 100vh !important;
-    page-break-after: always !important;
-    page-break-inside: avoid !important;
-    break-after: page !important;
-    break-inside: avoid !important;
-    overflow: hidden !important;
-  }
+    /* Reduzimos fisicamente a altura da página e as margens para não transbordar
+       os limites rigorosos de impressão do iOS Safari */
+    #catalogo .pagina {
+      width: 190mm !important;
+      height: 258mm !important;
+      max-height: 258mm !important;
+      padding: 8mm 10mm 8mm !important;
+      margin: 0 auto !important;
+      page-break-after: always !important;
+      page-break-inside: avoid !important;
+      overflow: hidden !important;
+    }
 
-  /* 3. Evita que a última página crie um fantasma */
-  #catalogo .pagina:last-child {
-    page-break-after: auto !important;
-    break-after: auto !important;
+    /* Ajuste da moldura da capa para a nova proporção */
+    #catalogo .capa .moldura {
+      inset: 4mm !important;
+    }
+
+    /* Reduz a altura dos itens e das imagens proporcionalmente */
+    #catalogo .item {
+      height: 66mm !important;
+      max-height: 66mm !important;
+      padding: 3mm 0 3mm 4mm !important;
+    }
+    
+    #catalogo .plate.p1 {
+      width: 29mm !important;
+      height: 44mm !important;
+    }
+    
+    #catalogo .plate.p2 {
+      width: 21mm !important;
+      height: 28mm !important;
+    }
+    
+    #catalogo .inspcol {
+      flex: 0 0 27mm !important;
+    }
+
+    /* Reposiciona o rodapé personalizado */
+    #catalogo .pe {
+      bottom: 8mm !important;
+      left: 10mm !important;
+      right: 10mm !important;
+    }
   }
 }
 
-/* 4. Oculta a URL, data e número de página nativos do navegador */
+/* Tentativa de forçar margem zero para navegadores que respeitam (Chrome/Edge mobile) */
 @page {
-  size: A4 portrait;
-  margin: 0 !important; /* Isso desativa os cabeçalhos/rodapés do navegador */
-}
-@page paisagem {
-  size: A4 landscape;
-  margin: 0 !important; /* Desativa para os relatórios também */
+  margin: 0 !important;
 }
