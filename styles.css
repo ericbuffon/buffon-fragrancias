@@ -593,4 +593,4 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 @media print { #scrollControls { display: none !important; } }
 
 #scrollControls { display: none; }
-body.publico:not(.pr-cat) #scrollControls { display: flex !important; }
+body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direction: column; }
