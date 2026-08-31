@@ -1835,7 +1835,7 @@ function catalogoItens(opt){
   return [...bloco('Masculino'), ...bloco('Feminino')];
 }
 const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:relative; overflow:hidden;">${src
-  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; top:0; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; text-align:center; font-size:4.5px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</div>' : ''}`
+  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:1.5mm; text-align:center; font-size:4.5px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</div>' : ''}`
   : `<div class="vazio">${ICO.frasco}<span>sem foto</span></div>`}</div>`;
 
 /* pirâmide olfativa: topo estreito, coração médio, fundo largo */
@@ -2920,7 +2920,7 @@ function desenhaVitrine(c){
   const itens = c.itens||[];
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
-  const foto = (src, alt, isRef) => src ? `<div style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; top:0; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; text-align:center; font-size:8px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">Referência Olfativa</div>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
+  const foto = (src, alt, isRef) => src ? `<div style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:6px; text-align:center; font-size:8px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">Referência Olfativa</div>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
   const card = p => `<div class="item" data-g="${p.genero}">
     <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
