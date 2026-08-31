@@ -307,13 +307,11 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- catálogo ---------- */
 #catalogo{--tinta:#141109; --suave:#453D33; --fraco:#7C7266;
   --papel:#FFF; --plate:#FFF; --fio:#CFC5B2; --fio2:#EAE4D8; --ouro:#8F6B22;}
-#catalogo .pagina{width:210mm;height:296.6mm;position:relative;overflow:hidden;background:var(--papel);
-  padding:14mm 15mm 11mm;display:flex;flex-direction:column;
-  break-after:page;page-break-after:always;color:var(--tinta)}
+#catalogo .pagina{width:210mm;height:296mm;position:relative;overflow:hidden;background:var(--papel);padding:14mm 15mm 11mm;display:block;break-after:page;page-break-after:always;color:var(--tinta)}
 #catalogo .pagina:last-child{break-after:auto;page-break-after:auto}
 
 /* capa */
-#catalogo .capa{align-items:center;justify-content:center;text-align:center;padding:0}
+#catalogo .capa{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0}
 #catalogo .capa .moldura{position:absolute;inset:8mm;border:1.4px solid var(--tinta)}
 #catalogo .capa .moldura::before{content:'';position:absolute;inset:2.4mm;border:.6px solid var(--ouro)}
 #catalogo .capa .miolo{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
@@ -333,15 +331,13 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 #catalogo .topo img.logo{height:8mm;width:auto;display:block}
 #catalogo .topo .rive{font-family:'Fraunces',Georgia,serif;font-size:11.5px;letter-spacing:.3em;
   font-weight:600;border:1px solid var(--tinta);padding:1.2mm 3.4mm}
-#catalogo .pe{margin-top:auto;padding-top:2.6mm;border-top:.8px solid var(--fio);
-  display:flex;align-items:baseline;font-size:10px;letter-spacing:.14em;color:var(--suave);
-  flex:none;font-weight:500}
+#catalogo .pe{position:absolute;bottom:11mm;left:15mm;right:15mm;padding-top:2.6mm;border-top:.8px solid var(--fio);display:flex;align-items:baseline;font-size:10px;letter-spacing:.14em;color:var(--suave);font-weight:500}
 #catalogo .pe .nota{flex:1;text-align:center;padding-left:14mm}
 #catalogo .pe .pag{flex:none;width:14mm;text-align:right;font-variant-numeric:tabular-nums;
   letter-spacing:.08em;color:var(--fraco)}
 
 /* entradas */
-#catalogo .lista{flex:1;display:flex;flex-direction:column;gap:0}
+#catalogo .lista{display:block;}
 #catalogo .item{display:flex;align-items:center;gap:4mm;padding:4mm 0 4mm 5mm;position:relative;break-inside:avoid;page-break-inside:avoid;height:76mm;max-height:76mm;overflow:hidden;}
 #catalogo .item::before{content:'';position:absolute;left:0;top:5mm;bottom:5mm;width:2mm;background:var(--acc)}
 #catalogo .item+.item{border-top:.8px solid var(--fio2)}
