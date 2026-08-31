@@ -620,64 +620,74 @@ input[type="date"] {
   width: auto !important;
 }
 
-/* ---------- Correção de Impressão (PDF) para o iPhone (Tamanhos Físicos Reduzidos) ---------- */
+/* ---------- Correção de Impressão (PDF) para o iPhone (Flexbox Adaptativo) ---------- */
 @media print {
   @supports (-webkit-touch-callout: none) {
-    /* Desativa qualquer escala vinda da visualização de tela */
+    /* Desativa escalas fixas da tela */
     body.publico.pr-cat #catalogo,
     body.pr-cat #catalogo {
       transform: none !important;
+      width: 100% !important;
     }
 
-    /* Reduzimos fisicamente a altura da página e as margens para não transbordar
-       os limites rigorosos de impressão do iOS Safari */
+    /* 
+      Transforma a página num Flexbox que ocupa exatos 100% da folha física (100vh),
+      seja ela A4 ou Carta, absorvendo a perda de espaço da URL nativa do iOS. 
+    */
     #catalogo .pagina {
-      width: 190mm !important;
-      height: 258mm !important;
-      max-height: 258mm !important;
-      padding: 8mm 10mm 8mm !important;
-      margin: 0 auto !important;
+      width: 100% !important;
+      height: 100vh !important; 
+      max-height: 100vh !important;
+      padding: 4vh 4vw 3vh !important; /* Espaçamento relativo à folha */
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
       page-break-after: always !important;
-      page-break-inside: avoid !important;
+      break-after: page !important;
       overflow: hidden !important;
     }
 
-    /* Ajuste da moldura da capa para a nova proporção */
-    #catalogo .capa .moldura {
-      inset: 4mm !important;
+    /* Topo flexível */
+    #catalogo .topo {
+      flex: none !important;
+      margin-bottom: 2vh !important;
     }
 
-    /* Reduz a altura dos itens e das imagens proporcionalmente */
+    /* Lista distribui os itens no espaço que sobrar */
+    #catalogo .lista {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-evenly !important; /* Espalha os 3 perfumes uniformemente */
+    }
+
+    /* O item se adapta, sem altura travada em mm */
     #catalogo .item {
-      height: 66mm !important;
-      max-height: 66mm !important;
-      padding: 3mm 0 3mm 4mm !important;
-    }
-    
-    #catalogo .plate.p1 {
-      width: 29mm !important;
-      height: 44mm !important;
-    }
-    
-    #catalogo .plate.p2 {
-      width: 21mm !important;
-      height: 28mm !important;
-    }
-    
-    #catalogo .inspcol {
-      flex: 0 0 27mm !important;
+      flex: none !important;
+      height: auto !important;
+      padding: 1.5vh 0 1.5vh 2vw !important;
     }
 
-    /* Reposiciona o rodapé personalizado */
+    /* Rodapé dinâmico: sai do "absolute" e vai pro final do flexbox */
     #catalogo .pe {
-      bottom: 8mm !important;
-      left: 10mm !important;
-      right: 10mm !important;
+      position: relative !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin-top: auto !important;
+      padding-top: 1.5vh !important;
+      flex: none !important;
+    }
+
+    /* Ajustes da Capa */
+    #catalogo .capa {
+      justify-content: center !important;
+    }
+    #catalogo .capa .moldura {
+      top: 3vh !important;
+      bottom: 3vh !important;
+      left: 4vw !important;
+      right: 4vw !important;
     }
   }
-}
-
-/* Tentativa de forçar margem zero para navegadores que respeitam (Chrome/Edge mobile) */
-@page {
-  margin: 0 !important;
 }
