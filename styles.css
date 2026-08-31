@@ -307,7 +307,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- catálogo ---------- */
 #catalogo{--tinta:#141109; --suave:#453D33; --fraco:#7C7266;
   --papel:#FFF; --plate:#FFF; --fio:#CFC5B2; --fio2:#EAE4D8; --ouro:#8F6B22;}
-#catalogo .pagina{width:210mm;height:296mm;position:relative;overflow:hidden;background:var(--papel);padding:14mm 15mm 11mm;display:block;break-after:page;page-break-after:always;color:var(--tinta)}
+#catalogo .pagina{width:210mm;height:275mm;position:relative;overflow:hidden;background:var(--papel);padding:14mm 15mm 11mm;display:block;break-after:page;page-break-after:always;color:var(--tinta)}
 #catalogo .pagina:last-child{break-after:auto;page-break-after:auto}
 
 /* capa */
@@ -591,3 +591,6 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 
 @media print { #scrollControls { display: none !important; } }
+
+#scrollControls { display: none; }
+body.publico:not(.pr-cat) #scrollControls { display: flex !important; }
