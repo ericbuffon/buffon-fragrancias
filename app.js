@@ -1834,8 +1834,8 @@ function catalogoItens(opt){
   const bloco = g => itens.filter(p=>p.genero===g).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   return [...bloco('Masculino'), ...bloco('Feminino')];
 }
-const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:relative">${src
-  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<span style="position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:max-content; font-size:4.5px; color:var(--ink); opacity:0.45; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; text-align:center; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</span>' : ''}`
+const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:relative; overflow:hidden;">${src
+  ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; bottom:1.5mm; left:0; right:0; text-align:center; font-size:4.5px; color:var(--ink); opacity:0.55; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</div>' : ''}`
   : `<div class="vazio">${ICO.frasco}<span>sem foto</span></div>`}</div>`;
 
 /* pirâmide olfativa: topo estreito, coração médio, fundo largo */
@@ -1859,8 +1859,8 @@ function itemHTML(p, n, opt){
   const algumaNota = tem.topo || tem.coracao || tem.fundo;
   const nv = (rot,val) => val ? `<div class="nv"><b>${rot}</b><span>${esc(val)}</span></div>` : '';
   return `<div class="item" style="--acc:${acc}">
-    ${plate('p1', p.foto, p.nome)}
-    <div class="meio">
+    <div style="flex:none">${plate('p1', p.foto, p.nome)}</div>
+    <div class="meio" style="overflow:hidden;">
       <div class="topolinha"><span class="num">${String(n).padStart(2,'0')}</span>
         ${(opt.marcaTester && p.tester)?`<span class="selotest">provador disponível</span>`:''}</div>
       <div class="nome">${esc(p.nome)}</div>
@@ -1880,7 +1880,7 @@ function itemHTML(p, n, opt){
       <div class="insp">${esc(p.inspiracao)}</div>
       ${p.marca?`<div class="marca">${esc(p.marca)}</div>`:''}
     </div>`:''}
-    <div class="dir">${plate('p2', p.fotoInsp, p.inspiracao||'referência', true)}</div>
+    <div class="dir" style="flex:none">${plate('p2', p.fotoInsp, p.inspiracao||'referência', true)}</div>
   </div>`;
 }
 

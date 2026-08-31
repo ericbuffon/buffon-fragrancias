@@ -579,3 +579,10 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   background: var(--accent);
   color: #fff;
 }
+
+@media screen and (max-width: 840px) {
+    #catalogo {
+        zoom: calc(100vw / 840);
+        transform-origin: top left;
+    }
+}
