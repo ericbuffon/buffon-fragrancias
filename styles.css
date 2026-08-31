@@ -620,29 +620,30 @@ input[type="date"] {
   width: auto !important;
 }
 
-/* ---------- Correção de Impressão (PDF) para o iPhone (Solução via Zoom) ---------- */
+/* ---------- Correção de Impressão (PDF) para o iPhone (Safe Break) ---------- */
 @media print {
-  @supports (-webkit-touch-callout: none) {
-    /* 1. Remove o transform nativo que o Safari aplica erradamente na visualização */
-    body.publico.pr-cat #catalogo,
-    body.pr-cat #catalogo {
-      transform: none !important;
-      
-      /* 2. O iOS Safari impõe uma margem obrigatória para o cabeçalho/rodapé do sistema,
-            o que reduz a área útil do papel A4 de 297mm para cerca de 271mm.
-            Usar a propriedade 'zoom' reduz proporcionalmente o tamanho visual E o espaço 
-            físico ocupado, fazendo os 296mm originais caberem perfeitamente dentro da folha. */
-      zoom: 0.88 !important;
-    }
+  /* 1. Reset completo para mobile e desktop */
+  body.publico.pr-cat #catalogo,
+  body.pr-cat #catalogo {
+    transform: none !important;
+    width: 100% !important;
+  }
 
-    /* 3. Garantimos que a página mantenha a proporção original e não quebre no meio */
-    #catalogo .pagina {
-      width: 210mm !important;
-      height: 296mm !important;
-      max-height: 296mm !important;
-      margin: 0 auto !important;
-      page-break-after: always !important;
-      page-break-inside: avoid !important;
-    }
+  /* 2. Forçamos a página a se adaptar ao conteúdo e quebrar no lugar certo */
+  #catalogo .pagina {
+    width: 100% !important;
+    height: auto !important; /* Deixa o Safari definir a altura sem transbordar */
+    min-height: 100vh !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    break-after: page !important;
+    break-inside: avoid !important;
+    overflow: hidden !important;
+  }
+
+  /* 3. Evita que a última página crie um fantasma */
+  #catalogo .pagina:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 }
