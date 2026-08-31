@@ -600,7 +600,7 @@ body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direc
   display: none !important;
 }
 
-/* 2. Remove o visual nativo inflado do iOS e força altura igual para os campos */
+/* 2. Remove o visual nativo inflado do iOS e força altura exata para os campos de data */
 input[type="date"] {
   -webkit-appearance: none !important;
   appearance: none !important;
@@ -612,4 +612,10 @@ input[type="date"] {
 /* 3. Força a largura dos campos de data nos filtros para o iOS não encolher */
 .filters input[type="date"] {
   width: 145px;
+}
+
+/* 4. Remove o min-width dos checkboxes nos filtros para não dar espaçamento gigante */
+.filters input[type="checkbox"] {
+  min-width: 0 !important;
+  width: auto !important;
 }
