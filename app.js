@@ -3184,25 +3184,26 @@ function renderCharts(){
 }
 
 
+
 document.addEventListener('DOMContentLoaded', () => {
-  const btnScroll = document.getElementById('btnScroll');
-  if(btnScroll){
-    let isDown = true;
-    btnScroll.addEventListener('click', () => {
-      if(isDown){
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    });
+  const btnUp = document.getElementById('btnScrollUp');
+  const btnDown = document.getElementById('btnScrollDown');
+  if(btnUp && btnDown) {
+    btnUp.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    btnDown.addEventListener('click', () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+    
+    // Hide 'Up' when at top, hide 'Down' when at bottom
     window.addEventListener('scroll', () => {
-      if(window.scrollY + window.innerHeight > document.body.scrollHeight - 100){
-        btnScroll.textContent = '↑';
-        isDown = false;
-      } else {
-        btnScroll.textContent = '↓';
-        isDown = true;
-      }
+      const scrollPos = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      
+      btnUp.style.display = scrollPos > 100 ? 'flex' : 'none';
+      btnDown.style.display = scrollPos < maxScroll - 100 ? 'flex' : 'none';
     });
+    
+    // Check periodically in case DOM changes height dynamically
+    setInterval(() => {
+      window.dispatchEvent(new Event('scroll'));
+    }, 1000);
   }
 });
