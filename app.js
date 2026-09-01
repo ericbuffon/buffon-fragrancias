@@ -547,7 +547,7 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — perfumes La Rive.\n`
+    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — Empório La Rive.\n`
       + `Dá para ver as fotos e as notas de cada fragrância aqui:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida é só me chamar.`;
   }
@@ -573,7 +573,7 @@ function textoCatalogo(genero){
     if(i<0) break;
     linhas.splice(i,1); cortou++; corpo = linhas.join('\n');
   }
-  return `*Buffon Fragrâncias* — perfumes La Rive\n`
+  return `*Buffon Fragrâncias* — Empório La Rive\n`
     + `As melhores inspirações da perfumaria internacional.\n${corpo}\n`
     + (cortou?`\n_(e mais ${cortou} disponíveis)_\n`:'')
 
@@ -1964,7 +1964,7 @@ $('#catPublicar').addEventListener('click', async ()=>{
 
     const pdfOpt = {
       margin:       0,
-      filename:     `catalogo_${id}.pdf`,
+      filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 1.5, useCORS: true }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1973,7 +1973,7 @@ $('#catPublicar').addEventListener('click', async ()=>{
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
     elCatalogo.style.display = 'none';
 
-    const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/catalogo_${id}.pdf`, {
+    const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + NV.tok,
@@ -2984,7 +2984,7 @@ function desenhaVitrine(c, auth){
       </div>
     </div></div>`;
     
-  const pdfUrl = auth ? `${auth.u}/storage/v1/object/public/catalogos/catalogo_${auth.i}.pdf` : '#';
+  const pdfUrl = auth ? `${auth.u}/storage/v1/object/public/catalogos/${auth.i}.pdf?download=Catalogo_Buffon_Fragrancias.pdf` : '#';
 
   $('#vitrine').innerHTML = `
     <div class="topo">
