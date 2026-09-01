@@ -2998,6 +2998,18 @@ function desenhaVitrine(c, auth){
       <button class="fbtn" data-f="Feminino">Femininas (${itens.filter(p=>p.genero==='Feminino').length})</button>
     </div>
     <div class="grade">${itens.map(card).join('')}</div>
+
+    <div style="margin: 3rem auto 1rem; max-width: 700px; padding: 2rem; background: var(--paper); border-radius: 12px; border: 1px solid var(--line); text-align: left;">
+      <h3 style="font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink); margin-bottom: 12px;">O ABC da Perfumação</h3>
+      <p style="font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6;">Você tem certeza de que sabe como aplicar perfume para que as notas da fragrância se desenvolvam corretamente na sua pele?</p>
+      <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
+        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Aplique o perfume na pele limpa, lavada e seca.</li>
+        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Não esfregue o perfume no corpo.</li>
+        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Perfume as áreas de maior circulação sanguínea – a parte interna dos pulsos, dobras dos cotovelos e joelhos, e o pescoço.</li>
+        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Lembre-se de que uma fragrância muito intensa pode incomodar as pessoas ao seu redor.</li>
+        <li style="display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Evite aplicar perfume nas roupas, pois pode ser difícil remover a fragrância depois.</li>
+      </ul>
+    </div>
     <div class="pe">
       <div>Disponibilidade sujeita a estoque — consulte antes de fechar o pedido.</div>
       <div>Atualizado em ${new Date(c.emitido).toLocaleDateString('pt-BR')}</div>
