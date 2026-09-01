@@ -1558,7 +1558,7 @@ function setFotoPrev(qual, src){
 }
 async function carregaFoto(qual, input){
   const f=input.files[0]; if(!f) return;
-  try{ setFotoPrev(qual, await resizeImg(f, 340, .72, $('#pRecorta').checked)); hideErr('#ePro'); }
+  try{ setFotoPrev(qual, await resizeImg(f, 340, .72, false)); hideErr('#ePro'); }
   catch(err){ showErr('#ePro','Não foi possível ler essa imagem. Tente JPG ou PNG.'); }
   input.value='';
 }
