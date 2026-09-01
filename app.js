@@ -3000,7 +3000,7 @@ function desenhaVitrine(c, auth){
     <div class="grade">${itens.map(card).join('')}</div>
 
     <div style="margin: 3rem auto 1rem; max-width: 700px; padding: 2rem; background: var(--paper); border-radius: 12px; border: 1px solid var(--line); text-align: left;">
-      <h3 style="font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink); margin-bottom: 12px;">O ABC da Perfumação</h3>
+      <h3 style="font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink); margin-bottom: 12px;">O ABC da Perfumaria</h3>
       <p style="font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6;">Você tem certeza de que sabe como aplicar perfume para que as notas da fragrância se desenvolvam corretamente na sua pele?</p>
       <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
         <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Aplique o perfume na pele limpa, lavada e seca.</li>
