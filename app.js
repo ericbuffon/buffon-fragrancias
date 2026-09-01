@@ -1951,20 +1951,50 @@ $('#catCancel').addEventListener('click',()=>$('#modalCat').classList.remove('op
 $('#modalCat').addEventListener('click',e=>{ if(e.target.id==='modalCat') $('#modalCat').classList.remove('open'); });
 $('#catPublicar').addEventListener('click', async ()=>{
   if(!nvLigado()) return alert('Para publicar o link é preciso estar conectado na nuvem.\n\nAbra o botão Nuvem e entre com sua conta.');
-  const b=$('#catPublicar'); b.disabled=true; b.textContent='Publicando…';
+  const b=$('#catPublicar'); b.disabled=true; b.textContent='Gerando PDF e Publicando…';
   try{
     const opt = opcoesCat();
-    const r = await publicaCatalogo(opt);
+    const r_publish = await publicaCatalogo(opt);
+
+    const id = idPublico();
+    const elCatalogo = $('#catalogo');
+    const itensParaCatalogo = catalogoItens(opt).map(paraCatalogo);
+    montaFolhas(itensParaCatalogo, opt);
+    elCatalogo.style.display = 'block';
+
+    const pdfOpt = {
+      margin:       0,
+      filename:     `catalogo_${id}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 1.5, useCORS: true }, 
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
+    elCatalogo.style.display = 'none';
+
+    const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/catalogo_${id}.pdf`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + NV.tok,
+        'apikey': NV.key,
+        'Content-Type': 'application/pdf',
+        'x-upsert': 'true'
+      },
+      body: pdfBlob
+    });
+
+    if(!storageRes.ok) throw new Error('Falha ao hospedar o arquivo PDF na nuvem.');
+
     data.config = Object.assign({}, data.config, {contato:opt.contato.trim()}); save();
-    $('#catLink').value = r.link; $('#catLinkBox').hidden=false;
-    const n = r.link.length;
-    $('#catNota').innerHTML = `O link mostra só nome, inspiração, notas, foto e preço — custo, estoque, vendas e clientes não vão junto. Republicar atualiza o mesmo link.`
-      + (n>120 ? `<br><b>Link com ${n} caracteres.</b> Para encurtar, me peça a versão com a sua configuração fixada no arquivo — o link vira algo como <code>${location.origin}/?c=${(data.config&&data.config.catalogoId)||'cat_xxxx'}</code>.` : ` Link com ${n} caracteres.`);
-    b.textContent = `Republicar (${r.n} no ar)`;
-    alert(`Catálogo atualizado com ${r.n} ${plural(r.n,'fragrância','fragrâncias')}.\n\nO link continua o mesmo — quem já recebeu vê a versão nova.`);
+    $('#catLink').value = r_publish.link; $('#catLinkBox').hidden=false;
+    $('#catNota').innerHTML = `O PDF foi gerado e hospedado no seu banco de dados. O link direto para download já está atualizado.`;
+    b.textContent = `Republicar (${r_publish.n} no ar)`;
+    alert(`Catálogo atualizado com sucesso!\n\nO PDF foi gerado silenciosamente e já substituiu o antigo na nuvem.`);
   }catch(e){
-    alert('Não consegui publicar: '+e.message+'\n\nSe a tabela do catálogo ainda não existe, rode o comando SQL de novo (na janela Nuvem).');
+    alert('Não consegui publicar: '+e.message+'\n\nCertifique-se de ter rodado o SQL que cria o bucket "catalogos".');
     b.textContent='Publicar link online';
+    $('#catalogo').style.display = 'none';
   }
   b.disabled=false;
 });
@@ -1985,13 +2015,27 @@ $('#catTirar').addEventListener('click', async ()=>{
   catch(e){ alert('Não consegui tirar do ar: '+e.message); }
 });
 
-$('#catGerar').addEventListener('click',()=>{
+$('#catGerar').addEventListener('click', ()=>{
   const opt = opcoesCat();
   const n = montaCatalogo(opt);
   if(!n) return alert('Nenhuma fragrância atende a esses filtros. Ajuste as opções e tente de novo.');
   data.config = Object.assign({}, data.config, {contato:opt.contato.trim()}); save();
   $('#modalCat').classList.remove('open');
-  imprime('pr-cat');
+
+  const elCatalogo = $('#catalogo');
+  elCatalogo.style.display = 'block';
+
+  const pdfOpt = {
+    margin:       0,
+    filename:     'Catalogo_Buffon_Fragrancias.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 1.5, useCORS: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
+    elCatalogo.style.display = 'none';
+  });
 });
 
 /* ---------------- exportação para Excel ----------------
@@ -2910,12 +2954,12 @@ async function abreVitrine(cfg){
       {headers:{apikey:c.k, 'Authorization':'Bearer '+c.k}});
     const j = await r.json();
     if(!r.ok || !j || !j[0]) throw new Error('fora do ar');
-    desenhaVitrine(j[0].conteudo);
+    desenhaVitrine(j[0].conteudo, c);
   }catch(e){
     box.innerHTML = `<div class="carregando">Este catálogo não está mais disponível.<br>Peça um link novo.</div>`;
   }
 }
-function desenhaVitrine(c){
+function desenhaVitrine(c, auth){
   window.vitrineContato = c.contato || '';
   const itens = c.itens||[];
   const zapNum = (c.contato||'').replace(/\D/g,'');
@@ -2939,6 +2983,9 @@ function desenhaVitrine(c){
         ${cart[p.nome] ? `<div class="qtd-ctrl"><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, -1)">-</button><span class="qtd-num">${cart[p.nome].qtd}</span><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">+</button></div>` : `<button class="vitrine-add" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">Adicionar ao carrinho</button>`}
       </div>
     </div></div>`;
+    
+  const pdfUrl = auth ? `${auth.u}/storage/v1/object/public/catalogos/catalogo_${auth.i}.pdf` : '#';
+
   $('#vitrine').innerHTML = `
     <div class="topo">
       ${logoImg(LOGO_M)}
@@ -2956,18 +3003,9 @@ function desenhaVitrine(c){
       <div>Atualizado em ${new Date(c.emitido).toLocaleDateString('pt-BR')}</div>
       ${(c.contato && !zapNum)?`<div class="contato">${ICO_ZAP(15,'#1F7A44')}<span>${esc(c.contato)}</span></div>`:''}
       ${zapNum?`<a class="zap" href="${zapLink('Oi! Vi o catálogo da Buffon Fragrâncias e queria mais informações.')}" target="_blank">${ICO_ZAP(17,'#fff')} Falar no WhatsApp</a>`:''}
-      <button class="btnpdf" id="vitPdf">Baixar catálogo em PDF</button>
+      <a class="btnpdf" id="vitPdf" href="${pdfUrl}" target="_blank" download="Catalogo_Buffon_Fragrancias.pdf" style="display:inline-block; text-decoration:none; text-align:center;">Baixar catálogo em PDF</a>
     </div>`;
-  const bp = $('#vitPdf');
-  if(bp) bp.addEventListener('click', ()=>{
-    /* mesma diagramação que a dona usa: capa, 3 por página, pirâmide */
-    const n = montaFolhas(itens, {preco:!!c.preco, marcaTester:true, contato:c.contato||''});
-    if(!n) return;
-    document.body.classList.add('pr-cat');
-    const limpa = ()=>{ document.body.classList.remove('pr-cat'); window.removeEventListener('afterprint',limpa); };
-    window.addEventListener('afterprint', limpa);
-    setTimeout(()=>{ window.print(); setTimeout(limpa,1500); }, 200);
-  });
+
   $('#vitrine').addEventListener('click', e=>{
     const b=e.target.closest('.fbtn'); if(!b) return;
     document.querySelectorAll('#vitrine .fbtn').forEach(x=>x.classList.toggle('on', x===b));
