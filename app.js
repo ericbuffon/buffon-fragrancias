@@ -496,15 +496,25 @@ document.addEventListener('click', e=>{
   if(toque && alvoBalao === el) return escondeBalao();
   mostraBalao(el);
 });
-let scrollTimeout;
-document.addEventListener('mouseover', e=>{
+let balaoTimer;
+document.addEventListener('mouseover', e => {
   if(matchMedia('(hover:none)').matches) return;      // celular: só no toque
   const el = e.target.closest('[data-dica]');
-  if(el) mostraBalao(el); else if(!e.target.closest('#balao')) escondeBalao();
+  
+  if(el) {
+    clearTimeout(balaoTimer);
+    mostraBalao(el);
+  } else if (e.target.closest('#balao')) {
+    // Se o mouse entrou no próprio balão, não fecha!
+    clearTimeout(balaoTimer);
+  } else {
+    // Se o mouse saiu para qualquer outro lugar, só fecha depois de 1 segundo
+    clearTimeout(balaoTimer);
+    balaoTimer = setTimeout(escondeBalao, 1000);
+  }
 });
 window.addEventListener('scroll', () => {
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(escondeBalao, 150); // Dá um tempinho antes de esconder ao rolar, para não fechar no susto com toques
+  // Desativado o escondeBalao no scroll para permitir leitura longa!
 }, true);
 window.addEventListener('resize', escondeBalao);
 
@@ -958,14 +968,20 @@ function renderDash(){
       + `Investimento total − Valor já recebido (pago)\n`
       + `${money(invest)} − ${money(recebido)} = ${money(Math.max(0, invest - recebido))}\n`
       + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`),
-    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `Líquido na Renda Fixa (${(selicMensalAtual * 100).toFixed(2)}% a.m.)`,
+    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `Líquido na Renda Fixa`,
       `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia na Renda Fixa (Já descontado 22,5% de IR = ~${(selicMensalAtual * 100).toFixed(2)}% líquidos ao mês).\n`
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
-      {t:'estoque', g:'est'})
+      {t:'estoque', g:'est'}),
+    kpi('Ticket Médio', money(vendas/Math.max(1, contaPedidos(data.sales))), 'roxo', `${contaPedidos(data.sales)} pedidos`,
+      `Valor médio que cada cliente gasta por compra.\n`
+      + `Faturamento Total ÷ Número de Pedidos.\n`
+      + `(Pedidos feitos pela mesma pessoa no mesmo dia contam como 1).`,
+      {t:'vendas', g:'ven'})
   ].join('');
   
   const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   
+  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
