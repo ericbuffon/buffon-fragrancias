@@ -496,15 +496,25 @@ document.addEventListener('click', e=>{
   if(toque && alvoBalao === el) return escondeBalao();
   mostraBalao(el);
 });
-let scrollTimeout;
-document.addEventListener('mouseover', e=>{
+let balaoTimer;
+document.addEventListener('mouseover', e => {
   if(matchMedia('(hover:none)').matches) return;      // celular: só no toque
   const el = e.target.closest('[data-dica]');
-  if(el) mostraBalao(el); else if(!e.target.closest('#balao')) escondeBalao();
+  
+  if(el) {
+    clearTimeout(balaoTimer);
+    mostraBalao(el);
+  } else if (e.target.closest('#balao')) {
+    // Se o mouse entrou no próprio balão, não fecha!
+    clearTimeout(balaoTimer);
+  } else {
+    // Se o mouse saiu para qualquer outro lugar, só fecha depois de 1 segundo
+    clearTimeout(balaoTimer);
+    balaoTimer = setTimeout(escondeBalao, 1000);
+  }
 });
 window.addEventListener('scroll', () => {
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(escondeBalao, 150); // Dá um tempinho antes de esconder ao rolar, para não fechar no susto com toques
+  // Desativado o escondeBalao no scroll para permitir leitura longa!
 }, true);
 window.addEventListener('resize', escondeBalao);
 
@@ -963,6 +973,8 @@ function renderDash(){
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
       {t:'estoque', g:'est'})
   ].join('');
+  
+  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   
   const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   $('#kpi2').innerHTML = [
