@@ -922,12 +922,11 @@ function renderDash(){
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
       +`Não desconta as despesas operacionais (${money(desp)}).`,
       {t:'vendas', g:'ven'}),
-    kpi('ROI',pct(roi),roi>=0?'verde':'vermelho',`Investimento ${money0(invest)}`,
+    kpi('ROI',pct(roi),roi>=0?'verde':'vermelho',`Investimento ${money(invest)}`,
       `Retorno sobre o investimento.\n`
       +`(lucro − despesas) ÷ investimento\n`
       +`(${money(lucro)} − ${money(desp)}) ÷ ${money(invest)} = ${pct(roi)}\n`
-      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`,
-      {t:'compras', g:'com'})].join('');
+      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`)].join('');
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
@@ -1572,7 +1571,7 @@ function setFotoPrev(qual, src){
 }
 async function carregaFoto(qual, input){
   const f=input.files[0]; if(!f) return;
-  try{ setFotoPrev(qual, await resizeImg(f, 340, .72, $('#pRecorta').checked)); hideErr('#ePro'); }
+  try{ setFotoPrev(qual, await resizeImg(f, 340, .72, false)); hideErr('#ePro'); }
   catch(err){ showErr('#ePro','Não foi possível ler essa imagem. Tente JPG ou PNG.'); }
   input.value='';
 }
