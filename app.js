@@ -29,6 +29,27 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc = s => (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 const plural = (n,s,p) => n===1?s:p;
+
+// Variável global para armazenar a taxa Selic mensal
+let selicMensalAtual = 0.0085; // Fallback para 0.85% ao mês (10.5% a.a.)
+
+async function atualizarTaxaSelic() {
+  try {
+    // Busca a Meta Selic anual atual (Série 432 do Banco Central do Brasil)
+    const response = await fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json');
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const selicAnual = parseFloat(data[0].valor);
+        // Calcula a taxa mensal equivalente: (1 + anual)^(1/12) - 1
+        selicMensalAtual = Math.pow(1 + (selicAnual / 100), 1 / 12) - 1;
+      }
+    }
+  } catch (error) {
+    console.log('Não foi possível atualizar a taxa Selic. Usando valor padrão.', error);
+  }
+}
+
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const rotuloMes = ym => { const [a,m]=ym.split('-'); return MESES[Number(m)-1]+'/'+a.slice(2); };
 /* filtro de data: registro sem data não entra quando há intervalo definido */
@@ -909,7 +930,7 @@ function renderDash(){
   const inad = inadimplentes();
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
-  const rendimentoCDI = valEst * 0.0085; // Aproximadamente 100% do CDI ao mês (0,85%)
+  const rendimentoCDI = valEst * selicMensalAtual;
   
   $('#kpi1').innerHTML = [
     kpi('Vendas totais',money(vendas),'azul',`Recebido ${money(recebido)}`,
@@ -935,8 +956,8 @@ function renderDash(){
       + `Investimento total − Valor já recebido (pago)\n`
       + `${money(invest)} − ${money(recebido)} = ${money(Math.max(0, invest - recebido))}\n`
       + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`),
-    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `na Renda Fixa`,
-      `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia se estivesse na Renda Fixa (CDI ~0,85% ao mês).\n`
+    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `na Renda Fixa (${(selicMensalAtual * 100).toFixed(2)}% a.m.)`,
+      `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia se estivesse na Renda Fixa (CDI ~${(selicMensalAtual * 100).toFixed(2)}% ao mês).\n`
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
       {t:'estoque', g:'est'})
   ].join('');
@@ -3057,7 +3078,9 @@ function desenhaVitrine(c, auth){
 
 
 // Inicialização do sistema
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await atualizarTaxaSelic(); // Garante a taxa Selic antes de renderizar a tela inicial
+  
   const qs = new URLSearchParams(location.search);
   let paramC = qs.get('c') || (qs.get('p') ? 'compacto' : null);
   
