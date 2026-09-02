@@ -944,7 +944,11 @@ function renderDash(){
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   const rendimentoCDI = valEst * selicMensalAtual;
   
-  $('#kpi1').innerHTML = [
+  
+  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
+  
+  $('#kpisGeral').innerHTML = [
+    
     kpi('Vendas totais',money(vendas),'azul',`Recebido ${money(recebido)}`,
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
       +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
@@ -972,10 +976,8 @@ function renderDash(){
       `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia na Renda Fixa (Já descontado 22,5% de IR = ~${(selicMensalAtual * 100).toFixed(2)}% líquidos ao mês).\n`
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
       {t:'estoque', g:'est'})
-  ].join('');
-  
-  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
-  $('#kpi2').innerHTML = [
+  ,
+    
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
       +`O valor ${money(valEst)} inclui o que está no parceiro, porque continua sendo seu.`,
@@ -1001,7 +1003,9 @@ function renderDash(){
       {t:'vendas', g:'ven', f:{venEnt:'Não'}}),
     kpi('Produtos Vendidos', produtosVendidos+' un', 'roxo', `${contaPedidos(data.sales)} pedidos no total`,
       `Mostra a quantidade total de frascos que você já tirou do estoque e converteu em vendas.`,
-      {t:'vendas', g:'ven'})].join('');
+      {t:'vendas', g:'ven'})
+  ].join('');
+
 
   $('#tInad').innerHTML = inad.length
     ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
