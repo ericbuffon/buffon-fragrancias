@@ -592,11 +592,25 @@ function textoReativacao(cli, r){
 const diasSemComprar = r => r.ultima ? Math.floor((Date.now()-Date.parse(r.ultima+'T00:00:00'))/86400000) : null;
 
 function textoCobranca(cli, r){
-  const itens = r.vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim')
-    .map(v=>`• [${dt(v.data)}] ${v.qtde}x ${v.produto} — ${money(v.valorVenda)}`).join('\n');
+  const pendentes = r.vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim');
+  
+  // Agrupar por data
+  const porData = {};
+  pendentes.forEach(v => {
+    const dataFormatada = dt(v.data);
+    if (!porData[dataFormatada]) porData[dataFormatada] = [];
+    porData[dataFormatada].push(`• ${v.qtde}x ${v.produto} — ${money(v.valorVenda)}`);
+  });
+
+  // Montar texto agrupado
+  let itensTexto = '';
+  for (const [data, itens] of Object.entries(porData)) {
+    itensTexto += `*Pedido de ${data}:*\n${itens.join('\n')}\n\n`;
+  }
+
   return `Oi, ${cli.nome.split(' ')[0]}! Tudo bem?\n\n`
-    + `Passando para lembrar do(s) pedido(s) da *Buffon Fragrâncias*:\n${itens}\n\n`
-    + `Total: ${money(r.emAberto)}\n\nQualquer coisa é só me chamar. Obrigado!`;
+    + `Passando para lembrar do(s) pedido(s) da *Buffon Fragrâncias*:\n\n${itensTexto}`
+    + `*Total: ${money(r.emAberto)}*\n\nQualquer coisa é só me chamar. Obrigado!`;
 }
 
 function renderCli(){
