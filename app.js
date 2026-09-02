@@ -40,9 +40,11 @@ async function atualizarTaxaSelic() {
     if (response.ok) {
       const data = await response.json();
       if (data && data.length > 0) {
-        const selicAnual = parseFloat(data[0].valor);
-        // Calcula a taxa mensal equivalente: (1 + anual)^(1/12) - 1
-        selicMensalAtual = Math.pow(1 + (selicAnual / 100), 1 / 12) - 1;
+        const selicAnualBruta = parseFloat(data[0].valor);
+        const impostoDeRenda = 0.225; // IR de 22,5% (alíquota para curtíssimo prazo / liquidez imediata)
+        const selicAnualLiquida = selicAnualBruta * (1 - impostoDeRenda);
+        // Calcula a taxa mensal equivalente LÍQUIDA: (1 + anual)^(1/12) - 1
+        selicMensalAtual = Math.pow(1 + (selicAnualLiquida / 100), 1 / 12) - 1;
       }
     }
   } catch (error) {
@@ -956,14 +958,20 @@ function renderDash(){
       + `Investimento total − Valor já recebido (pago)\n`
       + `${money(invest)} − ${money(recebido)} = ${money(Math.max(0, invest - recebido))}\n`
       + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`),
-    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `na Renda Fixa (${(selicMensalAtual * 100).toFixed(2)}% a.m.)`,
-      `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia se estivesse na Renda Fixa (CDI ~${(selicMensalAtual * 100).toFixed(2)}% ao mês).\n`
+    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `Líquido na Renda Fixa`,
+      `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia na Renda Fixa (Já descontado 22,5% de IR = ~${(selicMensalAtual * 100).toFixed(2)}% líquidos ao mês).\n`
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
-      {t:'estoque', g:'est'})
+      {t:'estoque', g:'est'}),
+    kpi('Ticket Médio', money(vendas/Math.max(1, contaPedidos(data.sales))), 'roxo', `${contaPedidos(data.sales)} pedidos`,
+      `Valor médio que cada cliente gasta por compra.\n`
+      + `Faturamento Total ÷ Número de Pedidos.\n`
+      + `(Pedidos feitos pela mesma pessoa no mesmo dia contam como 1).`,
+      {t:'vendas', g:'ven'})
   ].join('');
   
   const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   
+  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
