@@ -980,8 +980,6 @@ function renderDash(){
   ].join('');
   
   const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
-  
-  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
