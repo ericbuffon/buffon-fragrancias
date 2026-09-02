@@ -496,25 +496,15 @@ document.addEventListener('click', e=>{
   if(toque && alvoBalao === el) return escondeBalao();
   mostraBalao(el);
 });
-let balaoTimer;
-document.addEventListener('mouseover', e => {
+let scrollTimeout;
+document.addEventListener('mouseover', e=>{
   if(matchMedia('(hover:none)').matches) return;      // celular: só no toque
   const el = e.target.closest('[data-dica]');
-  
-  if(el) {
-    clearTimeout(balaoTimer);
-    mostraBalao(el);
-  } else if (e.target.closest('#balao')) {
-    // Se o mouse entrou no próprio balão, não fecha!
-    clearTimeout(balaoTimer);
-  } else {
-    // Se o mouse saiu para qualquer outro lugar, só fecha depois de 1 segundo
-    clearTimeout(balaoTimer);
-    balaoTimer = setTimeout(escondeBalao, 1000);
-  }
+  if(el) mostraBalao(el); else if(!e.target.closest('#balao')) escondeBalao();
 });
 window.addEventListener('scroll', () => {
-  // Desativado o escondeBalao no scroll para permitir leitura longa!
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(escondeBalao, 150); // Dá um tempinho antes de esconder ao rolar, para não fechar no susto com toques
 }, true);
 window.addEventListener('resize', escondeBalao);
 
@@ -971,13 +961,10 @@ function renderDash(){
     kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `Líquido na Renda Fixa`,
       `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia na Renda Fixa (Já descontado 22,5% de IR = ~${(selicMensalAtual * 100).toFixed(2)}% líquidos ao mês).\n`
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
-      {t:'estoque', g:'est'}),
-    kpi('Ticket Médio', money(vendas/Math.max(1, contaPedidos(data.sales))), 'roxo', `${contaPedidos(data.sales)} pedidos`,
-      `Valor médio que cada cliente gasta por compra.\n`
-      + `Faturamento Total ÷ Número de Pedidos.\n`
-      + `(Pedidos feitos pela mesma pessoa no mesmo dia contam como 1).`,
-      {t:'vendas', g:'ven'})
+      {t:'estoque', g:'est'})
   ].join('');
+  
+  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   
   const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
   $('#kpi2').innerHTML = [
@@ -1185,7 +1172,7 @@ function renderDash(){
     <li class="note">Estimativa pela margem bruta atual e preço médio de venda cadastrado.</li>`;
 }
 const kpi = (l,v,c,s,dica,ir) => `<div class="kpi ${c||''}${ir?' clicavel':''}"${ir?` data-ir='${esc(JSON.stringify(ir))}'`:''}>`
-  + `${dica?`<button class="qm" data-dica="${esc(dica)}" title="como é calculado" aria-label="como é calculado">?</button>`:''}`
+  + `${dica?`<button class="qm" data-dica="${esc(dica)}"  aria-label="como é calculado">?</button>`:''}`
   + `<div class="lbl">${l}</div><div class="val">${v}</div>`
   + `${s?`<div class="sub">${s}</div>`:''}</div>`;
 
