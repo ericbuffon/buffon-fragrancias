@@ -928,13 +928,71 @@ function renderDash(){
       `Mostra o dinheiro real que falta entrar para cobrir tudo o que você gastou.\n`
       + `Investimento total − Valor já recebido (pago)\n`
       + `${money(invest)} − ${money(recebido)} = ${money(Math.max(0, invest - recebido))}\n`
-      + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`),
-    kpi('Ticket Médio', money(vendas/Math.max(1, contaPedidos(data.sales))), 'roxo', `${contaPedidos(data.sales)} pedidos`,
-      `Valor médio que cada cliente gasta por compra.\n`
-      + `Faturamento Total ÷ Número de Pedidos.\n`
-      + `(Pedidos feitos pela mesma pessoa no mesmo dia contam como 1).`,
-      {t:'vendas', g:'ven'})
+      + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`)
   ].join('');
+  $('#kpi2').innerHTML = [
+    kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
+      `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
+      +`O valor ${money(valEst)} inclui o que está no parceiro, porque continua sendo seu.`,
+      {t:'estoque', g:'est'}),
+    kpi('Lucro potencial',money(lucroPot),'verde','estoque próprio',
+      `Se você vender todo o estoque pelo preço cadastrado:\n`
+      +`(em mãos + consignado) × preço − custo do estoque\n`
+      +`= ${money(lucroPot)}`, {t:'estoque', g:'est'}),
+    kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un',conAtivo.length?'terra':'verde',
+      `${[...new Set(conAtivo.map(c=>c.parceiro))].length} ${plural([...new Set(conAtivo.map(c=>c.parceiro))].length,'parceiro','parceiros')}`,
+      'Unidades que estão com parceiros e ainda não foram vendidas nem devolvidas.\nContinuam sendo suas, mas não estão na prateleira.',
+      {t:'consignado', g:'con', f:{conSit:'Em consignação'}}),
+    kpi('Compras a caminho',un(cam)+' un',cam.length?'ambar':'verde',
+      `${un(camLac)} lacrado${un(camLac)===1?'':'s'} · ${un(camTes)} tester${un(camTes)===1?'':'s'} · ${money(vl(cam))}`,
+      `Compras lançadas e ainda não marcadas como recebidas.\n`
+      +`Já saiu do seu bolso, mas ainda não entrou no estoque em mãos.\n\n`
+      +`Lacrados: ${un(camLac)} un · ${money(vl(camLac))}  (viram estoque de venda)\n`
+      +`Testers: ${un(camTes)} un · ${money(vl(camTes))}  (não entram no estoque de venda)\n\n`
+      +`Na aba Estoque, a coluna "A caminho" mostra só os ${un(camLac)} lacrados.`,
+      {t:'compras', g:'com', f:{comEnt:'Não'}}),
+    kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
+      'Vendas lançadas que ainda não foram entregues.\nSó baixam do estoque quando você marcar como entregue.',
+      {t:'vendas', g:'ven', f:{venEnt:'Não'}}),
+    kpi('Testers recebidos',unTes+' un','roxo',money(custoTes),
+      `Testers comprados e recebidos. Não entram no estoque de venda,\n`
+      +`mas o custo (${money(custoTes)}) entra no investimento total.`,
+      {t:'testers', g:'tes'})].join('');
+
+  $('#tInad').innerHTML = inad.length
+    ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
+      inad.map(c=>`<tr><td><button class="linkcli" data-cli="${esc(c.nome)}">${esc(c.nome)}</button>${c.canal?' <span class="badge cinza">canal</span>':''}</td>
+        <td class="num">${c.n}</td><td class="num">${money(c.valor)}</td></tr>`).join('')+
+      `</tbody><tfoot><tr><td>Total</td><td class="num">${inad.reduce((s,c)=>s+c.n,0)}</td><td class="num">${money(inad.reduce((s,c)=>s+c.valor,0))}</td></tr></tfoot>`
+    : `<tbody><tr><td class="empty">Ninguém com pedido entregue e não pago.</td></tr></tbody>`;
+
+  const tot = est.length || 1;
+  const cnt = s => est.filter(r=>r.status===s).length;
+  $('#kpiEst').innerHTML = [['Repor','REPOR','vermelho'],['Normal','NORMAL','verde'],['Excesso','EXCESSO','ambar']]
+    .map(([l,s,c])=>`<button type="button" class="kpi ${c}" data-est="${s}"><div class="lbl">${l}</div>
+      <div class="val">${cnt(s)}</div><div class="sub">${((cnt(s)/tot)*100).toFixed(0)}% do catálogo · ver</div></button>`).join('');
+
+  // ----- resultado por mês, a partir das datas de compras e vendas -----
+  const mesesSet = new Set();
+  const cpm = {}, vpm = {};
+  data.purchases.filter(c=>c.data).forEach(c=>{ const k=c.data.slice(0,7); mesesSet.add(k);
+    if(!cpm[k]) cpm[k]={q:0,v:0}; cpm[k].q+=Number(c.qtde); cpm[k].v+=Number(c.custoTotal); });
+  data.sales.filter(v=>v.data).forEach(v=>{ const k=v.data.slice(0,7); mesesSet.add(k);
+    if(!vpm[k]) vpm[k]={q:0,f:0,l:0,n:0}; vpm[k].q+=Number(v.qtde);
+    vpm[k].f+=Number(v.valorVenda); vpm[k].l+=calcVenda(v).lucro; vpm[k].n++; });
+  const meses = [...mesesSet].sort().reverse();
+  const semDataC = data.purchases.filter(c=>!c.data).length;
+  const semDataV = data.sales.filter(v=>!v.data).length;
+
+  $('#tMes').innerHTML = meses.length
+    ? `<thead><tr><th>Mês</th><th class="num">Comprado</th><th class="num">Vendido</th><th class="num">Lucro</th><th class="num">Margem</th></tr></thead><tbody>`+
+      meses.map(k=>{ const c=cpm[k]||{q:0,v:0}, s=vpm[k]||{q:0,f:0,l:0};
+        return `<tr><td>${rotuloMes(k)}</td><td class="num">${c.v?money(c.v):'—'}</td>
+          <td class="num">${s.f?money(s.f):'—'}</td><td class="num">${s.f?money(s.l):'—'}</td>
+          <td class="num">${s.f?pct(s.l/s.f):'—'}</td></tr>`; }).join('')+
+      `</tbody>`
+    : `<tbody><tr><td class="empty">Nenhum lançamento com data ainda.</td></tr></tbody>`;
+  const pend = [];
   if(semDataC) pend.push(`${semDataC} ${plural(semDataC,'compra','compras')}`);
   if(semDataV) pend.push(`${semDataV} ${plural(semDataV,'venda','vendas')}`);
   $('#notaMes').textContent = pend.length
@@ -3159,7 +3217,7 @@ function renderCharts(){
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}); } } } },
+      scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'R$ ' + value; } } } },
       plugins: { legend: { position: 'bottom' } }
     }
   });
@@ -3189,42 +3247,6 @@ function renderCharts(){
       cutout: '65%'
     }
   });
-
-  // 3. Gráfico de Canais de Venda (Rosca)
-  const ctxCanal = document.getElementById('chartCanal');
-  if(ctxCanal) {
-      const canaisData = {};
-      data.sales.forEach(v => {
-          const canal = canalDe(v);
-          canaisData[canal] = (canaisData[canal] || 0) + Number(v.valorVenda);
-      });
-      
-      const sortedCanais = Object.entries(canaisData).sort((a,b) => b[1] - a[1]);
-      const labelsCanais = sortedCanais.map(c => c[0]);
-      const valoresCanais = sortedCanais.map(c => c[1]);
-      const coresCanais = ['#6E28D9', '#0B63CE', '#04703C', '#B00966', '#8F5A02', '#496B00'];
-
-      if(window.myChartCanal) window.myChartCanal.destroy();
-      window.myChartCanal = new Chart(ctxCanal, {
-        type: 'doughnut',
-        data: {
-          labels: labelsCanais,
-          datasets: [{
-            data: valoresCanais,
-            backgroundColor: coresCanais.slice(0, labelsCanais.length),
-            borderWidth: 2, borderColor: '#fff'
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { 
-            legend: { position: 'right' },
-            tooltip: { callbacks: { label: function(context) { return 'R$ ' + context.raw.toLocaleString('pt-BR', {minimumFractionDigits:2}); } } }
-          },
-          cutout: '65%'
-        }
-      });
-  }
 }
 
 
