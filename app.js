@@ -593,9 +593,9 @@ const diasSemComprar = r => r.ultima ? Math.floor((Date.now()-Date.parse(r.ultim
 
 function textoCobranca(cli, r){
   const itens = r.vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim')
-    .map(v=>`• ${v.qtde}x ${v.produto} — ${money(v.valorVenda)}`).join('\n');
+    .map(v=>`• [${dt(v.data)}] ${v.qtde}x ${v.produto} — ${money(v.valorVenda)}`).join('\n');
   return `Oi, ${cli.nome.split(' ')[0]}! Tudo bem?\n\n`
-    + `Passando para lembrar do pedido da Buffon Fragrâncias:\n${itens}\n\n`
+    + `Passando para lembrar do(s) pedido(s) da *Buffon Fragrâncias*:\n${itens}\n\n`
     + `Total: ${money(r.emAberto)}\n\nQualquer coisa é só me chamar. Obrigado!`;
 }
 
@@ -1558,7 +1558,7 @@ function setFotoPrev(qual, src){
 }
 async function carregaFoto(qual, input){
   const f=input.files[0]; if(!f) return;
-  try{ setFotoPrev(qual, await resizeImg(f, 340, .72, false)); hideErr('#ePro'); }
+  try{ setFotoPrev(qual, await resizeImg(f, 340, .72, $('#pRecorta').checked)); hideErr('#ePro'); }
   catch(err){ showErr('#ePro','Não foi possível ler essa imagem. Tente JPG ou PNG.'); }
   input.value='';
 }
