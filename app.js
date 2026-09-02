@@ -926,7 +926,12 @@ function renderDash(){
       `Retorno sobre o investimento.\n`
       +`(lucro − despesas) ÷ investimento\n`
       +`(${money(lucro)} − ${money(desp)}) ÷ ${money(invest)} = ${pct(roi)}\n`
-      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`)].join('');
+      +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`),
+    kpi('Payback', pct(invest > 0 ? lucro / invest : 0), lucro >= invest ? 'verde' : 'ambar', lucro >= invest ? '100% recuperado' : `Falta ${money(be)}`,
+      `Progresso para o negócio se pagar (Break-even).\n`
+      + `Lucro acumulado ÷ Investimento total\n`
+      + `${money(lucro)} ÷ ${money(invest)} = ${pct(invest > 0 ? lucro / invest : 0)}\n`
+      + `Chega a 100% quando o lucro empata com o que foi investido.`)].join('');
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
