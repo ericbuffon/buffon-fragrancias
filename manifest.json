@@ -1,6 +1,6 @@
 {
   "name": "Buffon Fragrâncias",
-  "short_name": "Buffon",
+  "short_name": "Buffon Fragrâncias",
   "description": "Sistema de Gestão Buffon Fragrâncias",
   "start_url": "./",
   "display": "standalone",
@@ -8,12 +8,12 @@
   "theme_color": "#0B63CE",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "icone-b.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "logo.png",
+      "src": "icone-b.png",
       "sizes": "512x512",
       "type": "image/png"
     }
