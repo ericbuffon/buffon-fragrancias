@@ -910,13 +910,10 @@ function renderDash(){
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
       +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
       {t:'vendas', g:'ven'}),
-    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status==='Pendente').length} em aberto`,
-      `Tudo que está marcado como Pendente, entregue ou não.`,
+    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status==='Pendente').length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
+      `Todo o valor que falta ser pago pelos clientes.\n`
+      + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
       {t:'vendas', g:'ven', f:{venStat:'Pendente'}}),
-    kpi('A receber entregue',money(inad.reduce((s,c)=>s+c.valor,0)),inad.length?'vermelho':'verde',`${inad.length} ${plural(inad.length,'responsável','responsáveis')}`,
-      `Só o que já saiu da sua mão e não foi pago — o dinheiro realmente na rua.\n`
-      +`Do total a receber (${money(aReceber)}), ${money(aReceber-inad.reduce((s,c)=>s+c.valor,0))} ainda nem foi entregue.`,
-      {t:'vendas', g:'ven', f:{venStat:'Pendente', venEnt:'Sim'}}),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
@@ -927,11 +924,12 @@ function renderDash(){
       +`(lucro − despesas) ÷ investimento\n`
       +`(${money(lucro)} − ${money(desp)}) ÷ ${money(invest)} = ${pct(roi)}\n`
       +`Investimento = ${money(invCompras)} em compras + ${money(desp)} em despesas`),
-    kpi('Recuperação de Caixa', money(Math.max(0, invest - vendas)), (invest - vendas) > 0 ? 'ambar' : 'verde', (invest - vendas) > 0 ? 'Falta faturar' : 'Capital 100% recuperado',
-      `Mostra o quanto você ainda precisa vender para empatar com tudo o que gastou.\n`
-      + `Investimento total − Faturamento total\n`
-      + `${money(invest)} − ${money(vendas)} = ${money(Math.max(0, invest - vendas))}\n`
-      + `(Visão de fluxo de caixa, independentemente da margem de lucro).`)].join('');
+    kpi('Recuperação de Caixa', money(Math.max(0, invest - recebido)), (invest - recebido) > 0 ? 'ambar' : 'verde', (invest - recebido) > 0 ? 'Falta entrar no caixa' : 'Caixa no azul!',
+      `Mostra o dinheiro real que falta entrar para cobrir tudo o que você gastou.\n`
+      + `Investimento total − Valor já recebido (pago)\n`
+      + `${money(invest)} − ${money(recebido)} = ${money(Math.max(0, invest - recebido))}\n`
+      + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`)
+  ].join('');
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
