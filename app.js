@@ -905,6 +905,8 @@ function renderDash(){
   const inad = inadimplentes();
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
+  const rendimentoCDI = valEst * 0.0085; // Aproximadamente 100% do CDI ao mês (0,85%)
+  
   $('#kpi1').innerHTML = [
     kpi('Vendas totais',money(vendas),'azul',`Recebido ${money(recebido)}`,
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
@@ -928,7 +930,11 @@ function renderDash(){
       `Mostra o dinheiro real que falta entrar para cobrir tudo o que você gastou.\n`
       + `Investimento total − Valor já recebido (pago)\n`
       + `${money(invest)} − ${money(recebido)} = ${money(Math.max(0, invest - recebido))}\n`
-      + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`)
+      + `(Contabiliza apenas o dinheiro que já está no seu bolso, ignorando o que ainda está a receber).`),
+    kpi('Custo de Oportunidade', money(rendimentoCDI) + '/mês', 'roxo', `na Renda Fixa`,
+      `Quanto o dinheiro travado hoje no seu estoque (${money(valEst)}) renderia se estivesse na Renda Fixa (CDI ~0,85% ao mês).\n`
+      + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
+      {t:'estoque', g:'est'})
   ].join('');
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
@@ -3217,8 +3223,11 @@ function renderCharts(){
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'R$ ' + value; } } } },
-      plugins: { legend: { position: 'bottom' } }
+      scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}); } } } },
+      plugins: { 
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': R$ ' + context.raw.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}); } } }
+      }
     }
   });
 
@@ -3247,6 +3256,42 @@ function renderCharts(){
       cutout: '65%'
     }
   });
+
+  // 3. Gráfico de Canais de Venda (Rosca)
+  const ctxCanal = document.getElementById('chartCanal');
+  if(ctxCanal) {
+      const canaisData = {};
+      data.sales.forEach(v => {
+          const canal = canalDe(v);
+          canaisData[canal] = (canaisData[canal] || 0) + Number(v.valorVenda);
+      });
+      
+      const sortedCanais = Object.entries(canaisData).sort((a,b) => b[1] - a[1]);
+      const labelsCanais = sortedCanais.map(c => c[0]);
+      const valoresCanais = sortedCanais.map(c => c[1]);
+      const coresCanais = ['#6E28D9', '#0B63CE', '#04703C', '#B00966', '#8F5A02', '#496B00'];
+
+      if(window.myChartCanal) window.myChartCanal.destroy();
+      window.myChartCanal = new Chart(ctxCanal, {
+        type: 'doughnut',
+        data: {
+          labels: labelsCanais,
+          datasets: [{
+            data: valoresCanais,
+            backgroundColor: coresCanais.slice(0, labelsCanais.length),
+            borderWidth: 2, borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { 
+            legend: { position: 'right' },
+            tooltip: { callbacks: { label: function(context) { return 'R$ ' + context.raw.toLocaleString('pt-BR', {minimumFractionDigits:2}); } } }
+          },
+          cutout: '65%'
+        }
+      });
+  }
 }
 
 
