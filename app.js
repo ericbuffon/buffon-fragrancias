@@ -473,12 +473,16 @@ document.addEventListener('click', e=>{
   if(toque && alvoBalao === el) return escondeBalao();
   mostraBalao(el);
 });
+let scrollTimeout;
 document.addEventListener('mouseover', e=>{
   if(matchMedia('(hover:none)').matches) return;      // celular: só no toque
   const el = e.target.closest('[data-dica]');
   if(el) mostraBalao(el); else if(!e.target.closest('#balao')) escondeBalao();
 });
-window.addEventListener('scroll', escondeBalao, true);
+window.addEventListener('scroll', () => {
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(escondeBalao, 150); // Dá um tempinho antes de esconder ao rolar, para não fechar no susto com toques
+}, true);
 window.addEventListener('resize', escondeBalao);
 
 /* ---------------- clientes ---------------- */
@@ -936,6 +940,9 @@ function renderDash(){
       + `O seu lucro real no negócio precisa justificar esse valor que você "deixa de ganhar" sem esforço.`,
       {t:'estoque', g:'est'})
   ].join('');
+  
+  const produtosVendidos = data.sales.reduce((s,v)=>s+Number(v.qtde), 0);
+  
   $('#kpi2').innerHTML = [
     kpi('Estoque em mãos',unEst+' un','azul',`${money(valEst)} com o consignado`,
       `Unidades fisicamente com você: recebido − vendido e entregue − consignado.\n`
@@ -960,10 +967,9 @@ function renderDash(){
     kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
       'Vendas lançadas que ainda não foram entregues.\nSó baixam do estoque quando você marcar como entregue.',
       {t:'vendas', g:'ven', f:{venEnt:'Não'}}),
-    kpi('Testers recebidos',unTes+' un','roxo',money(custoTes),
-      `Testers comprados e recebidos. Não entram no estoque de venda,\n`
-      +`mas o custo (${money(custoTes)}) entra no investimento total.`,
-      {t:'testers', g:'tes'})].join('');
+    kpi('Produtos Vendidos', produtosVendidos+' un', 'roxo', `${contaPedidos(data.sales)} pedidos no total`,
+      `Mostra a quantidade total de frascos que você já tirou do estoque e converteu em vendas.`,
+      {t:'vendas', g:'ven'})].join('');
 
   $('#tInad').innerHTML = inad.length
     ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
