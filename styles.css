@@ -307,15 +307,14 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- catálogo ---------- */
 #catalogo{--tinta:#141109; --suave:#453D33; --fraco:#7C7266;
   --papel:#FFF; --plate:#FFF; --fio:#CFC5B2; --fio2:#EAE4D8; --ouro:#8F6B22;
-  /* Mantém o canvas do catálogo exatamente na largura física do A4.
-     Isso evita que o html2pdf redimensione a página de forma assimétrica. */
+  /* Largura física do catálogo em A4. */
   width:210mm; min-width:210mm; max-width:210mm; margin:0; padding:0;}
 #catalogo .pagina{box-sizing:border-box;width:210mm;height:296mm;position:relative;overflow:hidden;background:var(--papel);padding:53px 57px 42px;display:block;break-after:page;page-break-after:always;color:var(--tinta)}
 #catalogo .pagina:last-child{break-after:auto;page-break-after:auto}
 
 /* capa */
 #catalogo .capa{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0}
-#catalogo .capa .moldura{position:absolute;inset:30px;border:1.4px solid var(--tinta)}
+#catalogo .capa .moldura{position:absolute;top:30px;right:45px;bottom:30px;left:30px;border:1.4px solid var(--tinta)}
 #catalogo .capa .moldura::before{content:'';position:absolute;inset:9px;border:.6px solid var(--ouro)}
 #catalogo .capa .miolo{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
 #catalogo .capa img.logo{width:423px;height:auto;display:block}
