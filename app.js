@@ -181,7 +181,7 @@ function custoMedio(nome){
   return q>0 ? rel.reduce((s,c)=>s+Number(c.custoTotal),0)/q : 0;
 }
 function calcVenda(v){
-  const cu = custoMedio(v.produto), custo = v.qtde*cu, lucro = v.valorVenda-custo;
+  const cu = custoMedio(v.produto), custo = v.qtde*cu, lucro = v.valorVenda - custo - (Number(v.custosExtras)||0);
   return {custoUnit:cu, lucro, margem: v.valorVenda>0 ? lucro/v.valorVenda : 0};
 }
 /* saldo que ainda está fisicamente com o parceiro */
@@ -1744,7 +1744,7 @@ $('#fVen').addEventListener('submit',e=>{
   const cliente=$('#venCli').value.trim();
   hideErr('#eVen');
   const payload={data:$('#venData').value,qtde:Number($('#venQtd').value)||1,produto,
-    valorVenda:Number($('#venValor').value)||0, cliente,
+    valorVenda:Number($('#venValor').value)||0, custosExtras:Number($('#venCustos').value)||0, cliente,
     canal: ($('#venCanal').value.trim()||'Direto'),
     status:$('#venStat').value, entregue:$('#venEnt').value};
   if(edit.ven){ const i=data.sales.findIndex(v=>v.id===edit.ven); data.sales[i]={...data.sales[i],...payload}; cancVen(); }
@@ -1752,12 +1752,12 @@ $('#fVen').addEventListener('submit',e=>{
   if(cliente && !SEM_NOME.has(norm(cliente)) && !data.clients.some(c=>norm(c.nome)===norm(cliente)))
     data.clients.push({id:uid(), nome:cliente, telefone:'', observacao:''});
   const ultimoCanal = payload.canal;
-  $('#fVen').reset(); $('#venQtd').value=1; $('#venStat').value='Pago'; $('#venEnt').value='Sim';
+  $('#fVen').reset(); $('#venQtd').value=1; $('#venCustos').value=''; $('#venStat').value='Pago'; $('#venEnt').value='Sim';
   $('#venCanal').value = ultimoCanal;          // mantém o canal para o próximo lançamento
   $('#venData').value = hoje();
   save(); renderAll();
 });
-function cancVen(){ edit.ven=null; $('#fVen').reset(); $('#venQtd').value=1; $('#venStat').value='Pago'; $('#venEnt').value='Sim'; $('#venCanal').value=''; $('#venData').value=hoje();
+function cancVen(){ edit.ven=null; $('#fVen').reset(); $('#venQtd').value=1; $('#venCustos').value=''; $('#venStat').value='Pago'; $('#venEnt').value='Sim'; $('#venCanal').value=''; $('#venData').value=hoje();
   $('#tVenForm').textContent='Nova venda'; $('#bVen').textContent='Adicionar venda'; $('#cancVen').hidden=true; }
 $('#cancVen').addEventListener('click',cancVen);
 $('#tVen').addEventListener('click',e=>{
@@ -1765,7 +1765,7 @@ $('#tVen').addEventListener('click',e=>{
   if(ev){ const v=data.sales.find(x=>x.id===ev); if(!v)return;
     if(!byName(v.produto)) return showErr('#eVen',`O produto "${v.produto}" não está no cadastro. Cadastre-o na aba Produtos antes de editar esta venda.`);
     edit.ven=ev; $('#venData').value=v.data||''; $('#venQtd').value=v.qtde; $('#venProd').value=v.produto;
-    $('#venValor').value=v.valorVenda; $('#venCli').value=v.cliente||'';
+    $('#venValor').value=v.valorVenda; $('#venCustos').value=v.custosExtras||''; $('#venCli').value=v.cliente||'';
     $('#venCanal').value=canalDe(v); $('#venStat').value=v.status; $('#venEnt').value=v.entregue;
     hideErr('#eVen');
     $('#tVenForm').textContent='Editando venda'; $('#bVen').textContent='Salvar alterações'; $('#cancVen').hidden=false;
