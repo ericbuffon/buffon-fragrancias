@@ -1338,6 +1338,7 @@ function renderVen(){
   const st = sort.ven;
   const tq = rows.reduce((s,v)=>s+Number(v.qtde),0);
   const tv = rows.reduce((s,v)=>s+Number(v.valorVenda),0);
+  const tc = rows.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
@@ -1346,19 +1347,20 @@ function renderVen(){
     ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
     ['Unidades', tq, '', 'Soma das quantidades — frascos, não linhas.\nUm lançamento com 3 frascos conta 3 unidades.\nÉ este o número que aparece no rodapé da tabela.'],
     ['Faturado', money(tv)],
+    ['C. Extras', money(tc)],
     ['Lucro', money(tl), 'ok'],
     ['Margem', tv?pct(tl/tv):'—'],
     ['A receber', money(vPend.reduce((s,v)=>s+Number(v.valorVenda),0)), vPend.length?'al':'ok'],
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
-    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
+    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('C. Extras','custosExtras',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
       rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td class="ctr">${thumb(foto(v.produto),v.produto)}</td><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
         <td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td>
-        <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
+        <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(v.custosExtras || 0)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
         <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td>
         <td><div class="rowacts"><button class="btn sm" data-ev="${v.id}">Editar</button><button class="btn sm ghost" data-dv="${v.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num">${money(tc)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
   renderBulk('ven');
 }
@@ -2022,16 +2024,28 @@ $('#catPublicar').addEventListener('click', async ()=>{
     montaFolhas(itensParaCatalogo, opt);
     elCatalogo.style.display = 'block';
 
+    // Desativa o corte de tela temporariamente para forçar a captura completa no celular
+    document.body.style.setProperty('overflow-x', 'visible', 'important');
+    document.documentElement.style.setProperty('overflow-x', 'visible', 'important');
+    document.body.style.setProperty('max-width', 'none', 'important');
+    document.documentElement.style.setProperty('max-width', 'none', 'important');
+
     const pdfOpt = {
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 1.5, useCORS: true }, 
+      html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
     elCatalogo.style.display = 'none';
+
+    // Restaura as restrições originais da tela
+    document.body.style.removeProperty('overflow-x');
+    document.documentElement.style.removeProperty('overflow-x');
+    document.body.style.removeProperty('max-width');
+    document.documentElement.style.removeProperty('max-width');
 
     const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
       method: 'POST',
@@ -2055,6 +2069,10 @@ $('#catPublicar').addEventListener('click', async ()=>{
     alert('Não consegui publicar: '+e.message+'\n\nCertifique-se de ter rodado o SQL que cria o bucket "catalogos".');
     b.textContent='Publicar link online';
     $('#catalogo').style.display = 'none';
+    document.body.style.removeProperty('overflow-x');
+    document.documentElement.style.removeProperty('overflow-x');
+    document.body.style.removeProperty('max-width');
+    document.documentElement.style.removeProperty('max-width');
   }
   b.disabled=false;
 });
@@ -2085,16 +2103,27 @@ $('#catGerar').addEventListener('click', ()=>{
   const elCatalogo = $('#catalogo');
   elCatalogo.style.display = 'block';
 
+  // Desativa o corte de tela temporariamente para forçar a captura completa no celular
+  document.body.style.setProperty('overflow-x', 'visible', 'important');
+  document.documentElement.style.setProperty('overflow-x', 'visible', 'important');
+  document.body.style.setProperty('max-width', 'none', 'important');
+  document.documentElement.style.setProperty('max-width', 'none', 'important');
+
   const pdfOpt = {
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 1.5, useCORS: true },
+    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
     elCatalogo.style.display = 'none';
+    // Restaura as restrições originais da tela
+    document.body.style.removeProperty('overflow-x');
+    document.documentElement.style.removeProperty('overflow-x');
+    document.body.style.removeProperty('max-width');
+    document.documentElement.style.removeProperty('max-width');
   });
 });
 
