@@ -2118,7 +2118,7 @@ $('#catPublicar').addEventListener('click', async ()=>{
     document.body.classList.add('pdf-export');
     let pdfBlob;
     try {
-      pdfBlob = await geraPdfCatalogoDireto(elCatalogo, `${id}.pdf`);
+      pdfBlob = await geraPdfCatalogoDireto(elCatalogo, null);
     } finally {
       elCatalogo.style.display = 'none';
       document.body.classList.remove('pdf-export');
