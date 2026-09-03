@@ -312,7 +312,7 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 /* capa */
 #catalogo .capa{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0}
-#catalogo .capa .moldura{position:absolute;top:30px;bottom:30px;left:35px;right:30px;border:1.4px solid var(--tinta)}
+#catalogo .capa .moldura{position:absolute;top:30px;bottom:30px;left:30px;right:30px;border:1.4px solid var(--tinta)}
 #catalogo .capa .moldura::before{content:'';position:absolute;inset:9px;border:.6px solid var(--ouro)}
 #catalogo .capa .miolo{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
 #catalogo .capa img.logo{width:423px;height:auto;display:block}
@@ -589,6 +589,18 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 }
 
 
+
+/* PDF: neutraliza o layout responsivo durante a captura pelo html2canvas. */
+body.pdf-export #catalogo,
+body.pdf-export.pr-cat #catalogo {
+  width: 210mm !important;
+  transform: none !important;
+  transform-origin: top left !important;
+}
+body.pdf-export #catalogo .capa .moldura {
+  left: 30px !important;
+  right: 30px !important;
+}
 
 @media print { #scrollControls { display: none !important; } }
 

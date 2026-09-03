@@ -2028,13 +2028,18 @@ $('#catPublicar').addEventListener('click', async ()=>{
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 1.5, useCORS: true }, 
+      html2canvas:  { scale: 1.5, useCORS: true, windowWidth: 1000, windowHeight: 1200 },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
-    elCatalogo.style.display = 'none';
-    
+    document.body.classList.add('pdf-export');
+    let pdfBlob;
+    try {
+      pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
+    } finally {
+      elCatalogo.style.display = 'none';
+      document.body.classList.remove('pdf-export');
+    }
 
     const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
       method: 'POST',
@@ -2093,13 +2098,17 @@ $('#catGerar').addEventListener('click', ()=>{
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 1.5, useCORS: true },
+    html2canvas:  { scale: 1.5, useCORS: true, windowWidth: 1000, windowHeight: 1200 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
+  document.body.classList.add('pdf-export');
   html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
     elCatalogo.style.display = 'none';
-    
+    document.body.classList.remove('pdf-export');
+  }).catch(() => {
+    elCatalogo.style.display = 'none';
+    document.body.classList.remove('pdf-export');
   });
 });
 
