@@ -307,22 +307,22 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- catálogo ---------- */
 #catalogo{--tinta:#141109; --suave:#453D33; --fraco:#7C7266;
   --papel:#FFF; --plate:#FFF; --fio:#CFC5B2; --fio2:#EAE4D8; --ouro:#8F6B22;}
-#catalogo .pagina{box-sizing:border-box;width:794px !important;height:1123px !important;max-width:none !important;margin:0 !important;position:relative;overflow:hidden;background:var(--papel);padding:53px 57px 42px;display:block;break-after:page;page-break-after:always;color:var(--tinta)}
+#catalogo .pagina{box-sizing:border-box;width:210mm;height:296mm;position:relative;overflow:hidden;background:var(--papel);padding:14mm 15mm 11mm;display:block;break-after:page;page-break-after:always;color:var(--tinta)}
 #catalogo .pagina:last-child{break-after:auto;page-break-after:auto}
 
 /* capa */
 #catalogo .capa{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0}
-#catalogo .capa .moldura{position:absolute;inset:30px;border:1.4px solid var(--tinta)}
-#catalogo .capa .moldura::before{content:'';position:absolute;inset:9px;border:.6px solid var(--ouro)}
+#catalogo .capa .moldura{position:absolute;inset:8mm;border:1.4px solid var(--tinta)}
+#catalogo .capa .moldura::before{content:'';position:absolute;inset:2.4mm;border:.6px solid var(--ouro)}
 #catalogo .capa .miolo{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
-#catalogo .capa img.logo{width:423px;height:auto;display:block}
-#catalogo .capa .rive{margin-top:34px;border:1.2px solid var(--tinta);padding:9px 26px;
+#catalogo .capa img.logo{width:112mm;height:auto;display:block}
+#catalogo .capa .rive{margin-top:9mm;border:1.2px solid var(--tinta);padding:2.4mm 7mm;
   font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;letter-spacing:.3em;color:var(--tinta)}
-#catalogo .capa .frase{font-size:12px;line-height:1.85;color:var(--suave);max-width:46ch;margin-top:41px;
+#catalogo .capa .frase{font-size:12px;line-height:1.85;color:var(--suave);max-width:46ch;margin-top:11mm;
   letter-spacing:.02em}
 #catalogo .capa .contatoCapa{display:flex;align-items:center;justify-content:center;gap:2.4mm;
-  margin-top:34px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta);font-weight:600}
-#catalogo .capa .meta{margin-top:49px;font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+  margin-top:9mm;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta);font-weight:600}
+#catalogo .capa .meta{margin-top:13mm;font-size:10px;letter-spacing:.24em;text-transform:uppercase;
   color:var(--suave);line-height:2.4;font-weight:500}
 
 /* cabeçalho e rodapé corridos */
@@ -579,8 +579,8 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 
 @media screen and (max-width: 840px) {
   body.publico.pr-cat #catalogo {
-    width: 794px;
-    transform: scale(calc(100vw / 794px));
+    width: 210mm;
+    transform: scale(calc(100vw / 210mm));
     transform-origin: top left;
   }
   body.publico.pr-cat {
@@ -705,4 +705,11 @@ input[type="date"] {
     margin-bottom: 0;
     gap: 10px;
   }
+}
+
+body.gerando-pdf {
+  overflow: visible !important;
+  max-width: none !important;
+  width: auto !important;
+  height: auto !important;
 }
