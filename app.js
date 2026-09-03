@@ -1003,6 +1003,19 @@ function renderDash(){
       `Mostra a quantidade total de frascos que você já tirou do estoque e converteu em vendas.`,
       {t:'vendas', g:'ven'})].join('');
 
+  const ultimasVendas = data.sales.slice().sort((a,b)=>{
+    const da = a.data ? Date.parse(a.data+'T00:00:00') : -Infinity;
+    const db = b.data ? Date.parse(b.data+'T00:00:00') : -Infinity;
+    if(db !== da) return db-da;
+    return (data.sales.indexOf(b) - data.sales.indexOf(a));
+  }).slice(0,5);
+
+  $('#tUltimasVendas').innerHTML = ultimasVendas.length
+    ? `<thead><tr><th>Data</th><th>Produto</th><th>Cliente</th><th class="num">Valor</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>` +
+      ultimasVendas.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td><td class="num">${money(v.valorVenda)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('') +
+      `</tbody>`
+    : `<tbody><tr><td class="empty">Nenhuma venda lançada.</td></tr></tbody>`;
+
   $('#tInad').innerHTML = inad.length
     ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
       inad.map(c=>`<tr><td><button class="linkcli" data-cli="${esc(c.nome)}">${esc(c.nome)}</button>${c.canal?' <span class="badge cinza">canal</span>':''}</td>
