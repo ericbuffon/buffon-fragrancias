@@ -2028,7 +2028,11 @@ $('#catPublicar').addEventListener('click', async ()=>{
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 1.5, useCORS: true }, 
+      /* O catálogo já tem exatamente 210 mm de largura.
+         Fixamos a viewport do html2canvas em ~794 px (210 mm a 96 dpi)
+         para impedir uma escala horizontal diferente da escala do A4. */
+      html2canvas:  { scale: 2, useCORS: true, width: 794, windowWidth: 794, scrollX: 0, scrollY: 0 },
+      pagebreak:    { mode: ['css', 'legacy'] },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -2093,7 +2097,11 @@ $('#catGerar').addEventListener('click', ()=>{
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 1.5, useCORS: true },
+    /* O catálogo já tem exatamente 210 mm de largura.
+       Fixamos a viewport do html2canvas em ~794 px (210 mm a 96 dpi)
+       para impedir uma escala horizontal diferente da escala do A4. */
+    html2canvas:  { scale: 2, useCORS: true, width: 794, windowWidth: 794, scrollX: 0, scrollY: 0 },
+    pagebreak:    { mode: ['css', 'legacy'] },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
