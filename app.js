@@ -2023,13 +2023,13 @@ $('#catPublicar').addEventListener('click', async ()=>{
     montaFolhas(itensParaCatalogo, opt);
     elCatalogo.style.display = 'block';
   
-    await new Promise(r => setTimeout(r, 500));
+
     const pdfOpt = {
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, windowWidth: 794 }, 
-      jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
+      html2canvas:  { scale: 1.5, useCORS: true }, 
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
@@ -2088,19 +2088,19 @@ $('#catGerar').addEventListener('click', ()=>{
   const elCatalogo = $('#catalogo');
   elCatalogo.style.display = 'block';
   
-  setTimeout(() => {
-    const pdfOpt = {
+
+  const pdfOpt = {
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, windowWidth: 794 },
-    jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
+    html2canvas:  { scale: 1.5, useCORS: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
-    html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
-      elCatalogo.style.display = 'none';
-    });
-  }, 500);
+  html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
+    elCatalogo.style.display = 'none';
+    
+  });
 });
 
 /* ---------------- exportação para Excel ----------------
