@@ -691,3 +691,18 @@ input[type="date"] {
     }
   }
 }
+
+@media screen and (max-width: 880px) {
+  .kpi-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.1rem;
+  }
+  .kpi-wrapper .kpis {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    gap: 10px;
+  }
+}
