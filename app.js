@@ -712,9 +712,9 @@ function abreFicha(id){
   ].join('');
   const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
   $('#fichaTab').innerHTML = vs.length
-    ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Valor</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
+    ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
       vs.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
-        <td class="num">${money(v.valorVenda)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('')+`</tbody>`
+        <td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money((v.valorVenda||0) - (v.custosExtras||0))}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('')+`</tbody>`
     : `<tbody><tr><td class="empty">Nenhuma compra registrada.</td></tr></tbody>`;
   const precisaTel = ()=>{ if(!soDigitos(cli.telefone)){ alert('Cadastre o WhatsApp deste cliente primeiro.'); return false; } return true; };
   const zap = $('#fichaZap');
@@ -1338,6 +1338,7 @@ function renderVen(){
   const st = sort.ven;
   const tq = rows.reduce((s,v)=>s+Number(v.qtde),0);
   const tv = rows.reduce((s,v)=>s+Number(v.valorVenda),0);
+  const tcE = rows.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
@@ -1352,13 +1353,13 @@ function renderVen(){
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
-    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
+    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Custos','custosExtras',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
       rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td class="ctr">${thumb(foto(v.produto),v.produto)}</td><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
         <td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td>
-        <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
+        <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
         <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td>
         <td><div class="rowacts"><button class="btn sm" data-ev="${v.id}">Editar</button><button class="btn sm ghost" data-dv="${v.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num" style="color:var(--vermelho)">-${money(tcE)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
   renderBulk('ven');
 }
@@ -2026,8 +2027,8 @@ $('#catPublicar').addEventListener('click', async ()=>{
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 1.5, useCORS: true }, 
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas:  { scale: 2, useCORS: true, windowWidth: 794, width: 794 }, 
+      jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
     };
 
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
@@ -2089,8 +2090,8 @@ $('#catGerar').addEventListener('click', ()=>{
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 1.5, useCORS: true },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas:  { scale: 2, useCORS: true, windowWidth: 794, width: 794 },
+    jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
   };
 
   html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
