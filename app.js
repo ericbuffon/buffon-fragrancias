@@ -585,7 +585,7 @@ function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
     return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — o maior portfólio da *La Rive* você só encontra aqui.\n`
-      + `Dá para ver as fotos e as notas de cada fragrância aqui:\n${linkPublico(id)}\n\n`
+      + `Confira as fotos e as notas de cada fragrância:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida é só me chamar.`;
   }
   return textoCatalogo('');

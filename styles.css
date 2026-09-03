@@ -732,3 +732,21 @@ input[type="date"] {
     gap: 10px;
   }
 }
+
+/* Cores dos KPIs em pares: desktop = acima/abaixo; celular = esquerda/direita. */
+@media screen and (min-width: 881px){
+  #kpi1 .kpi:nth-child(1), #kpi1 .kpi:nth-child(4),
+  #kpi2 .kpi:nth-child(1), #kpi2 .kpi:nth-child(4){border-left-color:var(--azul) !important}
+  #kpi1 .kpi:nth-child(2), #kpi1 .kpi:nth-child(5),
+  #kpi2 .kpi:nth-child(2), #kpi2 .kpi:nth-child(5){border-left-color:var(--verde) !important}
+  #kpi1 .kpi:nth-child(3), #kpi1 .kpi:nth-child(6),
+  #kpi2 .kpi:nth-child(3), #kpi2 .kpi:nth-child(6){border-left-color:var(--ambar) !important}
+}
+@media screen and (max-width: 880px){
+  #kpi1 .kpi:nth-child(1), #kpi2 .kpi:nth-child(1),
+  #kpi1 .kpi:nth-child(4), #kpi2 .kpi:nth-child(4){border-left-color:var(--azul) !important}
+  #kpi1 .kpi:nth-child(2), #kpi2 .kpi:nth-child(2),
+  #kpi1 .kpi:nth-child(5), #kpi2 .kpi:nth-child(5){border-left-color:var(--verde) !important}
+  #kpi1 .kpi:nth-child(3), #kpi2 .kpi:nth-child(3),
+  #kpi1 .kpi:nth-child(6), #kpi2 .kpi:nth-child(6){border-left-color:var(--ambar) !important}
+}
