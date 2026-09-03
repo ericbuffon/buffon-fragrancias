@@ -1989,6 +1989,74 @@ function imprime(classe){
   setTimeout(()=>{ window.print(); setTimeout(limpa,1500); },150);
 }
 
+async function geraPdfCatalogoDireto(elCatalogo, filename){
+  // Não usamos html2pdf() para o catálogo: no iOS ele pode redimensionar
+  // o contêiner responsivo antes da captura. Capturamos cada página A4
+  // separadamente e a colocamos em uma folha A4 do jsPDF.
+  const pages = Array.from(elCatalogo.querySelectorAll('.pagina'));
+  if(!pages.length) throw new Error('Nenhuma página do catálogo foi encontrada.');
+
+  const PDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if(typeof PDF !== 'function') throw new Error('Biblioteca PDF indisponível.');
+
+  const oldCatalogoWidth = elCatalogo.style.width;
+  const oldCatalogoTransform = elCatalogo.style.transform;
+  const oldCatalogoMinWidth = elCatalogo.style.minWidth;
+  elCatalogo.style.width = '794px';
+  elCatalogo.style.minWidth = '794px';
+  elCatalogo.style.transform = 'none';
+
+  const pdf = new PDF({unit:'mm', format:'a4', orientation:'portrait', compress:true});
+  const A4W = 210, A4H = 296;
+  const PXW = 794, PXH = 1122;
+
+  try{
+    for(let i=0;i<pages.length;i++){
+      const page = pages[i];
+      const oldWidth = page.style.width;
+      const oldHeight = page.style.height;
+      const oldMinWidth = page.style.minWidth;
+      const oldMaxWidth = page.style.maxWidth;
+      page.style.width = PXW + 'px';
+      page.style.minWidth = PXW + 'px';
+      page.style.maxWidth = PXW + 'px';
+      page.style.height = PXH + 'px';
+
+      // Aguarda imagens/fontes antes de capturar, especialmente importante no iPhone.
+      if(document.fonts && document.fonts.ready) await document.fonts.ready;
+      const imgs = Array.from(page.querySelectorAll('img'));
+      await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(r=>{img.onload=img.onerror=r;})));
+
+      const canvas = await html2canvas(page, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#FFFFFF',
+        width: PXW,
+        height: PXH,
+        windowWidth: PXW,
+        windowHeight: PXH,
+        scrollX: 0,
+        scrollY: 0
+      });
+
+      if(i>0) pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.98), 'JPEG', 0, 0, A4W, A4H, undefined, 'FAST');
+
+      page.style.width = oldWidth;
+      page.style.minWidth = oldMinWidth;
+      page.style.maxWidth = oldMaxWidth;
+      page.style.height = oldHeight;
+    }
+    pdf.save(filename);
+    return true;
+  } finally {
+    elCatalogo.style.width = oldCatalogoWidth;
+    elCatalogo.style.minWidth = oldCatalogoMinWidth;
+    elCatalogo.style.transform = oldCatalogoTransform;
+  }
+}
+
 function opcoesCat(){
   return {genero:$('#catGen').value, soFoto:$('#catSoFoto').checked,
     preco:$('#catPreco').checked, soEstoque:$('#catEstoque').checked,
@@ -2024,18 +2092,10 @@ $('#catPublicar').addEventListener('click', async ()=>{
     elCatalogo.style.display = 'block';
   
 
-    const pdfOpt = {
-      margin:       0,
-      filename:     `${id}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 1.5, useCORS: true, windowWidth: 1000, windowHeight: 1200 },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
     document.body.classList.add('pdf-export');
     let pdfBlob;
     try {
-      pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
+      pdfBlob = await geraPdfCatalogoDireto(elCatalogo, `${id}.pdf`);
     } finally {
       elCatalogo.style.display = 'none';
       document.body.classList.remove('pdf-export');
@@ -2094,16 +2154,8 @@ $('#catGerar').addEventListener('click', ()=>{
   elCatalogo.style.display = 'block';
   
 
-  const pdfOpt = {
-    margin:       0,
-    filename:     'Catalogo_Buffon_Fragrancias.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 1.5, useCORS: true, windowWidth: 1000, windowHeight: 1200 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
   document.body.classList.add('pdf-export');
-  html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
+  geraPdfCatalogoDireto(elCatalogo, 'Catalogo_Buffon_Fragrancias.pdf').then(() => {
     elCatalogo.style.display = 'none';
     document.body.classList.remove('pdf-export');
   }).catch(() => {
