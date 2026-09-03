@@ -584,7 +584,7 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — Empório La Rive.\n`
+    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — o maior portfólio da *La Rive* você só encontra aqui.\n`
       + `Dá para ver as fotos e as notas de cada fragrância aqui:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida é só me chamar.`;
   }
@@ -610,7 +610,7 @@ function textoCatalogo(genero){
     if(i<0) break;
     linhas.splice(i,1); cortou++; corpo = linhas.join('\n');
   }
-  return `*Buffon Fragrâncias* — Empório La Rive\n`
+  return `*Buffon Fragrâncias* — o maior portfólio da *La Rive* você só encontra aqui.\n`
     + `As melhores inspirações da perfumaria internacional.\n${corpo}\n`
     + (cortou?`\n_(e mais ${cortou} disponíveis)_\n`:'')
 
@@ -1120,21 +1120,6 @@ function renderDash(){
       + `<li class="note">Comparando ${rotuloMes(mesAtual)} com ${rotuloMes(mesAnt)}, só vendas com data.</li>`
     : `<li><span class="empty">Sem vendas com data nos dois últimos meses.</span></li>`;
 
-  // ----- dinheiro parado: estoque sem giro -----
-  const ultimaVenda = {};
-  data.sales.filter(v=>v.data).forEach(v=>{ if(!ultimaVenda[v.produto]||v.data>ultimaVenda[v.produto]) ultimaVenda[v.produto]=v.data; });
-  const parados = est.filter(r=>r.saldo+r.consig>0 && !r.novo).map(r=>{
-    const u = ultimaVenda[r.produto];
-    return {...r, dias: u ? Math.floor((Date.now()-Date.parse(u+'T00:00:00'))/86400000) : null,
-            valor: (r.saldo+r.consig)*r.custoMedio};
-  }).filter(r=>r.dias===null || r.dias>=45).sort((a,b)=>b.valor-a.valor);
-  const totParado = parados.reduce((s,r)=>s+r.valor,0);
-  $('#lParado').innerHTML = parados.length
-    ? `<li><span>Produtos sem giro</span><span class="val">${parados.length} de ${est.filter(r=>r.saldo+r.consig>0).length}</span></li>`
-      + `<li><span>Custo empatado</span><span class="val" style="color:var(--vermelho)">${money(totParado)}</span></li>`
-      + parados.slice(0,5).map(r=>`<li><span>${esc(r.produto)}</span><span class="val">${money(r.valor)} · ${r.dias===null?'nunca vendeu':r.dias+' d'}</span></li>`).join('')
-      + `<li class="note">Com estoque e sem venda há 45 dias ou mais. Produtos novos no catálogo (até ${DIAS_NOVO} dias) ficam de fora.</li>`
-    : `<li><span class="empty">Tudo com estoque teve venda nos últimos 45 dias.</span></li>`;
 
   // ----- sugestão de compra a partir do histórico -----
   renderSugestao(est);
@@ -1143,31 +1128,6 @@ function renderDash(){
   renderCharts();
 
 
-
-  // ----- tempo entre comprar e vender -----
-  const giro = [];
-  data.products.forEach(prod=>{
-    const compras = data.purchases.filter(c=>c.produto===prod.nome && c.tipo==='Lacrado' && c.data).map(c=>c.data).sort();
-    const vendas = data.sales.filter(v=>v.produto===prod.nome && v.data).map(v=>v.data).sort();
-    if(!compras.length || !vendas.length) return;
-    /* casa cada venda com a compra mais recente que a antecede */
-    const dias = [];
-    vendas.forEach(dv=>{
-      const ant = compras.filter(dc=>dc<=dv).pop();
-      if(ant) dias.push(Math.round((Date.parse(dv)-Date.parse(ant))/86400000));
-    });
-    if(dias.length) giro.push({p:prod.nome, media: dias.reduce((s,d)=>s+d,0)/dias.length, n:dias.length});
-  });
-  giro.sort((a,b)=>a.media-b.media);
-  const mediaGeral = giro.length ? giro.reduce((s,g)=>s+g.media*g.n,0)/giro.reduce((s,g)=>s+g.n,0) : 0;
-  $('#lGiro').innerHTML = giro.length
-    ? `<li><span>Média geral</span><span class="val">${mediaGeral.toFixed(0)} dias entre comprar e vender</span></li>`
-      + `<li class="note" style="padding-top:2px">Mais rápidos</li>`
-      + giro.slice(0,3).map(g=>`<li><span>${esc(g.p)}</span><span class="val" style="color:var(--verde)">${g.media.toFixed(0)} dias</span></li>`).join('')
-      + `<li class="note" style="padding-top:8px">Mais lentos</li>`
-      + giro.slice(-3).reverse().map(g=>`<li><span>${esc(g.p)}</span><span class="val" style="color:var(--ambar)">${g.media.toFixed(0)} dias</span></li>`).join('')
-      + `<li class="note">Quanto tempo seu dinheiro fica preso em cada perfume. Calculado sobre ${giro.length} ${plural(giro.length,'produto','produtos')} com compra e venda datadas.</li>`
-    : `<li><span class="empty">Precisa de compras e vendas com data para calcular.</span></li>`;
 
   const precoRef = data.products.length?data.products.reduce((s,p)=>s+(Number(p.precoVenda)||90),0)/data.products.length:90;
   const unAdd = margem>0?Math.ceil(be/(margem*precoRef)):0;
