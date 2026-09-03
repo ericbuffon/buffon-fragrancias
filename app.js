@@ -2022,6 +2022,11 @@ $('#catPublicar').addEventListener('click', async ()=>{
     const itensParaCatalogo = catalogoItens(opt).map(paraCatalogo);
     montaFolhas(itensParaCatalogo, opt);
     elCatalogo.style.display = 'block';
+  elCatalogo.style.position = 'absolute';
+  elCatalogo.style.top = '0';
+  elCatalogo.style.left = '0';
+  elCatalogo.style.zIndex = '99999';
+  elCatalogo.style.background = '#fff';
   
 
     const pdfOpt = {
@@ -2034,6 +2039,11 @@ $('#catPublicar').addEventListener('click', async ()=>{
 
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
     elCatalogo.style.display = 'none';
+    elCatalogo.style.position = '';
+    elCatalogo.style.top = '';
+    elCatalogo.style.left = '';
+    elCatalogo.style.zIndex = '';
+    elCatalogo.style.background = '';
     
 
     const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
@@ -2087,6 +2097,11 @@ $('#catGerar').addEventListener('click', ()=>{
 
   const elCatalogo = $('#catalogo');
   elCatalogo.style.display = 'block';
+  elCatalogo.style.position = 'absolute';
+  elCatalogo.style.top = '0';
+  elCatalogo.style.left = '0';
+  elCatalogo.style.zIndex = '99999';
+  elCatalogo.style.background = '#fff';
   
 
   const pdfOpt = {
@@ -2099,6 +2114,11 @@ $('#catGerar').addEventListener('click', ()=>{
 
   html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
     elCatalogo.style.display = 'none';
+    elCatalogo.style.position = '';
+    elCatalogo.style.top = '';
+    elCatalogo.style.left = '';
+    elCatalogo.style.zIndex = '';
+    elCatalogo.style.background = '';
     
   });
 });
