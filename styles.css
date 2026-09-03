@@ -750,3 +750,281 @@ input[type="date"] {
   #kpi1 .kpi:nth-child(3), #kpi2 .kpi:nth-child(3),
   #kpi1 .kpi:nth-child(6), #kpi2 .kpi:nth-child(6){border-left-color:var(--ambar) !important}
 }
+
+/* =========================================================
+   BUFFON PREMIUM — redesign visual do sistema administrativo
+   Mantém a logo original e toda a identidade da marca.
+   ========================================================= */
+:root{
+  --paper:#F6F4EF;
+  --card:#FFFFFF;
+  --ink:#171717;
+  --ink-soft:#5F5B55;
+  --ink-faint:#8C877F;
+  --line:#E4DED3;
+  --line2:#EEEAE3;
+  --accent:#B22E18;
+  --accent-ink:#8F2412;
+  --accent-soft:#F7E8E2;
+  --brand-gold:#B08A43;
+  --brand-gold-soft:#F5EEDF;
+  --verde:#287A55;
+  --ambar:#A87518;
+  --vermelho:#B42318;
+}
+
+body:not(.publico){
+  background:var(--paper);
+  color:var(--ink);
+}
+
+/* Desktop: barra lateral elegante, mantendo a logo original */
+@media screen and (min-width:960px){
+  body:not(.publico){
+    display:block;
+    min-height:100vh;
+    padding:0 0 0 238px;
+  }
+  body:not(.publico) header.top{
+    position:fixed;
+    z-index:80;
+    left:0; top:0; bottom:0;
+    width:238px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:stretch;
+    padding:24px 18px 20px;
+    background:#151515;
+    border:0;
+    box-shadow:8px 0 28px rgba(0,0,0,.06);
+  }
+  body:not(.publico) .brand{
+    min-height:78px;
+    justify-content:center;
+    padding:10px 8px 24px;
+    border-bottom:1px solid rgba(176,138,67,.34);
+  }
+  body:not(.publico) .brand img.logo{
+    height:58px;
+    width:auto;
+    max-width:175px;
+  }
+  body:not(.publico) .top-right{
+    position:fixed;
+    top:0; right:0; left:238px;
+    height:78px;
+    padding:0 30px;
+    justify-content:flex-end;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    z-index:79;
+  }
+  body:not(.publico) .top-right .btn{
+    background:#fff;
+  }
+  body:not(.publico) nav.tabs{
+    position:fixed;
+    z-index:81;
+    left:0; top:112px; bottom:0;
+    width:238px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:12px 14px 24px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    background:#151515;
+    border:0;
+  }
+  body:not(.publico) .navgrupo{
+    color:#A9A39A;
+    padding:15px 12px 6px;
+    font-size:9.5px;
+    letter-spacing:.16em;
+  }
+  body:not(.publico) .navgrupo:first-child{padding-top:4px}
+  body:not(.publico) .tab{
+    position:relative;
+    width:100%;
+    min-height:42px;
+    justify-content:flex-start;
+    gap:10px;
+    padding:10px 12px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#D7D3CD;
+    font-size:13.5px;
+    font-weight:500;
+  }
+  body:not(.publico) .tab svg{color:#A9A39A;opacity:1;width:17px;height:17px}
+  body:not(.publico) .tab:hover:not(.active){background:rgba(255,255,255,.055);color:#fff}
+  body:not(.publico) .tab.active{
+    background:linear-gradient(90deg,rgba(176,138,67,.22),rgba(176,138,67,.08));
+    color:#fff;
+    font-weight:700;
+  }
+  body:not(.publico) .tab.active::before{
+    content:'';
+    position:absolute;
+    left:-14px; top:7px; bottom:7px;
+    width:3px;
+    background:var(--brand-gold);
+    border-radius:0 3px 3px 0;
+  }
+  body:not(.publico) .tab.active svg{color:#D0A85E}
+  body:not(.publico) main{
+    width:auto;
+    max-width:1480px;
+    margin:0;
+    padding:108px 34px 40px;
+  }
+  body:not(.publico) .sec-head{
+    margin-bottom:22px;
+    padding-bottom:15px;
+    border-bottom:1px solid var(--line);
+  }
+  body:not(.publico) .sec-head h2{font-size:24px;letter-spacing:-.01em}
+  body:not(.publico) .sec-head p{font-size:12px;color:var(--ink-faint)}
+}
+
+/* Mobile: topo compacto e navegação horizontal mais limpa */
+@media screen and (max-width:959px){
+  body:not(.publico) header.top{
+    padding:14px 16px 12px;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+  }
+  body:not(.publico) .brand img.logo{height:38px}
+  body:not(.publico) .top-right{gap:6px}
+  body:not(.publico) .top-right .btn{padding:7px 9px;font-size:11px}
+  body:not(.publico) nav.tabs{
+    background:#1A1A1A;
+    border:0;
+    padding:8px 10px;
+    gap:5px;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+  }
+  body:not(.publico) .navgrupo{display:none}
+  body:not(.publico) .tab{
+    background:transparent;
+    border:1px solid transparent;
+    color:#D8D4CE;
+    border-radius:7px;
+    padding:8px 11px;
+    font-size:12px;
+  }
+  body:not(.publico) .tab svg{color:#A9A39A}
+  body:not(.publico) .tab.active{
+    background:#302A21;
+    border-color:#5A4A31;
+    color:#fff;
+  }
+  body:not(.publico) .tab.active svg{color:#D0A85E}
+  body:not(.publico) main{padding-top:18px}
+}
+
+/* Cabeçalho dos controles: menos aparência de formulário */
+body:not(.publico) .btn{
+  border-color:var(--line);
+  border-radius:7px;
+  background:#fff;
+  transition:all .15s ease;
+}
+body:not(.publico) .btn:hover{border-color:#C8BDAE;box-shadow:0 2px 8px rgba(23,23,23,.05)}
+body:not(.publico) .btn.primary{
+  background:var(--accent);
+  border-color:var(--accent);
+  box-shadow:0 3px 10px rgba(178,46,24,.12);
+}
+
+/* KPI cards: uma linguagem visual única, com cor apenas quando significa algo */
+body:not(.publico) .kpi{
+  border:1px solid var(--line);
+  border-left:3px solid var(--brand-gold) !important;
+  border-radius:10px;
+  padding:16px 17px;
+  background:linear-gradient(180deg,#fff 0%,#FCFBF9 100%);
+  box-shadow:0 2px 8px rgba(30,24,18,.035);
+  min-height:112px;
+}
+body:not(.publico) .kpi.verde{border-left-color:var(--verde) !important}
+body:not(.publico) .kpi.ambar{border-left-color:var(--ambar) !important}
+body:not(.publico) .kpi.vermelho{border-left-color:var(--vermelho) !important}
+body:not(.publico) .kpi.azul,
+body:not(.publico) .kpi.roxo,
+body:not(.publico) .kpi.terra{border-left-color:var(--brand-gold) !important}
+body:not(.publico) .kpi .lbl{font-size:10px;letter-spacing:.1em;color:var(--ink-soft)}
+body:not(.publico) .kpi .val{font-size:24px;color:#171717}
+body:not(.publico) .kpi .sub{color:var(--ink-faint)}
+body:not(.publico) .kpi .qm{background:#fff;border-color:var(--line)}
+
+/* Cards gerais */
+body:not(.publico) .card{
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:18px 19px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 3px 14px rgba(30,24,18,.035);
+}
+body:not(.publico) .card-title{
+  color:#34312D;
+  font-size:11px;
+  letter-spacing:.1em;
+  margin-bottom:14px;
+}
+
+/* Resumos e formulários */
+body:not(.publico) .resumo{
+  border-radius:10px;
+  border-color:var(--line);
+  box-shadow:0 2px 8px rgba(30,24,18,.025);
+}
+body:not(.publico) input,
+body:not(.publico) select{
+  border-color:var(--line);
+  border-radius:7px;
+  background:#fff;
+}
+body:not(.publico) input:focus,
+body:not(.publico) select:focus{outline-color:var(--brand-gold);border-color:var(--brand-gold)}
+
+/* Filtros como barra de ferramentas */
+body:not(.publico) .filters{
+  background:#FBFAF8;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+}
+
+/* Tabelas mais leves */
+body:not(.publico) .twrap{
+  border:1px solid var(--line);
+  border-radius:9px;
+  overflow:auto;
+  background:#fff;
+}
+body:not(.publico) table th{
+  background:#F7F4EE;
+  color:#5E574E;
+  font-size:10px;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+body:not(.publico) table td{border-bottom:1px solid var(--line2)}
+body:not(.publico) table tbody tr:hover{background:#FCFAF6}
+
+/* Pequenos detalhes de marca */
+body:not(.publico) .save-state{color:var(--ink-soft)}
+body:not(.publico) .dot{background:var(--verde)}
+body:not(.publico) .nuvemstat.ok{color:var(--brand-gold)}
+body:not(.publico) .nuvemstat.ok .pt{background:var(--brand-gold)}
+
+/* Desktop: dashboard com mais respiro */
+@media screen and (min-width:1200px){
+  body:not(.publico) #sec-dashboard .kpi-wrapper{gap:14px}
+  body:not(.publico) #sec-dashboard .kpis{gap:14px}
+  body:not(.publico) #sec-dashboard .card{margin-bottom:18px}
+}
