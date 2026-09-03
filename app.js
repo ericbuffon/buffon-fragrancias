@@ -1990,21 +1990,24 @@ function imprime(classe){
 }
 
 async function geraPdfCatalogoDireto(elCatalogo, filename){
-  // Não usamos html2pdf() para o catálogo: no iOS ele pode redimensionar
-  // o contêiner responsivo antes da captura. Capturamos cada página A4
-  // separadamente e a colocamos em uma folha A4 do jsPDF.
+  // Geração robusta para desktop e iPhone: cada página é capturada
+  // individualmente em uma largura A4 fixa e inserida em uma folha A4.
+  // jsPDF e html2canvas são carregados explicitamente no index.html.
   const pages = Array.from(elCatalogo.querySelectorAll('.pagina'));
   if(!pages.length) throw new Error('Nenhuma página do catálogo foi encontrada.');
 
   const PDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  if(typeof PDF !== 'function') throw new Error('Biblioteca PDF indisponível.');
+  if(typeof PDF !== 'function') throw new Error('Biblioteca jsPDF indisponível.');
+  if(typeof window.html2canvas !== 'function') throw new Error('Biblioteca html2canvas indisponível.');
 
   const oldCatalogoWidth = elCatalogo.style.width;
-  const oldCatalogoTransform = elCatalogo.style.transform;
   const oldCatalogoMinWidth = elCatalogo.style.minWidth;
+  const oldCatalogoTransform = elCatalogo.style.transform;
+  const oldCatalogoOverflow = elCatalogo.style.overflow;
   elCatalogo.style.width = '794px';
   elCatalogo.style.minWidth = '794px';
   elCatalogo.style.transform = 'none';
+  elCatalogo.style.overflow = 'visible';
 
   const pdf = new PDF({unit:'mm', format:'a4', orientation:'portrait', compress:true});
   const A4W = 210, A4H = 296;
@@ -2013,22 +2016,26 @@ async function geraPdfCatalogoDireto(elCatalogo, filename){
   try{
     for(let i=0;i<pages.length;i++){
       const page = pages[i];
-      const oldWidth = page.style.width;
-      const oldHeight = page.style.height;
-      const oldMinWidth = page.style.minWidth;
-      const oldMaxWidth = page.style.maxWidth;
+      const old = {
+        width: page.style.width, height: page.style.height,
+        minWidth: page.style.minWidth, maxWidth: page.style.maxWidth,
+        transform: page.style.transform
+      };
       page.style.width = PXW + 'px';
       page.style.minWidth = PXW + 'px';
       page.style.maxWidth = PXW + 'px';
       page.style.height = PXH + 'px';
+      page.style.transform = 'none';
 
-      // Aguarda imagens/fontes antes de capturar, especialmente importante no iPhone.
       if(document.fonts && document.fonts.ready) await document.fonts.ready;
       const imgs = Array.from(page.querySelectorAll('img'));
-      await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(r=>{img.onload=img.onerror=r;})));
+      await Promise.all(imgs.map(img => {
+        if(img.complete && img.naturalWidth) return Promise.resolve();
+        return new Promise(resolve => { img.onload=img.onerror=resolve; });
+      }));
 
-      const canvas = await html2canvas(page, {
-        scale: 2,
+      const canvas = await window.html2canvas(page, {
+        scale: 1.5,
         useCORS: true,
         allowTaint: false,
         backgroundColor: '#FFFFFF',
@@ -2037,26 +2044,42 @@ async function geraPdfCatalogoDireto(elCatalogo, filename){
         windowWidth: PXW,
         windowHeight: PXH,
         scrollX: 0,
-        scrollY: 0
+        scrollY: 0,
+        logging: false
       });
 
       if(i>0) pdf.addPage();
-      pdf.addImage(canvas.toDataURL('image/jpeg',0.98), 'JPEG', 0, 0, A4W, A4H, undefined, 'FAST');
+      const imgData = canvas.toDataURL('image/jpeg', 0.94);
+      pdf.addImage(imgData, 'JPEG', 0, 0, A4W, A4H, undefined, 'FAST');
 
-      page.style.width = oldWidth;
-      page.style.minWidth = oldMinWidth;
-      page.style.maxWidth = oldMaxWidth;
-      page.style.height = oldHeight;
+      page.style.width = old.width;
+      page.style.height = old.height;
+      page.style.minWidth = old.minWidth;
+      page.style.maxWidth = old.maxWidth;
+      page.style.transform = old.transform;
     }
-    pdf.save(filename);
-    return true;
+
+    // Não usamos pdf.save() aqui porque o botão Publicar precisa do Blob.
+    const blob = pdf.output('blob');
+    if(filename){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 30000);
+    }
+    return blob;
   } finally {
     elCatalogo.style.width = oldCatalogoWidth;
     elCatalogo.style.minWidth = oldCatalogoMinWidth;
     elCatalogo.style.transform = oldCatalogoTransform;
+    elCatalogo.style.overflow = oldCatalogoOverflow;
   }
 }
-
 function opcoesCat(){
   return {genero:$('#catGen').value, soFoto:$('#catSoFoto').checked,
     preco:$('#catPreco').checked, soEstoque:$('#catEstoque').checked,
@@ -2158,9 +2181,10 @@ $('#catGerar').addEventListener('click', ()=>{
   geraPdfCatalogoDireto(elCatalogo, 'Catalogo_Buffon_Fragrancias.pdf').then(() => {
     elCatalogo.style.display = 'none';
     document.body.classList.remove('pdf-export');
-  }).catch(() => {
+  }).catch((e) => {
     elCatalogo.style.display = 'none';
     document.body.classList.remove('pdf-export');
+    alert('Não consegui gerar o catálogo em PDF: ' + (e && e.message ? e.message : e));
   });
 });
 
