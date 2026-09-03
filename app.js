@@ -2022,13 +2022,8 @@ $('#catPublicar').addEventListener('click', async ()=>{
     const itensParaCatalogo = catalogoItens(opt).map(paraCatalogo);
     montaFolhas(itensParaCatalogo, opt);
     elCatalogo.style.display = 'block';
-  elCatalogo.style.position = 'absolute';
-  elCatalogo.style.top = '0';
-  elCatalogo.style.left = '0';
-  elCatalogo.style.zIndex = '99999';
-  elCatalogo.style.background = '#fff';
   
-
+    await new Promise(r => setTimeout(r, 500));
     const pdfOpt = {
       margin:       0,
       filename:     `${id}.pdf`,
@@ -2039,11 +2034,6 @@ $('#catPublicar').addEventListener('click', async ()=>{
 
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
     elCatalogo.style.display = 'none';
-    elCatalogo.style.position = '';
-    elCatalogo.style.top = '';
-    elCatalogo.style.left = '';
-    elCatalogo.style.zIndex = '';
-    elCatalogo.style.background = '';
     
 
     const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
@@ -2097,14 +2087,9 @@ $('#catGerar').addEventListener('click', ()=>{
 
   const elCatalogo = $('#catalogo');
   elCatalogo.style.display = 'block';
-  elCatalogo.style.position = 'absolute';
-  elCatalogo.style.top = '0';
-  elCatalogo.style.left = '0';
-  elCatalogo.style.zIndex = '99999';
-  elCatalogo.style.background = '#fff';
   
-
-  const pdfOpt = {
+  setTimeout(() => {
+    const pdfOpt = {
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
@@ -2112,15 +2097,10 @@ $('#catGerar').addEventListener('click', ()=>{
     jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
   };
 
-  html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
-    elCatalogo.style.display = 'none';
-    elCatalogo.style.position = '';
-    elCatalogo.style.top = '';
-    elCatalogo.style.left = '';
-    elCatalogo.style.zIndex = '';
-    elCatalogo.style.background = '';
-    
-  });
+    html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
+      elCatalogo.style.display = 'none';
+    });
+  }, 500);
 });
 
 /* ---------------- exportação para Excel ----------------
