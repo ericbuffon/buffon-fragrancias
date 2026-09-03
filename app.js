@@ -1343,14 +1343,9 @@ function renderVen(){
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
-    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.
-Duas compras da mesma pessoa no mesmo dia contam como um só.'],
-    ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.
-Três perfumes diferentes = três lançamentos.
-Três frascos do mesmo perfume = um lançamento só.'],
-    ['Unidades', tq, '', 'Soma das quantidades — frascos, não linhas.
-Um lançamento com 3 frascos conta 3 unidades.
-É este o número que aparece no rodapé da tabela.'],
+    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDuas compras da mesma pessoa no mesmo dia contam como um só.'],
+    ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
+    ['Unidades', tq, '', 'Soma das quantidades — frascos, não linhas.\nUm lançamento com 3 frascos conta 3 unidades.\nÉ este o número que aparece no rodapé da tabela.'],
     ['Faturado', money(tv)],
     ['C. Extras', money(tc)],
     ['Lucro', money(tl), 'ok'],
@@ -1369,7 +1364,6 @@ Um lançamento com 3 frascos conta 3 unidades.
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
   renderBulk('ven');
 }
-
 
 /* ---------------- estoque ---------------- */
 function renderEst(){
@@ -2018,9 +2012,7 @@ $('#btnCatalogo').addEventListener('click',()=>{
 $('#catCancel').addEventListener('click',()=>$('#modalCat').classList.remove('open'));
 $('#modalCat').addEventListener('click',e=>{ if(e.target.id==='modalCat') $('#modalCat').classList.remove('open'); });
 $('#catPublicar').addEventListener('click', async ()=>{
-  if(!nvLigado()) return alert('Para publicar o link é preciso estar conectado na nuvem.
-
-Abra o botão Nuvem e entre com sua conta.');
+  if(!nvLigado()) return alert('Para publicar o link é preciso estar conectado na nuvem.\n\nAbra o botão Nuvem e entre com sua conta.');
   const b=$('#catPublicar'); b.disabled=true; b.textContent='Gerando PDF e Publicando…';
   
   let siblings = [];
@@ -2075,9 +2067,7 @@ Abra o botão Nuvem e entre com sua conta.');
             $('#catLink').value = r_publish.link; $('#catLinkBox').hidden=false;
             $('#catNota').innerHTML = `O PDF foi gerado e hospedado no seu banco de dados. O link direto para download já está atualizado.`;
             b.textContent = `Republicar (${r_publish.n} no ar)`;
-            alert(`Catálogo atualizado com sucesso!
-
-O PDF foi gerado silenciosamente e já substituiu o antigo na nuvem.`);
+            alert(`Catálogo atualizado com sucesso!\n\nO PDF foi gerado silenciosamente e já substituiu o antigo na nuvem.`);
         } catch (err) {
             alert('Não consegui publicar o PDF: '+err.message);
             b.textContent='Publicar link online';
@@ -2090,9 +2080,7 @@ O PDF foi gerado silenciosamente e já substituiu o antigo na nuvem.`);
     }, 300);
 
   }catch(e){
-    alert('Não consegui publicar: '+e.message+'
-
-Certifique-se de ter rodado o SQL que cria o bucket "catalogos".');
+    alert('Não consegui publicar: '+e.message+'\n\nCertifique-se de ter rodado o SQL que cria o bucket "catalogos".');
     b.textContent='Publicar link online';
     $('#catalogo').style.display = 'none';
     document.body.style.removeProperty('overflow-x');
