@@ -1964,7 +1964,7 @@ function montaFolhas(itens, opt){
   let html = `<div class="pagina capa"><div class="moldura"></div><div class="miolo">
     ${logoImg(LOGO_G)}
     <div class="rive">LA RIVE</div>
-    <div class="meta" style="margin-top:13mm">${itens.length} ${plural(itens.length,'fragrância','fragrâncias')}<br>
+    <div class="meta" style="margin-top:49px">${itens.length} ${plural(itens.length,'fragrância','fragrâncias')}<br>
       ${nM} ${plural(nM,'masculina','masculinas')} &nbsp;·&nbsp; ${nF} ${plural(nF,'feminina','femininas')}</div>
     ${contato?`<div class="contatoCapa">${ICO_ZAP(13,'#1F7A44')}<span>${esc(contato)}</span></div>`:''}
   </div></div>`;
@@ -2028,8 +2028,8 @@ $('#catPublicar').addEventListener('click', async ()=>{
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 }, 
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas:  { scale: 2, useCORS: true, windowWidth: 794 }, 
+      jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
     };
 
     const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
@@ -2093,8 +2093,8 @@ $('#catGerar').addEventListener('click', ()=>{
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas:  { scale: 2, useCORS: true, windowWidth: 794 },
+    jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
   };
 
   html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
