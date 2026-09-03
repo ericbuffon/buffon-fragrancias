@@ -1343,9 +1343,14 @@ function renderVen(){
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
-    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDuas compras da mesma pessoa no mesmo dia contam como um só.'],
-    ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
-    ['Unidades', tq, '', 'Soma das quantidades — frascos, não linhas.\nUm lançamento com 3 frascos conta 3 unidades.\nÉ este o número que aparece no rodapé da tabela.'],
+    ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.
+Duas compras da mesma pessoa no mesmo dia contam como um só.'],
+    ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.
+Três perfumes diferentes = três lançamentos.
+Três frascos do mesmo perfume = um lançamento só.'],
+    ['Unidades', tq, '', 'Soma das quantidades — frascos, não linhas.
+Um lançamento com 3 frascos conta 3 unidades.
+É este o número que aparece no rodapé da tabela.'],
     ['Faturado', money(tv)],
     ['C. Extras', money(tc)],
     ['Lucro', money(tl), 'ok'],
@@ -1364,6 +1369,7 @@ function renderVen(){
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
   renderBulk('ven');
 }
+
 
 /* ---------------- estoque ---------------- */
 function renderEst(){
@@ -2012,8 +2018,12 @@ $('#btnCatalogo').addEventListener('click',()=>{
 $('#catCancel').addEventListener('click',()=>$('#modalCat').classList.remove('open'));
 $('#modalCat').addEventListener('click',e=>{ if(e.target.id==='modalCat') $('#modalCat').classList.remove('open'); });
 $('#catPublicar').addEventListener('click', async ()=>{
-  if(!nvLigado()) return alert('Para publicar o link é preciso estar conectado na nuvem.\n\nAbra o botão Nuvem e entre com sua conta.');
+  if(!nvLigado()) return alert('Para publicar o link é preciso estar conectado na nuvem.
+
+Abra o botão Nuvem e entre com sua conta.');
   const b=$('#catPublicar'); b.disabled=true; b.textContent='Gerando PDF e Publicando…';
+  
+  let siblings = [];
   try{
     const opt = opcoesCat();
     const r_publish = await publicaCatalogo(opt);
@@ -2022,59 +2032,74 @@ $('#catPublicar').addEventListener('click', async ()=>{
     const elCatalogo = $('#catalogo');
     const itensParaCatalogo = catalogoItens(opt).map(paraCatalogo);
     montaFolhas(itensParaCatalogo, opt);
+    
+    // Ocultar os outros elementos para o catálogo ficar perfeitamente no topo (y=0) e sem cortes
+    siblings = Array.from(document.body.children).filter(el => el.id !== 'catalogo' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.tagName !== 'LINK');
+    siblings.forEach(el => { el.dataset.pdfHide = el.style.display; el.style.display = 'none'; });
+    
     elCatalogo.style.display = 'block';
-
-    // Desativa o corte de tela temporariamente para forçar a captura completa no celular
     document.body.style.setProperty('overflow-x', 'visible', 'important');
     document.documentElement.style.setProperty('overflow-x', 'visible', 'important');
-    document.body.style.setProperty('max-width', 'none', 'important');
-    document.documentElement.style.setProperty('max-width', 'none', 'important');
+    window.scrollTo(0, 0);
 
     const pdfOpt = {
       margin:       0,
       filename:     `${id}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 }, 
+      html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024, scrollY: 0 }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
-    elCatalogo.style.display = 'none';
+    setTimeout(async () => {
+        try {
+            const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
+            elCatalogo.style.display = 'none';
+            document.body.style.removeProperty('overflow-x');
+            document.documentElement.style.removeProperty('overflow-x');
+            siblings.forEach(el => { el.style.display = el.dataset.pdfHide || ''; });
 
-    // Restaura as restrições originais da tela
-    document.body.style.removeProperty('overflow-x');
-    document.documentElement.style.removeProperty('overflow-x');
-    document.body.style.removeProperty('max-width');
-    document.documentElement.style.removeProperty('max-width');
+            const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + NV.tok,
+                'apikey': NV.key,
+                'Content-Type': 'application/pdf',
+                'x-upsert': 'true'
+              },
+              body: pdfBlob
+            });
 
-    const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + NV.tok,
-        'apikey': NV.key,
-        'Content-Type': 'application/pdf',
-        'x-upsert': 'true'
-      },
-      body: pdfBlob
-    });
+            if(!storageRes.ok) throw new Error('Falha ao hospedar o arquivo PDF na nuvem.');
 
-    if(!storageRes.ok) throw new Error('Falha ao hospedar o arquivo PDF na nuvem.');
+            data.config = Object.assign({}, data.config, {contato:opt.contato.trim()}); save();
+            $('#catLink').value = r_publish.link; $('#catLinkBox').hidden=false;
+            $('#catNota').innerHTML = `O PDF foi gerado e hospedado no seu banco de dados. O link direto para download já está atualizado.`;
+            b.textContent = `Republicar (${r_publish.n} no ar)`;
+            alert(`Catálogo atualizado com sucesso!
 
-    data.config = Object.assign({}, data.config, {contato:opt.contato.trim()}); save();
-    $('#catLink').value = r_publish.link; $('#catLinkBox').hidden=false;
-    $('#catNota').innerHTML = `O PDF foi gerado e hospedado no seu banco de dados. O link direto para download já está atualizado.`;
-    b.textContent = `Republicar (${r_publish.n} no ar)`;
-    alert(`Catálogo atualizado com sucesso!\n\nO PDF foi gerado silenciosamente e já substituiu o antigo na nuvem.`);
+O PDF foi gerado silenciosamente e já substituiu o antigo na nuvem.`);
+        } catch (err) {
+            alert('Não consegui publicar o PDF: '+err.message);
+            b.textContent='Publicar link online';
+            elCatalogo.style.display = 'none';
+            document.body.style.removeProperty('overflow-x');
+            document.documentElement.style.removeProperty('overflow-x');
+            siblings.forEach(el => { el.style.display = el.dataset.pdfHide || ''; });
+        }
+        b.disabled = false;
+    }, 300);
+
   }catch(e){
-    alert('Não consegui publicar: '+e.message+'\n\nCertifique-se de ter rodado o SQL que cria o bucket "catalogos".');
+    alert('Não consegui publicar: '+e.message+'
+
+Certifique-se de ter rodado o SQL que cria o bucket "catalogos".');
     b.textContent='Publicar link online';
     $('#catalogo').style.display = 'none';
     document.body.style.removeProperty('overflow-x');
     document.documentElement.style.removeProperty('overflow-x');
-    document.body.style.removeProperty('max-width');
-    document.documentElement.style.removeProperty('max-width');
+    if(siblings.length) siblings.forEach(el => { el.style.display = el.dataset.pdfHide || ''; });
+    b.disabled=false;
   }
-  b.disabled=false;
 });
 $('#catCopiar').addEventListener('click', async ()=>{
   const b=$('#catCopiar');
@@ -2101,30 +2126,33 @@ $('#catGerar').addEventListener('click', ()=>{
   $('#modalCat').classList.remove('open');
 
   const elCatalogo = $('#catalogo');
+  
+  // Ocultar os outros elementos para o catálogo ficar perfeitamente no topo (y=0) e sem cortes
+  const siblings = Array.from(document.body.children).filter(el => el.id !== 'catalogo' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.tagName !== 'LINK');
+  siblings.forEach(el => { el.dataset.pdfHide = el.style.display; el.style.display = 'none'; });
+  
   elCatalogo.style.display = 'block';
-
-  // Desativa o corte de tela temporariamente para forçar a captura completa no celular
   document.body.style.setProperty('overflow-x', 'visible', 'important');
   document.documentElement.style.setProperty('overflow-x', 'visible', 'important');
-  document.body.style.setProperty('max-width', 'none', 'important');
-  document.documentElement.style.setProperty('max-width', 'none', 'important');
+  window.scrollTo(0, 0);
 
   const pdfOpt = {
     margin:       0,
     filename:     'Catalogo_Buffon_Fragrancias.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 },
+    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024, scrollY: 0 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
-  html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
-    elCatalogo.style.display = 'none';
-    // Restaura as restrições originais da tela
-    document.body.style.removeProperty('overflow-x');
-    document.documentElement.style.removeProperty('overflow-x');
-    document.body.style.removeProperty('max-width');
-    document.documentElement.style.removeProperty('max-width');
-  });
+  // timeout para o navegador respirar e desenhar as fontes/imagens antes de capturar
+  setTimeout(() => {
+    html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
+      elCatalogo.style.display = 'none';
+      document.body.style.removeProperty('overflow-x');
+      document.documentElement.style.removeProperty('overflow-x');
+      siblings.forEach(el => { el.style.display = el.dataset.pdfHide || ''; });
+    });
+  }, 300);
 });
 
 /* ---------------- exportação para Excel ----------------
