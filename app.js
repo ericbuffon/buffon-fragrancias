@@ -984,11 +984,11 @@ function renderDash(){
       `Se você vender todo o estoque pelo preço cadastrado:\n`
       +`(em mãos + consignado) × preço − custo do estoque\n`
       +`= ${money(lucroPot)}`, {t:'estoque', g:'est'}),
-    kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un',conAtivo.length?'terra':'verde',
+    kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un', aReceber>0?'ambar':'verde',
       `${[...new Set(conAtivo.map(c=>c.parceiro))].length} ${plural([...new Set(conAtivo.map(c=>c.parceiro))].length,'parceiro','parceiros')}`,
       'Unidades que estão com parceiros e ainda não foram vendidas nem devolvidas.\nContinuam sendo suas, mas não estão na prateleira.',
       {t:'consignado', g:'con', f:{conSit:'Em consignação'}}),
-    kpi('Compras a caminho',un(cam)+' un',cam.length?'ambar':'verde',
+    kpi('Compras a caminho',un(cam)+' un', roi>=0?'verde':'vermelho',
       `${un(camLac)} lacrado${un(camLac)===1?'':'s'} · ${un(camTes)} tester${un(camTes)===1?'':'s'} · ${money(vl(cam))}`,
       `Compras lançadas e ainda não marcadas como recebidas.\n`
       +`Já saiu do seu bolso, mas ainda não entrou no estoque em mãos.\n\n`
@@ -996,7 +996,7 @@ function renderDash(){
       +`Testers: ${un(camTes)} un · ${money(vl(camTes))}  (não entram no estoque de venda)\n\n`
       +`Na aba Estoque, a coluna "A caminho" mostra só os ${un(camLac)} lacrados.`,
       {t:'compras', g:'com', f:{comEnt:'Não'}}),
-    kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
+    kpi('Vendas a entregar',aEntregar.length+' un', (invest-recebido)>0?'ambar':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
       'Vendas lançadas que ainda não foram entregues.\nSó baixam do estoque quando você marcar como entregue.',
       {t:'vendas', g:'ven', f:{venEnt:'Não'}}),
     kpi('Produtos Vendidos', produtosVendidos+' un', 'roxo', `${contaPedidos(data.sales)} pedidos no total`,
