@@ -370,14 +370,14 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   border:.8px solid var(--ouro);color:var(--ouro);padding:.5mm 2mm}
 #catalogo .meio .fam{display:inline-block;margin-top:2mm;font-size:8.5px;letter-spacing:.13em;
   text-transform:uppercase;font-weight:700;color:var(--acc);border:.9px solid var(--acc);padding:.7mm 2.4mm}
-#catalogo .piramide{display:flex;align-items:stretch;gap:2.5mm;margin-top:3mm;min-height:58px}
-#catalogo .piramide svg{flex:0 0 68px;width:68px;height:58px;display:block;overflow:visible}
-#catalogo .piramide .niveis{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:1px 0}
-#catalogo .piramide .nv{display:grid;grid-template-columns:34mm minmax(0,1fr);column-gap:2.5mm;align-items:start;min-height:17px}
+#catalogo .piramide{display:flex;align-items:stretch;gap:3.2mm;margin-top:3mm;min-height:66px}
+#catalogo .piramide svg{flex:0 0 82px;width:82px;height:66px;display:block;overflow:visible}
+#catalogo .piramide .niveis{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:0}
+#catalogo .piramide .nv{display:flex;flex-direction:column;justify-content:center;min-height:20px;position:relative;padding-left:0}
 #catalogo .piramide .nv:last-child{margin-bottom:0}
-#catalogo .piramide .nv b{width:auto;font-size:7.7px;line-height:1.2;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ouro);font-weight:800;padding-top:1px}
-#catalogo .piramide .nv span{font-size:8.8px;line-height:1.42;color:var(--tinta)}
+#catalogo .piramide .nv b{display:block;width:auto;font-size:7.5px;line-height:1.15;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ouro);font-weight:800;margin:0 0 .8mm}
+#catalogo .piramide .nv span{display:block;font-size:8.2px;line-height:1.28;color:var(--tinta);max-width:43mm}
 #catalogo .semnotas{font-size:8.5px;color:var(--fraco);margin-top:3mm;font-style:italic}
 #catalogo .meio .preco{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;margin-top:3mm;color:var(--tinta)}
 #catalogo .dir{flex:none;display:flex;flex-direction:column;align-items:center;gap:1.8mm}

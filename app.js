@@ -1948,20 +1948,22 @@ const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:
 /* pirâmide olfativa: topo estreito, coração médio, fundo largo */
 function piramideSVG(acc, tem){
   const t = tem.topo?1:.18, c = tem.coracao?1:.18, f = tem.fundo?1:.18;
+  /* dourado/bege da identidade Buffon; sem contorno externo */
   const ouro = '#B08A3E';
-  return `<svg width="68" height="58" viewBox="0 0 68 58" fill="none" aria-hidden="true">
-    <path d="M20 2 31 20H9z" fill="${ouro}" opacity="${t}"/>
-    <path d="M8 22h24l8 17H0z" fill="${ouro}" opacity="${c}"/>
-    <path d="M0 41h40l8 15H-8z" fill="${ouro}" opacity="${f}"/>
-    <circle cx="20" cy="11" r="4.5" fill="#fff" stroke="${ouro}" stroke-width="1.7"/>
-    <circle cx="20" cy="11" r="1.7" fill="${ouro}"/>
-    <line x1="24.5" y1="11" x2="64" y2="11" stroke="${ouro}" stroke-width="1"/>
-    <circle cx="20" cy="30.5" r="4.5" fill="#fff" stroke="${ouro}" stroke-width="1.7"/>
-    <circle cx="20" cy="30.5" r="1.7" fill="${ouro}"/>
-    <line x1="24.5" y1="30.5" x2="64" y2="30.5" stroke="${ouro}" stroke-width="1"/>
-    <circle cx="20" cy="48" r="4.5" fill="#fff" stroke="${ouro}" stroke-width="1.7"/>
-    <circle cx="20" cy="48" r="1.7" fill="${ouro}"/>
-    <line x1="24.5" y1="48" x2="64" y2="48" stroke="${ouro}" stroke-width="1"/>
+  const linha = '#8F7740';
+  return `<svg width="82" height="66" viewBox="0 0 82 66" fill="none" aria-hidden="true">
+    <path d="M25 2 37 21H13z" fill="${ouro}" opacity="${t}"/>
+    <path d="M12 23h26l8 19H4z" fill="${ouro}" opacity="${c}"/>
+    <path d="M4 44h42l10 20H-6z" fill="${ouro}" opacity="${f}"/>
+    <circle cx="25" cy="11.5" r="4" fill="#fff" stroke="${linha}" stroke-width="1.4"/>
+    <circle cx="25" cy="11.5" r="1.5" fill="${linha}"/>
+    <line x1="29" y1="11.5" x2="82" y2="11.5" stroke="${linha}" stroke-width="0.9"/>
+    <circle cx="25" cy="32" r="4" fill="#fff" stroke="${linha}" stroke-width="1.4"/>
+    <circle cx="25" cy="32" r="1.5" fill="${linha}"/>
+    <line x1="29" y1="32" x2="82" y2="32" stroke="${linha}" stroke-width="0.9"/>
+    <circle cx="25" cy="54" r="4" fill="#fff" stroke="${linha}" stroke-width="1.4"/>
+    <circle cx="25" cy="54" r="1.5" fill="${linha}"/>
+    <line x1="29" y1="54" x2="82" y2="54" stroke="${linha}" stroke-width="0.9"/>
   </svg>`;
 }
 /* formato único usado pelo catálogo impresso e pelo link público */
