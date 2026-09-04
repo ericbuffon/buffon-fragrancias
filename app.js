@@ -586,10 +586,9 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Esse é o catálogo da *Buffon Fragrâncias*.\n`
-      + `O maior portfólio da *La Rive* você só encontra aqui.\n\n`
-      + `Confira as fotos e as notas das fragrâncias:\n${linkPublico(id)}\n\n`
-      + `Qualquer dúvida, é só me chamar.`;
+    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — o maior portfólio da *La Rive* você só encontra aqui.\n`
+      + `Confira as fotos e as notas de cada fragrância:\n${linkPublico(id)}\n\n`
+      + `Qualquer dúvida é só me chamar.`;
   }
   return textoCatalogo('');
 }

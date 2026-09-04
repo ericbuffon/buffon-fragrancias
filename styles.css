@@ -370,20 +370,14 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   border:.8px solid var(--ouro);color:var(--ouro);padding:.5mm 2mm}
 #catalogo .meio .fam{display:inline-block;margin-top:2mm;font-size:8.5px;letter-spacing:.13em;
   text-transform:uppercase;font-weight:700;color:var(--acc);border:.9px solid var(--acc);padding:.7mm 2.4mm}
-#catalogo .piramide{display:grid;grid-template-columns:18mm minmax(17mm,20mm) minmax(0,1fr);
-  align-items:center;column-gap:2.5mm;width:100%;max-width:125mm;margin:3mm auto 0}
-#catalogo .piramide svg{width:62px;height:58px;justify-self:center;display:block}
-#catalogo .piramide .niveis{display:contents}
-#catalogo .piramide .nv{display:contents}
-#catalogo .piramide .nv b{font-size:8px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--suave);font-weight:700;align-self:baseline;padding:0}
-#catalogo .piramide .nv span{font-size:9.2px;line-height:1.5;color:var(--tinta);align-self:baseline}
-#catalogo .piramide .nv b:nth-of-type(1),#catalogo .piramide .nv span:nth-of-type(1){grid-row:1}
-#catalogo .piramide .nv b:nth-of-type(2),#catalogo .piramide .nv span:nth-of-type(2){grid-row:2}
-#catalogo .piramide .nv b:nth-of-type(3),#catalogo .piramide .nv span:nth-of-type(3){grid-row:3}
-#catalogo .piramide .nv b{grid-column:2}
-#catalogo .piramide .nv span{grid-column:3}
-
+#catalogo .piramide{display:flex;align-items:center;justify-content:center;gap:4mm;margin:3mm auto 0;width:100%;max-width:112mm}
+#catalogo .piramide svg{flex:none;width:62px;height:58px;display:block}
+#catalogo .piramide .niveis{flex:0 1 78mm;min-width:0}
+#catalogo .piramide .nv{display:flex;gap:3mm;align-items:baseline;margin-bottom:1.3mm}
+#catalogo .piramide .nv:last-child{margin-bottom:0}
+#catalogo .piramide .nv b{flex:0 0 16mm;font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--suave);font-weight:700}
+#catalogo .piramide .nv span{flex:1;min-width:0;font-size:9.2px;line-height:1.5;color:var(--tinta)}
 #catalogo .semnotas{font-size:8.5px;color:var(--fraco);margin-top:3mm;font-style:italic}
 #catalogo .meio .preco{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;margin-top:3mm;color:var(--tinta)}
 #catalogo .dir{flex:none;display:flex;flex-direction:column;align-items:center;gap:1.8mm}
