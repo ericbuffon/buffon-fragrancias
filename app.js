@@ -1198,7 +1198,9 @@ function abrePedido(ids){
   const primeira = vs[0];
   const cliente = temNome(primeira) ? primeira.cliente.trim() : (canalDe(primeira)!=='Direto' ? canalDe(primeira) : 'Cliente não identificado');
   const valor = vs.reduce((s,v)=>s+Number(v.valorVenda)||0,0);
-  const custos = vs.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
+  const custosExtras = vs.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
+  const custoProdutos = vs.reduce((s,v)=>s+((Number(v.qtde)||0)*calcVenda(v).custoUnit),0);
+  const custos = custoProdutos + custosExtras;
   const lucro = vs.reduce((s,v)=>s+calcVenda(v).lucro,0);
   const qtde = vs.reduce((s,v)=>s+Number(v.qtde)||0,0);
   const stats = [...new Set(vs.map(v=>v.status).filter(Boolean))];
@@ -1213,10 +1215,12 @@ function abrePedido(ids){
     kpi('Lançamentos', vs.length, 'azul', `${vs.length} ${plural(vs.length,'produto','produtos')}`),
     kpi('Pagamento', status==='Misto'?'Misto':status, status==='Pago'?'verde':status==='Pendente'?'ambar':'cinza'),
     kpi('Entrega', entrega==='Misto'?'Misto':entrega, entrega==='Sim'?'verde':entrega==='Não'?'ambar':'cinza'),
-    kpi('Lucro', money(lucro), lucro>=0?'verde':'vermelho', `Custos extras ${money(custos)}`)
+    kpi('Custos extras', money(custosExtras), 'ambar', custosExtras>0 ? 'despesas adicionais do pedido' : 'sem custos extras'),
+    kpi('Lucro', money(lucro), lucro>=0?'verde':'vermelho', `Valor ${money(valor)} − custos ${money(custos)}`)
   ].join('');
   $('#pedidoTab').innerHTML = `<thead><tr><th>Produto</th><th class="num">Qtde</th><th class="num">Valor</th><th class="num">Lucro</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>` +
-    vs.map(v=>`<tr><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(calcVenda(v).lucro)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('') + `</tbody><tfoot><tr><td>Total</td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num">${money(lucro)}</td><td colspan="2"></td></tr></tfoot>`;
+    vs.map(v=>{ const cv=calcVenda(v); return `<tr><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(cv.lucro)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`; }).join('') +
+    `</tbody><tfoot><tr><td>Total</td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num">${money(lucro)}</td><td colspan="2"></td></tr><tr><td colspan="2"><b>Custos extras do pedido</b></td><td class="num"><b>${money(custosExtras)}</b></td><td colspan="3"></td></tr></tfoot>`;
   $('#pedidoVendas').onclick = ()=>{
     $('#modalPedido').classList.remove('open');
     aplicaFiltros('ven', {venPedido:ids});
