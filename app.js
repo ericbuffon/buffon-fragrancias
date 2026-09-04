@@ -10,7 +10,7 @@ let fotos = {prod:'', insp:''};
 let fil = {
   prodGen:'',prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
-  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,
+  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',
   estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
@@ -437,7 +437,7 @@ window.addEventListener('popstate', e=>{
 const GRUPOS = {
   prod:{campos:['prodGen','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
-  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
+  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
   est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
@@ -447,14 +447,12 @@ const GRUPOS = {
 };
 function limpaFiltros(g){
   setTimeout(guardaFiltros,0);
-  if(g==='ven') fil.venPedido=null;
   const G = GRUPOS[g]; if(!G) return;
   G.campos.forEach(c=>{ fil[c]=''; const el=$(G.els[c]); if(el) el.value=''; });
   G.render();
 }
 function aplicaFiltros(g, vals){
   setTimeout(guardaFiltros,0);
-  if(g==='ven' && !Object.prototype.hasOwnProperty.call(vals,'venPedido')) fil.venPedido=null;
   const G = GRUPOS[g]; if(!G) return;
   G.campos.forEach(c=>{ fil[c] = vals[c]||''; const el=$(G.els[c]); if(el) el.value=fil[c]; });
   G.render();
@@ -586,10 +584,9 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Esse é o catálogo da *Buffon Fragrâncias*.\n`
-      + `O maior portfólio da *La Rive* você só encontra aqui.\n\n`
-      + `Confira as fotos e as notas das fragrâncias:\n${linkPublico(id)}\n\n`
-      + `Qualquer dúvida, é só me chamar.`;
+    return `Oi! Esse é o catálogo da *Buffon Fragrâncias* — Empório La Rive.\n`
+      + `Dá para ver as fotos e as notas de cada fragrância aqui:\n${linkPublico(id)}\n\n`
+      + `Qualquer dúvida é só me chamar.`;
   }
   return textoCatalogo('');
 }
@@ -613,7 +610,7 @@ function textoCatalogo(genero){
     if(i<0) break;
     linhas.splice(i,1); cortou++; corpo = linhas.join('\n');
   }
-  return `*Buffon Fragrâncias* — o maior portfólio da *La Rive* você só encontra aqui.\n`
+  return `*Buffon Fragrâncias* — Empório La Rive\n`
     + `As melhores inspirações da perfumaria internacional.\n${corpo}\n`
     + (cortou?`\n_(e mais ${cortou} disponíveis)_\n`:'')
 
@@ -715,9 +712,9 @@ function abreFicha(id){
   ].join('');
   const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
   $('#fichaTab').innerHTML = vs.length
-    ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
+    ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Valor</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
       vs.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
-        <td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money((v.valorVenda||0) - (v.custosExtras||0))}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('')+`</tbody>`
+        <td class="num">${money(v.valorVenda)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('')+`</tbody>`
     : `<tbody><tr><td class="empty">Nenhuma compra registrada.</td></tr></tbody>`;
   const precisaTel = ()=>{ if(!soDigitos(cli.telefone)){ alert('Cadastre o WhatsApp deste cliente primeiro.'); return false; } return true; };
   const zap = $('#fichaZap');
@@ -987,11 +984,11 @@ function renderDash(){
       `Se você vender todo o estoque pelo preço cadastrado:\n`
       +`(em mãos + consignado) × preço − custo do estoque\n`
       +`= ${money(lucroPot)}`, {t:'estoque', g:'est'}),
-    kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un', aReceber>0?'ambar':'verde',
+    kpi('Consignado',conAtivo.reduce((s,c)=>s+saldoCon(c),0)+' un',conAtivo.length?'terra':'verde',
       `${[...new Set(conAtivo.map(c=>c.parceiro))].length} ${plural([...new Set(conAtivo.map(c=>c.parceiro))].length,'parceiro','parceiros')}`,
       'Unidades que estão com parceiros e ainda não foram vendidas nem devolvidas.\nContinuam sendo suas, mas não estão na prateleira.',
       {t:'consignado', g:'con', f:{conSit:'Em consignação'}}),
-    kpi('Compras a caminho',un(cam)+' un', roi>=0?'verde':'vermelho',
+    kpi('Compras a caminho',un(cam)+' un',cam.length?'ambar':'verde',
       `${un(camLac)} lacrado${un(camLac)===1?'':'s'} · ${un(camTes)} tester${un(camTes)===1?'':'s'} · ${money(vl(cam))}`,
       `Compras lançadas e ainda não marcadas como recebidas.\n`
       +`Já saiu do seu bolso, mas ainda não entrou no estoque em mãos.\n\n`
@@ -999,41 +996,12 @@ function renderDash(){
       +`Testers: ${un(camTes)} un · ${money(vl(camTes))}  (não entram no estoque de venda)\n\n`
       +`Na aba Estoque, a coluna "A caminho" mostra só os ${un(camLac)} lacrados.`,
       {t:'compras', g:'com', f:{comEnt:'Não'}}),
-    kpi('Vendas a entregar',aEntregar.length+' un', (invest-recebido)>0?'ambar':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
+    kpi('Vendas a entregar',aEntregar.length+' un',aEntregar.length?'laranja':'verde',money(aEntregar.reduce((s,v)=>s+Number(v.valorVenda),0)),
       'Vendas lançadas que ainda não foram entregues.\nSó baixam do estoque quando você marcar como entregue.',
       {t:'vendas', g:'ven', f:{venEnt:'Não'}}),
     kpi('Produtos Vendidos', produtosVendidos+' un', 'roxo', `${contaPedidos(data.sales)} pedidos no total`,
       `Mostra a quantidade total de frascos que você já tirou do estoque e converteu em vendas.`,
       {t:'vendas', g:'ven'})].join('');
-
-  /* Últimos pedidos: mesma pessoa + mesmo dia + mesmo canal = um pedido.
-     Sem cliente/data, a linha permanece como pedido individual. */
-  const gruposUltimos = new Map();
-  data.sales.forEach(v=>{
-    const chave = chavePedido(v);
-    if(!gruposUltimos.has(chave)) gruposUltimos.set(chave,{ids:[], data:v.data||'', cliente:temNome(v)?v.cliente:'', canal:canalDe(v), valor:0, qtde:0, n:0, ordem:data.sales.indexOf(v), status:new Set(), entregue:new Set()});
-    const g=gruposUltimos.get(chave);
-    g.ids.push(v.id); g.valor+=Number(v.valorVenda)||0; g.qtde+=Number(v.qtde)||0; g.n++;
-    if(v.status) g.status.add(v.status); if(v.entregue) g.entregue.add(v.entregue);
-    if((v.data||'') > (g.data||'')) g.data=v.data;
-  });
-  const ultimosPedidos = [...gruposUltimos.values()].sort((a,b)=>{
-    const da=a.data?Date.parse(a.data+'T00:00:00'):-Infinity, db=b.data?Date.parse(b.data+'T00:00:00'):-Infinity;
-    if(db!==da) return db-da;
-    return b.ordem-a.ordem;
-  }).slice(0,5);
-  const resumoStatus = set => set.size===1 ? [...set][0] : (set.size?'Misto':'');
-  $('#tUltimasVendas').innerHTML = ultimosPedidos.length
-    ? `<thead><tr><th>Data</th><th>Cliente</th><th class="num">Itens</th><th class="num">Valor</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th><th></th></tr></thead><tbody>` +
-      ultimosPedidos.map(g=>{
-        const stat=resumoStatus(g.status), ent=resumoStatus(g.entregue);
-        const label=g.cliente || (g.canal!=='Direto'?g.canal:'Cliente não identificado');
-        const info=`${g.n} ${plural(g.n,'lançamento','lançamentos')} · ${g.qtde} ${plural(g.qtde,'unidade','unidades')}`;
-        const ir=esc(JSON.stringify({t:'vendas',g:'ven',f:{venPedido:g.ids}}));
-        return `<tr><td>${dt(g.data)}</td><td><b>${esc(label)}</b><br><span class="mini-note">${esc(info)}</span></td><td class="num">${g.n}</td><td class="num">${money(g.valor)}</td><td class="ctr">${stat==='Misto'?'<span class="badge cinza">Misto</span>':stat?bPag(stat):'—'}</td><td class="ctr">${ent==='Misto'?'<span class="badge cinza">Misto</span>':ent?bEntV(ent):'—'}</td><td class="ctr"><button type="button" class="btn sm" data-pedido='${ir}' title="Ver detalhes deste pedido">Ver pedido</button></td></tr>`;
-      }).join('') +
-      `</tbody>`
-    : `<tbody><tr><td class="empty">Nenhuma venda lançada.</td></tr></tbody>`;
 
   $('#tInad').innerHTML = inad.length
     ? `<thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor devido</th></tr></thead><tbody>`+
@@ -1152,6 +1120,21 @@ function renderDash(){
       + `<li class="note">Comparando ${rotuloMes(mesAtual)} com ${rotuloMes(mesAnt)}, só vendas com data.</li>`
     : `<li><span class="empty">Sem vendas com data nos dois últimos meses.</span></li>`;
 
+  // ----- dinheiro parado: estoque sem giro -----
+  const ultimaVenda = {};
+  data.sales.filter(v=>v.data).forEach(v=>{ if(!ultimaVenda[v.produto]||v.data>ultimaVenda[v.produto]) ultimaVenda[v.produto]=v.data; });
+  const parados = est.filter(r=>r.saldo+r.consig>0 && !r.novo).map(r=>{
+    const u = ultimaVenda[r.produto];
+    return {...r, dias: u ? Math.floor((Date.now()-Date.parse(u+'T00:00:00'))/86400000) : null,
+            valor: (r.saldo+r.consig)*r.custoMedio};
+  }).filter(r=>r.dias===null || r.dias>=45).sort((a,b)=>b.valor-a.valor);
+  const totParado = parados.reduce((s,r)=>s+r.valor,0);
+  $('#lParado').innerHTML = parados.length
+    ? `<li><span>Produtos sem giro</span><span class="val">${parados.length} de ${est.filter(r=>r.saldo+r.consig>0).length}</span></li>`
+      + `<li><span>Custo empatado</span><span class="val" style="color:var(--vermelho)">${money(totParado)}</span></li>`
+      + parados.slice(0,5).map(r=>`<li><span>${esc(r.produto)}</span><span class="val">${money(r.valor)} · ${r.dias===null?'nunca vendeu':r.dias+' d'}</span></li>`).join('')
+      + `<li class="note">Com estoque e sem venda há 45 dias ou mais. Produtos novos no catálogo (até ${DIAS_NOVO} dias) ficam de fora.</li>`
+    : `<li><span class="empty">Tudo com estoque teve venda nos últimos 45 dias.</span></li>`;
 
   // ----- sugestão de compra a partir do histórico -----
   renderSugestao(est);
@@ -1160,6 +1143,31 @@ function renderDash(){
   renderCharts();
 
 
+
+  // ----- tempo entre comprar e vender -----
+  const giro = [];
+  data.products.forEach(prod=>{
+    const compras = data.purchases.filter(c=>c.produto===prod.nome && c.tipo==='Lacrado' && c.data).map(c=>c.data).sort();
+    const vendas = data.sales.filter(v=>v.produto===prod.nome && v.data).map(v=>v.data).sort();
+    if(!compras.length || !vendas.length) return;
+    /* casa cada venda com a compra mais recente que a antecede */
+    const dias = [];
+    vendas.forEach(dv=>{
+      const ant = compras.filter(dc=>dc<=dv).pop();
+      if(ant) dias.push(Math.round((Date.parse(dv)-Date.parse(ant))/86400000));
+    });
+    if(dias.length) giro.push({p:prod.nome, media: dias.reduce((s,d)=>s+d,0)/dias.length, n:dias.length});
+  });
+  giro.sort((a,b)=>a.media-b.media);
+  const mediaGeral = giro.length ? giro.reduce((s,g)=>s+g.media*g.n,0)/giro.reduce((s,g)=>s+g.n,0) : 0;
+  $('#lGiro').innerHTML = giro.length
+    ? `<li><span>Média geral</span><span class="val">${mediaGeral.toFixed(0)} dias entre comprar e vender</span></li>`
+      + `<li class="note" style="padding-top:2px">Mais rápidos</li>`
+      + giro.slice(0,3).map(g=>`<li><span>${esc(g.p)}</span><span class="val" style="color:var(--verde)">${g.media.toFixed(0)} dias</span></li>`).join('')
+      + `<li class="note" style="padding-top:8px">Mais lentos</li>`
+      + giro.slice(-3).reverse().map(g=>`<li><span>${esc(g.p)}</span><span class="val" style="color:var(--ambar)">${g.media.toFixed(0)} dias</span></li>`).join('')
+      + `<li class="note">Quanto tempo seu dinheiro fica preso em cada perfume. Calculado sobre ${giro.length} ${plural(giro.length,'produto','produtos')} com compra e venda datadas.</li>`
+    : `<li><span class="empty">Precisa de compras e vendas com data para calcular.</span></li>`;
 
   const precoRef = data.products.length?data.products.reduce((s,p)=>s+(Number(p.precoVenda)||90),0)/data.products.length:90;
   const unAdd = margem>0?Math.ceil(be/(margem*precoRef)):0;
@@ -1192,59 +1200,6 @@ $('#kpiEst').addEventListener('click', e=>{
   const b = e.target.closest('[data-est]'); if(!b) return;
   aplicaFiltros('est', {estStat:b.dataset.est}); goTab('estoque');
 });
-function abrePedido(ids){
-  if(!Array.isArray(ids) || !ids.length) return;
-  const vs = data.sales.filter(v=>ids.includes(v.id));
-  if(!vs.length) return;
-  const primeira = vs[0];
-  const cliente = temNome(primeira) ? primeira.cliente.trim() : (canalDe(primeira)!=='Direto' ? canalDe(primeira) : 'Cliente não identificado');
-  const valor = vs.reduce((s,v)=>s+Number(v.valorVenda)||0,0);
-  const custosExtras = vs.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
-  const custoProdutos = vs.reduce((s,v)=>s+((Number(v.qtde)||0)*calcVenda(v).custoUnit),0);
-  const custos = custoProdutos + custosExtras;
-  const lucro = vs.reduce((s,v)=>s+calcVenda(v).lucro,0);
-  const qtde = vs.reduce((s,v)=>s+Number(v.qtde)||0,0);
-  const stats = [...new Set(vs.map(v=>v.status).filter(Boolean))];
-  const ents = [...new Set(vs.map(v=>v.entregue).filter(Boolean))];
-  const status = stats.length===1 ? stats[0] : (stats.length ? 'Misto' : '—');
-  const entrega = ents.length===1 ? ents[0] : (ents.length ? 'Misto' : '—');
-  const dataPedido = vs.map(v=>v.data).filter(Boolean).sort().reverse()[0] || '';
-  $('#pedidoNome').textContent = 'Pedido de ' + cliente;
-  $('#pedidoSub').textContent = [dataPedido ? dt(dataPedido) : '', canalDe(primeira)].filter(Boolean).join(' · ');
-  $('#pedidoKpis').innerHTML = [
-    kpi('Valor', money(valor), 'verde', `${qtde} ${plural(qtde,'unidade','unidades')}`),
-    kpi('Lançamentos', vs.length, 'azul', `${vs.length} ${plural(vs.length,'produto','produtos')}`),
-    kpi('Pagamento', status==='Misto'?'Misto':status, status==='Pago'?'verde':status==='Pendente'?'ambar':'cinza'),
-    kpi('Entrega', entrega==='Misto'?'Misto':entrega, entrega==='Sim'?'verde':entrega==='Não'?'ambar':'cinza'),
-    kpi('Custos extras', money(custosExtras), 'ambar', custosExtras>0 ? 'despesas adicionais do pedido' : 'sem custos extras'),
-    kpi('Lucro', money(lucro), lucro>=0?'verde':'vermelho', `Valor ${money(valor)} − custos ${money(custos)}`)
-  ].join('');
-  $('#pedidoTab').innerHTML = vs.length
-    ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
-      vs.map(v=>{
-        const venda=Number(v.valorVenda)||0, custosExtra=Number(v.custosExtras)||0, liquido=venda-custosExtra;
-        return `<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
-          <td class="num">${money(venda)}</td><td class="num" style="color:var(--vermelho)">-${money(custosExtra)}</td><td class="num">${money(liquido)}</td>
-          <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`;
-      }).join('')+
-      `</tbody><tfoot><tr><td>Total</td><td></td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num" style="color:var(--vermelho)">-${money(custosExtras)}</td><td class="num">${money(valor-custosExtras)}</td><td colspan="2"></td></tr></tfoot>`
-    : `<tbody><tr><td class="empty">Nenhum item neste pedido.</td></tr></tbody>`;
-  $('#pedidoVendas').onclick = ()=>{
-    $('#modalPedido').classList.remove('open');
-    aplicaFiltros('ven', {venPedido:ids});
-    goTab('vendas');
-  };
-  $('#modalPedido').classList.add('open');
-}
-$('#tUltimasVendas').addEventListener('click', e=>{
-  const b=e.target.closest('[data-pedido]'); if(!b) return;
-  const ir=JSON.parse(b.getAttribute('data-pedido'));
-  escondeBalao();
-  if(ir && Array.isArray(ir.f && ir.f.venPedido)) abrePedido(ir.f.venPedido);
-});
-$('#pedidoFechar').addEventListener('click', ()=>$('#modalPedido').classList.remove('open'));
-$('#modalPedido').addEventListener('click', e=>{ if(e.target.id==='modalPedido') $('#modalPedido').classList.remove('open'); });
-
 $('#tInad').addEventListener('click', e=>{
   const b = e.target.closest('[data-cli]'); if(!b) return;
   const nome = b.dataset.cli;
@@ -1377,14 +1332,12 @@ function renderVen(){
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
   if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
   if(fil.venQ) rows = rows.filter(v=>norm(v.produto).includes(norm(fil.venQ))||norm(v.cliente).includes(norm(fil.venQ)));
-  if(fil.venPedido && Array.isArray(fil.venPedido)) rows = rows.filter(v=>fil.venPedido.includes(v.id));
   chipProduto('ven','venProdX');
 
   rows = ord(rows, sort.ven);
   const st = sort.ven;
   const tq = rows.reduce((s,v)=>s+Number(v.qtde),0);
   const tv = rows.reduce((s,v)=>s+Number(v.valorVenda),0);
-  const tcE = rows.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
   const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
@@ -1399,13 +1352,13 @@ function renderVen(){
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
-    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Custos','custosExtras',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
+    ? `<thead><tr>${chkTodos('ven')}<th class="ctr">Foto</th>${th('Data','data',st)}${th('Produto','produto',st)}${th('Gênero','genero',st,'ctr')}${th('Canal','canal',st)}${th('Cliente','cliente',st)}${th('Qtde','qtde',st,'num')}${th('Valor','valorVenda',st,'num')}${th('Lucro','lucro',st,'num')}${th('Margem','margem',st,'num')}${th('Pagamento','status',st,'ctr')}${th('Entrega','entregue',st,'ctr')}<th></th></tr></thead><tbody>`+
       rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td class="ctr">${thumb(foto(v.produto),v.produto)}</td><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
         <td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td>
-        <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
+        <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
         <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td>
         <td><div class="rowacts"><button class="btn sm" data-ev="${v.id}">Editar</button><button class="btn sm ghost" data-dv="${v.id}">Excluir</button></div></td></tr>`).join('')+
-      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num" style="color:var(--vermelho)">-${money(tcE)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
+      `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
   renderBulk('ven');
 }
@@ -1945,23 +1898,19 @@ const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:
   ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:1.5mm; text-align:center; font-size:4.5px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</div>' : ''}`
   : `<div class="vazio">${ICO.frasco}<span>sem foto</span></div>`}</div>`;
 
-/* pirâmide olfativa — cor acompanha o gênero/família visual do produto */
+/* pirâmide olfativa: topo estreito, coração médio, fundo largo */
 function piramideSVG(acc, tem){
-  const t = tem.topo?1:.16, c = tem.coracao?1:.16, f = tem.fundo?1:.16;
-  const cor = acc || '#B08A3E';
-  return `<svg width="100" height="78" viewBox="0 0 100 78" fill="none" aria-hidden="true">
-    <path d="M29 2 43 25H15z" fill="${cor}" opacity="${t}"/>
-    <path d="M14 27h30l10 22H4z" fill="${cor}" opacity="${c}"/>
-    <path d="M3 51h51l11 25H-8z" fill="${cor}" opacity="${f}"/>
-    <circle cx="29" cy="14" r="5" fill="#fff" stroke="${cor}" stroke-width="1.8"/>
-    <circle cx="29" cy="14" r="1.8" fill="${cor}"/>
-    <line x1="34" y1="14" x2="95" y2="14" stroke="${cor}" stroke-width="1.15"/>
-    <circle cx="29" cy="38" r="5" fill="#fff" stroke="${cor}" stroke-width="1.8"/>
-    <circle cx="29" cy="38" r="1.8" fill="${cor}"/>
-    <line x1="34" y1="38" x2="95" y2="38" stroke="${cor}" stroke-width="1.15"/>
-    <circle cx="29" cy="63" r="5" fill="#fff" stroke="${cor}" stroke-width="1.8"/>
-    <circle cx="29" cy="63" r="1.8" fill="${cor}"/>
-    <line x1="34" y1="63" x2="95" y2="63" stroke="${cor}" stroke-width="1.15"/>
+  const t = tem.topo?1:.18, c = tem.coracao?1:.18, f = tem.fundo?1:.18;
+  /* Pirâmide inspirada na referência aprovada: triângulo à esquerda,
+     marcador circular em cada nível e linha horizontal conduzindo ao texto. */
+  return `<svg class="piramide-grafico" width="82" height="64" viewBox="0 0 164 64" fill="none" aria-hidden="true">
+    <path d="M28 2 45 21H11z" fill="${acc}" opacity="${t}"/>
+    <path d="M10 22.5h36L54 42H2z" fill="${acc}" opacity="${c}"/>
+    <path d="M1 43h54l9 19H-8z" fill="${acc}" opacity="${f}"/>
+    <circle cx="28" cy="13" r="3.5" fill="#fff" stroke="${acc}" stroke-width="2"/>
+    <circle cx="28" cy="32" r="3.5" fill="#fff" stroke="${acc}" stroke-width="2"/>
+    <circle cx="28" cy="52" r="3.5" fill="#fff" stroke="${acc}" stroke-width="2"/>
+    <path d="M33 13H164M33 32H164M33 52H164" stroke="${acc}" stroke-width="1.4"/>
   </svg>`;
 }
 /* formato único usado pelo catálogo impresso e pelo link público */
@@ -2020,7 +1969,7 @@ function montaFolhas(itens, opt){
   let html = `<div class="pagina capa"><div class="moldura"></div><div class="miolo">
     ${logoImg(LOGO_G)}
     <div class="rive">LA RIVE</div>
-    <div class="meta" style="margin-top:49px">${itens.length} ${plural(itens.length,'fragrância','fragrâncias')}<br>
+    <div class="meta" style="margin-top:13mm">${itens.length} ${plural(itens.length,'fragrância','fragrâncias')}<br>
       ${nM} ${plural(nM,'masculina','masculinas')} &nbsp;·&nbsp; ${nF} ${plural(nF,'feminina','femininas')}</div>
     ${contato?`<div class="contatoCapa">${ICO_ZAP(13,'#1F7A44')}<span>${esc(contato)}</span></div>`:''}
   </div></div>`;
@@ -2045,97 +1994,6 @@ function imprime(classe){
   setTimeout(()=>{ window.print(); setTimeout(limpa,1500); },150);
 }
 
-async function geraPdfCatalogoDireto(elCatalogo, filename){
-  // Geração robusta para desktop e iPhone: cada página é capturada
-  // individualmente em uma largura A4 fixa e inserida em uma folha A4.
-  // jsPDF e html2canvas são carregados explicitamente no index.html.
-  const pages = Array.from(elCatalogo.querySelectorAll('.pagina'));
-  if(!pages.length) throw new Error('Nenhuma página do catálogo foi encontrada.');
-
-  const PDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  if(typeof PDF !== 'function') throw new Error('Biblioteca jsPDF indisponível.');
-  if(typeof window.html2canvas !== 'function') throw new Error('Biblioteca html2canvas indisponível.');
-
-  const oldCatalogoWidth = elCatalogo.style.width;
-  const oldCatalogoMinWidth = elCatalogo.style.minWidth;
-  const oldCatalogoTransform = elCatalogo.style.transform;
-  const oldCatalogoOverflow = elCatalogo.style.overflow;
-  elCatalogo.style.width = '794px';
-  elCatalogo.style.minWidth = '794px';
-  elCatalogo.style.transform = 'none';
-  elCatalogo.style.overflow = 'visible';
-
-  const pdf = new PDF({unit:'mm', format:'a4', orientation:'portrait', compress:true});
-  const A4W = 210, A4H = 296;
-  const PXW = 794, PXH = 1122;
-
-  try{
-    for(let i=0;i<pages.length;i++){
-      const page = pages[i];
-      const old = {
-        width: page.style.width, height: page.style.height,
-        minWidth: page.style.minWidth, maxWidth: page.style.maxWidth,
-        transform: page.style.transform
-      };
-      page.style.width = PXW + 'px';
-      page.style.minWidth = PXW + 'px';
-      page.style.maxWidth = PXW + 'px';
-      page.style.height = PXH + 'px';
-      page.style.transform = 'none';
-
-      if(document.fonts && document.fonts.ready) await document.fonts.ready;
-      const imgs = Array.from(page.querySelectorAll('img'));
-      await Promise.all(imgs.map(img => {
-        if(img.complete && img.naturalWidth) return Promise.resolve();
-        return new Promise(resolve => { img.onload=img.onerror=resolve; });
-      }));
-
-      const canvas = await window.html2canvas(page, {
-        scale: 1.5,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#FFFFFF',
-        width: PXW,
-        height: PXH,
-        windowWidth: PXW,
-        windowHeight: PXH,
-        scrollX: 0,
-        scrollY: 0,
-        logging: false
-      });
-
-      if(i>0) pdf.addPage();
-      const imgData = canvas.toDataURL('image/jpeg', 0.94);
-      pdf.addImage(imgData, 'JPEG', 0, 0, A4W, A4H, undefined, 'FAST');
-
-      page.style.width = old.width;
-      page.style.height = old.height;
-      page.style.minWidth = old.minWidth;
-      page.style.maxWidth = old.maxWidth;
-      page.style.transform = old.transform;
-    }
-
-    // Não usamos pdf.save() aqui porque o botão Publicar precisa do Blob.
-    const blob = pdf.output('blob');
-    if(filename){
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 30000);
-    }
-    return blob;
-  } finally {
-    elCatalogo.style.width = oldCatalogoWidth;
-    elCatalogo.style.minWidth = oldCatalogoMinWidth;
-    elCatalogo.style.transform = oldCatalogoTransform;
-    elCatalogo.style.overflow = oldCatalogoOverflow;
-  }
-}
 function opcoesCat(){
   return {genero:$('#catGen').value, soFoto:$('#catSoFoto').checked,
     preco:$('#catPreco').checked, soEstoque:$('#catEstoque').checked,
@@ -2169,16 +2027,17 @@ $('#catPublicar').addEventListener('click', async ()=>{
     const itensParaCatalogo = catalogoItens(opt).map(paraCatalogo);
     montaFolhas(itensParaCatalogo, opt);
     elCatalogo.style.display = 'block';
-  
 
-    document.body.classList.add('pdf-export');
-    let pdfBlob;
-    try {
-      pdfBlob = await geraPdfCatalogoDireto(elCatalogo, null);
-    } finally {
-      elCatalogo.style.display = 'none';
-      document.body.classList.remove('pdf-export');
-    }
+    const pdfOpt = {
+      margin:       0,
+      filename:     `${id}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 1.5, useCORS: true }, 
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    const pdfBlob = await html2pdf().set(pdfOpt).from(elCatalogo).output('blob');
+    elCatalogo.style.display = 'none';
 
     const storageRes = await fetch(`${NV.url}/storage/v1/object/catalogos/${id}.pdf`, {
       method: 'POST',
@@ -2231,16 +2090,17 @@ $('#catGerar').addEventListener('click', ()=>{
 
   const elCatalogo = $('#catalogo');
   elCatalogo.style.display = 'block';
-  
 
-  document.body.classList.add('pdf-export');
-  geraPdfCatalogoDireto(elCatalogo, 'Catalogo_Buffon_Fragrancias.pdf').then(() => {
+  const pdfOpt = {
+    margin:       0,
+    filename:     'Catalogo_Buffon_Fragrancias.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 1.5, useCORS: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(pdfOpt).from(elCatalogo).save().then(() => {
     elCatalogo.style.display = 'none';
-    document.body.classList.remove('pdf-export');
-  }).catch((e) => {
-    elCatalogo.style.display = 'none';
-    document.body.classList.remove('pdf-export');
-    alert('Não consegui gerar o catálogo em PDF: ' + (e && e.message ? e.message : e));
   });
 });
 

@@ -26,10 +26,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=58">
+<link rel="stylesheet" href="/styles.css?v=53">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
@@ -95,10 +93,6 @@
 
   <div class="two-col">
     <div>
-      <div class="card last-sales-card">
-        <div class="card-title">Últimas vendas <span class="card-action-note">5 pedidos mais recentes</span></div>
-        <div class="twrap"><table id="tUltimasVendas"></table></div>
-      </div>
       <div class="card"><div class="card-title">A receber — entregue e não pago</div>
         <div class="twrap"><table id="tInad"></table></div>
         <p class="note">Só entram pedidos já entregues. Quando a venda foi por um canal (barbearia, outra pessoa), quem aparece é o canal — é dele que você acerta. Clique para ver o detalhe.</p>
@@ -117,8 +111,10 @@
       <div class="card"><div class="card-title">Maiores margens</div><ul class="simple" id="lLucro"></ul></div>
       <div class="card"><div class="card-title">Break-even do investimento</div><ul class="simple" id="lBE"></ul></div>
       <div class="card"><div class="card-title">Este mês contra o anterior</div><ul class="simple" id="lMesMes"></ul></div>
+      <div class="card"><div class="card-title">Dinheiro parado</div><ul class="simple" id="lParado"></ul></div>
       <div class="card"><div class="card-title">Curva ABC — concentração do faturamento</div>
         <ul class="simple" id="lABC"></ul></div>
+      <div class="card"><div class="card-title">Tempo até vender</div><ul class="simple" id="lGiro"></ul></div>
     </div>
   </div>
 </section>
@@ -386,7 +382,7 @@
         <div class="field"><label for="desItem">Item</label><input id="desItem" required></div>
         <div class="field"><label for="desCat">Categoria</label><input id="desCat"></div>
         <div class="field"><label for="desVal">Valor (R$)</label><input type="number" id="desVal" min="0" step="0.01" required></div>
-        <div class="field des-obs-field"><label for="desObs">Observação</label><input id="desObs"></div>
+        <div class="field"><label for="desObs">Observação</label><input id="desObs"></div>
       </div>
       <div class="err" id="eDes"></div>
       <div class="actions"><button class="btn primary" id="bDes">Adicionar despesa</button>
@@ -418,17 +414,6 @@
     <button class="btn" id="fichaVolta">Chamar de volta</button>
     <button class="btn" id="fichaVendas">Ver nas vendas</button>
     <button class="btn" id="fichaFechar">Fechar</button>
-  </div>
-</div></div>
-<div class="modal" id="modalPedido"><div class="box largo">
-  <h3 id="pedidoNome"></h3>
-  <p class="aviso" id="pedidoSub"></p>
-  <div class="kpis" id="pedidoKpis"></div>
-  <div class="card-title" style="margin-top:.6rem">Itens do pedido</div>
-  <div class="twrap" style="max-height:250px;overflow:auto"><table id="pedidoTab"></table></div>
-  <div class="actions">
-    <button class="btn primary" id="pedidoVendas">Ver nas vendas</button>
-    <button class="btn" id="pedidoFechar">Fechar</button>
   </div>
 </div></div>
 <div class="modal" id="modalNuvem"><div class="box largo">
@@ -477,7 +462,7 @@
   <div class="linha"><label for="catGen">Quais fragrâncias</label>
     <select id="catGen"><option value="">Todas</option><option value="Masculino">Só masculinas</option><option value="Feminino">Só femininas</option></select></div>
   <label class="chk"><input type="checkbox" id="catSoFoto"> Incluir apenas as que já têm foto</label>
-  <label class="chk"><input type="checkbox" id="catPreco"> Mostrar preço</label>
+  <label class="chk"><input type="checkbox" id="catPreco" checked> Mostrar preço</label>
   <label class="chk"><input type="checkbox" id="catEstoque"> Incluir apenas as disponíveis em estoque</label>
   <label class="chk"><input type="checkbox" id="catTester"> Incluir apenas as que têm provador</label>
   <label class="chk"><input type="checkbox" id="catMarcaTester" checked> Marcar no catálogo quais têm provador</label>
@@ -508,6 +493,6 @@
 <div id="catalogo"></div>
 <div id="relatorio"></div>
 
-<script src="/app.js?v=62" defer></script>
+<script src="/app.js?v=53" defer></script>
 </body>
 </html>
