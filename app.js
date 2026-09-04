@@ -1029,7 +1029,7 @@ function renderDash(){
         const label=g.cliente || (g.canal!=='Direto'?g.canal:'Cliente não identificado');
         const info=`${g.n} ${plural(g.n,'lançamento','lançamentos')} · ${g.qtde} ${plural(g.qtde,'unidade','unidades')}`;
         const ir=esc(JSON.stringify({t:'vendas',g:'ven',f:{venPedido:g.ids}}));
-        return `<tr><td>${dt(g.data)}</td><td><b>${esc(label)}</b><br><span class="mini-note">${esc(info)}</span></td><td class="num">${g.n}</td><td class="num">${money(g.valor)}</td><td class="ctr">${stat==='Misto'?'<span class="badge cinza">Misto</span>':stat?bPag(stat):'—'}</td><td class="ctr">${ent==='Misto'?'<span class="badge cinza">Misto</span>':ent?bEntV(ent):'—'}</td><td class="ctr"><button type="button" class="btn sm" data-ir='${ir}' title="Abrir este pedido em Vendas">Ver pedido</button></td></tr>`;
+        return `<tr><td>${dt(g.data)}</td><td><b>${esc(label)}</b><br><span class="mini-note">${esc(info)}</span></td><td class="num">${g.n}</td><td class="num">${money(g.valor)}</td><td class="ctr">${stat==='Misto'?'<span class="badge cinza">Misto</span>':stat?bPag(stat):'—'}</td><td class="ctr">${ent==='Misto'?'<span class="badge cinza">Misto</span>':ent?bEntV(ent):'—'}</td><td class="ctr"><button type="button" class="btn sm" data-pedido='${ir}' title="Ver detalhes deste pedido">Ver pedido</button></td></tr>`;
       }).join('') +
       `</tbody>`
     : `<tbody><tr><td class="empty">Nenhuma venda lançada.</td></tr></tbody>`;
@@ -1191,6 +1191,48 @@ $('#kpiEst').addEventListener('click', e=>{
   const b = e.target.closest('[data-est]'); if(!b) return;
   aplicaFiltros('est', {estStat:b.dataset.est}); goTab('estoque');
 });
+function abrePedido(ids){
+  if(!Array.isArray(ids) || !ids.length) return;
+  const vs = data.sales.filter(v=>ids.includes(v.id));
+  if(!vs.length) return;
+  const primeira = vs[0];
+  const cliente = temNome(primeira) ? primeira.cliente.trim() : (canalDe(primeira)!=='Direto' ? canalDe(primeira) : 'Cliente não identificado');
+  const valor = vs.reduce((s,v)=>s+Number(v.valorVenda)||0,0);
+  const custos = vs.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
+  const lucro = vs.reduce((s,v)=>s+calcVenda(v).lucro,0);
+  const qtde = vs.reduce((s,v)=>s+Number(v.qtde)||0,0);
+  const stats = [...new Set(vs.map(v=>v.status).filter(Boolean))];
+  const ents = [...new Set(vs.map(v=>v.entregue).filter(Boolean))];
+  const status = stats.length===1 ? stats[0] : (stats.length ? 'Misto' : '—');
+  const entrega = ents.length===1 ? ents[0] : (ents.length ? 'Misto' : '—');
+  const dataPedido = vs.map(v=>v.data).filter(Boolean).sort().reverse()[0] || '';
+  $('#pedidoNome').textContent = 'Pedido de ' + cliente;
+  $('#pedidoSub').textContent = [dataPedido ? dt(dataPedido) : '', canalDe(primeira)].filter(Boolean).join(' · ');
+  $('#pedidoKpis').innerHTML = [
+    kpi('Valor', money(valor), 'verde', `${qtde} ${plural(qtde,'unidade','unidades')}`),
+    kpi('Lançamentos', vs.length, 'azul', `${vs.length} ${plural(vs.length,'produto','produtos')}`),
+    kpi('Pagamento', status==='Misto'?'Misto':status, status==='Pago'?'verde':status==='Pendente'?'ambar':'cinza'),
+    kpi('Entrega', entrega==='Misto'?'Misto':entrega, entrega==='Sim'?'verde':entrega==='Não'?'ambar':'cinza'),
+    kpi('Lucro', money(lucro), lucro>=0?'verde':'vermelho', `Custos extras ${money(custos)}`)
+  ].join('');
+  $('#pedidoTab').innerHTML = `<thead><tr><th>Produto</th><th class="num">Qtde</th><th class="num">Valor</th><th class="num">Lucro</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>` +
+    vs.map(v=>`<tr><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(calcVenda(v).lucro)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('') + `</tbody><tfoot><tr><td>Total</td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num">${money(lucro)}</td><td colspan="2"></td></tr></tfoot>`;
+  $('#pedidoVendas').onclick = ()=>{
+    $('#modalPedido').classList.remove('open');
+    aplicaFiltros('ven', {venPedido:ids});
+    goTab('vendas');
+  };
+  $('#modalPedido').classList.add('open');
+}
+$('#tUltimasVendas').addEventListener('click', e=>{
+  const b=e.target.closest('[data-pedido]'); if(!b) return;
+  const ir=JSON.parse(b.getAttribute('data-pedido'));
+  escondeBalao();
+  if(ir && Array.isArray(ir.f && ir.f.venPedido)) abrePedido(ir.f.venPedido);
+});
+$('#pedidoFechar').addEventListener('click', ()=>$('#modalPedido').classList.remove('open'));
+$('#modalPedido').addEventListener('click', e=>{ if(e.target.id==='modalPedido') $('#modalPedido').classList.remove('open'); });
+
 $('#tInad').addEventListener('click', e=>{
   const b = e.target.closest('[data-cli]'); if(!b) return;
   const nome = b.dataset.cli;
