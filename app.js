@@ -586,7 +586,107 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Esse é o catálogo da *Buffon Fragrâncias*.\n*O maior portfólio da *La Rive* você só encontra aqui.*\n\nConfira as fotos e as notas das fragrâncias:\nhttps://buffon-fragrancias.vercel.app/catalogo\n\nQualquer dúvida, é só me chamar.','nCompras',st,'num')}${th('Unidades','unidades',st,'num')}${th('Total','total',st,'num')}${th('Em aberto','emAberto',st,'num')}${th('Lucro','lucro',st,'num')}${th('Ticket','ticket',st,'num')}${th('Última','ultima',st)}${th('Última compra há','diasSem',st,'num')}${th('Preferido','favorito',st)}<th></th></tr></thead><tbody>`+
+    return `Oi! Esse é o catálogo da *Buffon Fragrâncias*.\n`
+      + `O maior portfólio da *La Rive* você só encontra aqui.\n\n`
+      + `Confira as fotos e as notas das fragrâncias:\n${linkPublico(id)}\n\n`
+      + `Qualquer dúvida, é só me chamar.`;
+  }
+  return textoCatalogo('');
+}
+function textoCatalogo(genero){
+  const est = {}; estoque().forEach(r=>est[r.produto]=r.saldo+r.consig);
+  /* manda o catálogo inteiro: o que não está em casa vai como encomenda,
+     que é como você já vende. Antes só ia o que tinha em estoque. */
+  let itens = data.products.slice();
+  if(genero) itens = itens.filter(p=>p.genero===genero);
+  const linha = p => `• ${p.nome}${p.inspiracao?` — inspirado em ${p.inspiracao}`:''}`
+    + ((est[p.nome]||0)>0 ? '' : ' _(sob encomenda)_');
+  const bloco = g => {
+    const l = itens.filter(p=>p.genero===g).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+    return l.length ? `\n*${g==='Masculino'?'MASCULINOS':'FEMININOS'}*\n` + l.map(linha).join('\n') : '';
+  };
+  let corpo = bloco('Masculino') + bloco('Feminino');
+  let cortou = 0;
+  while(corpo.length > 3200){
+    const linhas = corpo.split('\n');
+    const i = linhas.map((s,k)=>s.startsWith('•')?k:-1).filter(k=>k>=0).pop();
+    if(i<0) break;
+    linhas.splice(i,1); cortou++; corpo = linhas.join('\n');
+  }
+  return `*Buffon Fragrâncias* — o maior portfólio da *La Rive* você só encontra aqui.\n`
+    + `As melhores inspirações da perfumaria internacional.\n${corpo}\n`
+    + (cortou?`\n_(e mais ${cortou} disponíveis)_\n`:'')
+
+    + `\nSe preferir, envio o catálogo completo em PDF, com as fotos e as notas de cada fragrância. É só me pedir.`;
+}
+function textoReativacao(cli, r){
+  const nome = cli.nome.split(' ')[0];
+  const d = diasSemComprar(r);
+  const ref = r.favorito ? `Vi aqui que o *${r.favorito}* é o seu preferido.` : '';
+  return `Oi, ${nome}! Tudo bem?\n\n`
+    + (d ? `Sua última compra foi em ${dt(r.ultima)}.\n\n` : '')
+    + (ref ? ref + `\n\n` : '')
+    + `Chegaram novidades na *Buffon Fragrâncias*.\n`
+    + `Quer que eu te mande o catálogo atualizado?`;
+}
+const diasSemComprar = r => r.ultima ? Math.floor((Date.now()-Date.parse(r.ultima+'T00:00:00'))/86400000) : null;
+
+function textoCobranca(cli, r){
+  const pendentes = r.vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim');
+  
+  // Agrupar por data
+  const porData = {};
+  pendentes.forEach(v => {
+    const dataFormatada = dt(v.data);
+    if (!porData[dataFormatada]) porData[dataFormatada] = [];
+    porData[dataFormatada].push(`• ${v.qtde}x ${v.produto} — ${money(v.valorVenda)}`);
+  });
+
+  // Montar texto agrupado
+  let itensTexto = '';
+  for (const [data, itens] of Object.entries(porData)) {
+    itensTexto += `*Pedido de ${data}:*\n${itens.join('\n')}\n\n`;
+  }
+
+  return `Oi, ${cli.nome.split(' ')[0]}! Tudo bem?\n\n`
+    + `Passando para lembrar do(s) pedido(s) da *Buffon Fragrâncias*:\n\n${itensTexto}`
+    + `*Total: ${money(r.emAberto)}*\n\nQualquer coisa é só me chamar. Obrigado!`;
+}
+
+function renderCli(){
+  let rows = clientesRows();
+  const total = rows.length;
+  if(fil.cliSit==='devendo') rows = rows.filter(c=>c.emAberto>0);
+  if(fil.cliSit==='quitado') rows = rows.filter(c=>c.emAberto===0);
+  if(fil.cliSit==='semtel') rows = rows.filter(c=>!soDigitos(c.telefone));
+  if(fil.cliQ) rows = rows.filter(c=>norm(c.nome).includes(norm(fil.cliQ)));
+  rows = ord(rows, sort.cli);
+  const st = sort.cli;
+  $('#cntCli').textContent = `${rows.length} de ${total}`;
+  const cDev = rows.filter(c=>c.emAberto>0);
+  const maior = cDev.slice().sort((a,b)=>b.emAberto-a.emAberto)[0];
+  resumo('resCli', [
+    ['Clientes', rows.length],
+    ['Pedidos', rows.reduce((s,c)=>s+c.pedidos,0), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.'],
+    ['Lançamentos', rows.reduce((s,c)=>s+c.nCompras,0), '', 'Cada linha lançada na aba Vendas — um produto por linha.'],
+    ['Unidades', rows.reduce((s,c)=>s+c.unidades,0), '', 'Soma das quantidades — frascos, não linhas.'],
+    ['Faturado', money(rows.reduce((s,c)=>s+c.total,0))],
+    ['Em aberto', money(cDev.reduce((s,c)=>s+c.emAberto,0)), cDev.length?'al':'ok',
+      `${cDev.length} ${plural(cDev.length,'cliente','clientes')} com pedido entregue e não pago.`],
+    ['Maior devedor', maior ? `${maior.nome} · ${money(maior.emAberto)}` : '—', maior?'al':'ok'],
+    ['Ticket médio', money(rows.reduce((s,c)=>s+c.total,0)/Math.max(1,rows.reduce((s,c)=>s+c.pedidos,0))), '', 'Faturado ÷ pedidos.'],
+    ['Recorrentes', rows.filter(c=>c.pedidos>1).length, 'ok', 'Clientes que voltaram em outro pedido.'],
+    ['Sem WhatsApp', rows.filter(c=>!soDigitos(c.telefone)).length, rows.some(c=>!soDigitos(c.telefone))?'am':'ok',
+      'Sem telefone não dá para cobrar nem oferecer novidade.']
+  ]);
+
+  const todos = clientesRows();
+  const devendo = todos.filter(c=>c.emAberto>0);
+
+  const t = rows.reduce((a,c)=>({p:a.p+c.pedidos,n:a.n+c.nCompras,un:a.un+c.unidades,
+    tot:a.tot+c.total,ab:a.ab+c.emAberto,lu:a.lu+c.lucro}),{p:0,n:0,un:0,tot:0,ab:0,lu:0});
+  $('#tCli').innerHTML = rows.length
+    ? `<thead><tr>${th('Cliente','nome',st)}${th('WhatsApp','telefone',st)}${th('Pedidos','pedidos',st,'num')}${th('Lançam.','nCompras',st,'num')}${th('Unidades','unidades',st,'num')}${th('Total','total',st,'num')}${th('Em aberto','emAberto',st,'num')}${th('Lucro','lucro',st,'num')}${th('Ticket','ticket',st,'num')}${th('Última','ultima',st)}${th('Última compra há','diasSem',st,'num')}${th('Preferido','favorito',st)}<th></th></tr></thead><tbody>`+
       rows.map(c=>`<tr><td><button class="linkcli" data-ficha="${c.id}">${esc(c.nome)}</button></td>
         <td>${esc(c.telefone)||'—'}</td><td class="num">${c.pedidos}</td><td class="num">${c.nCompras}</td><td class="num">${c.unidades}</td>
         <td class="num">${money(c.total)}</td>
