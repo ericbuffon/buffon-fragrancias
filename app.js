@@ -1945,25 +1945,23 @@ const plate = (cls,src,alt,isRef) => `<div class="plate ${cls}" style="position:
   ? `<img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:1.5mm; text-align:center; font-size:4.5px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">REFERÊNCIA OLFATIVA</div>' : ''}`
   : `<div class="vazio">${ICO.frasco}<span>sem foto</span></div>`}</div>`;
 
-/* pirâmide olfativa: topo estreito, coração médio, fundo largo */
+/* pirâmide olfativa — cor acompanha o gênero/família visual do produto */
 function piramideSVG(acc, tem){
-  const t = tem.topo?1:.18, c = tem.coracao?1:.18, f = tem.fundo?1:.18;
-  /* dourado/bege da identidade Buffon; sem contorno externo */
-  const ouro = '#B08A3E';
-  const linha = '#8F7740';
-  return `<svg width="82" height="66" viewBox="0 0 82 66" fill="none" aria-hidden="true">
-    <path d="M25 2 37 21H13z" fill="${ouro}" opacity="${t}"/>
-    <path d="M12 23h26l8 19H4z" fill="${ouro}" opacity="${c}"/>
-    <path d="M4 44h42l10 20H-6z" fill="${ouro}" opacity="${f}"/>
-    <circle cx="25" cy="11.5" r="4" fill="#fff" stroke="${linha}" stroke-width="1.4"/>
-    <circle cx="25" cy="11.5" r="1.5" fill="${linha}"/>
-    <line x1="29" y1="11.5" x2="82" y2="11.5" stroke="${linha}" stroke-width="0.9"/>
-    <circle cx="25" cy="32" r="4" fill="#fff" stroke="${linha}" stroke-width="1.4"/>
-    <circle cx="25" cy="32" r="1.5" fill="${linha}"/>
-    <line x1="29" y1="32" x2="82" y2="32" stroke="${linha}" stroke-width="0.9"/>
-    <circle cx="25" cy="54" r="4" fill="#fff" stroke="${linha}" stroke-width="1.4"/>
-    <circle cx="25" cy="54" r="1.5" fill="${linha}"/>
-    <line x1="29" y1="54" x2="82" y2="54" stroke="${linha}" stroke-width="0.9"/>
+  const t = tem.topo?1:.16, c = tem.coracao?1:.16, f = tem.fundo?1:.16;
+  const cor = acc || '#B08A3E';
+  return `<svg width="100" height="78" viewBox="0 0 100 78" fill="none" aria-hidden="true">
+    <path d="M29 2 43 25H15z" fill="${cor}" opacity="${t}"/>
+    <path d="M14 27h30l10 22H4z" fill="${cor}" opacity="${c}"/>
+    <path d="M3 51h51l11 25H-8z" fill="${cor}" opacity="${f}"/>
+    <circle cx="29" cy="14" r="5" fill="#fff" stroke="${cor}" stroke-width="1.8"/>
+    <circle cx="29" cy="14" r="1.8" fill="${cor}"/>
+    <line x1="34" y1="14" x2="95" y2="14" stroke="${cor}" stroke-width="1.15"/>
+    <circle cx="29" cy="38" r="5" fill="#fff" stroke="${cor}" stroke-width="1.8"/>
+    <circle cx="29" cy="38" r="1.8" fill="${cor}"/>
+    <line x1="34" y1="38" x2="95" y2="38" stroke="${cor}" stroke-width="1.15"/>
+    <circle cx="29" cy="63" r="5" fill="#fff" stroke="${cor}" stroke-width="1.8"/>
+    <circle cx="29" cy="63" r="1.8" fill="${cor}"/>
+    <line x1="34" y1="63" x2="95" y2="63" stroke="${cor}" stroke-width="1.15"/>
   </svg>`;
 }
 /* formato único usado pelo catálogo impresso e pelo link público */
