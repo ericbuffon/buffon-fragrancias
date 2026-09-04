@@ -759,3 +759,7 @@ input[type="date"] {
   #tUltimasVendas th:nth-child(2),#tUltimasVendas td:nth-child(2){max-width:150px;overflow:hidden;text-overflow:ellipsis}
   #tUltimasVendas th:nth-child(3),#tUltimasVendas td:nth-child(3){max-width:125px;overflow:hidden;text-overflow:ellipsis}
 }
+
+.mini-note{font-size:11px;color:var(--ink-faint)}
+.last-sales-card .twrap{max-height:none}
+@media screen and (max-width:640px){.last-sales-card .twrap{overflow-x:auto}.last-sales-card table{min-width:650px}.last-sales-card .btn.sm{white-space:nowrap}}

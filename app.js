@@ -10,7 +10,7 @@ let fotos = {prod:'', insp:''};
 let fil = {
   prodGen:'',prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
-  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',
+  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,
   estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
@@ -437,7 +437,7 @@ window.addEventListener('popstate', e=>{
 const GRUPOS = {
   prod:{campos:['prodGen','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
-  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
+  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
   est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
@@ -447,12 +447,14 @@ const GRUPOS = {
 };
 function limpaFiltros(g){
   setTimeout(guardaFiltros,0);
+  if(g==='ven') fil.venPedido=null;
   const G = GRUPOS[g]; if(!G) return;
   G.campos.forEach(c=>{ fil[c]=''; const el=$(G.els[c]); if(el) el.value=''; });
   G.render();
 }
 function aplicaFiltros(g, vals){
   setTimeout(guardaFiltros,0);
+  if(g==='ven' && !Object.prototype.hasOwnProperty.call(vals,'venPedido')) fil.venPedido=null;
   const G = GRUPOS[g]; if(!G) return;
   G.campos.forEach(c=>{ fil[c] = vals[c]||''; const el=$(G.els[c]); if(el) el.value=fil[c]; });
   G.render();
@@ -1003,16 +1005,32 @@ function renderDash(){
       `Mostra a quantidade total de frascos que você já tirou do estoque e converteu em vendas.`,
       {t:'vendas', g:'ven'})].join('');
 
-  const ultimasVendas = data.sales.slice().sort((a,b)=>{
-    const da = a.data ? Date.parse(a.data+'T00:00:00') : -Infinity;
-    const db = b.data ? Date.parse(b.data+'T00:00:00') : -Infinity;
-    if(db !== da) return db-da;
-    return (data.sales.indexOf(b) - data.sales.indexOf(a));
+  /* Últimos pedidos: mesma pessoa + mesmo dia + mesmo canal = um pedido.
+     Sem cliente/data, a linha permanece como pedido individual. */
+  const gruposUltimos = new Map();
+  data.sales.forEach(v=>{
+    const chave = chavePedido(v);
+    if(!gruposUltimos.has(chave)) gruposUltimos.set(chave,{ids:[], data:v.data||'', cliente:temNome(v)?v.cliente:'', canal:canalDe(v), valor:0, qtde:0, n:0, ordem:data.sales.indexOf(v), status:new Set(), entregue:new Set()});
+    const g=gruposUltimos.get(chave);
+    g.ids.push(v.id); g.valor+=Number(v.valorVenda)||0; g.qtde+=Number(v.qtde)||0; g.n++;
+    if(v.status) g.status.add(v.status); if(v.entregue) g.entregue.add(v.entregue);
+    if((v.data||'') > (g.data||'')) g.data=v.data;
+  });
+  const ultimosPedidos = [...gruposUltimos.values()].sort((a,b)=>{
+    const da=a.data?Date.parse(a.data+'T00:00:00'):-Infinity, db=b.data?Date.parse(b.data+'T00:00:00'):-Infinity;
+    if(db!==da) return db-da;
+    return b.ordem-a.ordem;
   }).slice(0,5);
-
-  $('#tUltimasVendas').innerHTML = ultimasVendas.length
-    ? `<thead><tr><th>Data</th><th>Produto</th><th>Cliente</th><th class="num">Valor</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>` +
-      ultimasVendas.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td><td class="num">${money(v.valorVenda)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('') +
+  const resumoStatus = set => set.size===1 ? [...set][0] : (set.size?'Misto':'');
+  $('#tUltimasVendas').innerHTML = ultimosPedidos.length
+    ? `<thead><tr><th>Data</th><th>Cliente</th><th class="num">Itens</th><th class="num">Valor</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th><th></th></tr></thead><tbody>` +
+      ultimosPedidos.map(g=>{
+        const stat=resumoStatus(g.status), ent=resumoStatus(g.entregue);
+        const label=g.cliente || (g.canal!=='Direto'?g.canal:'Cliente não identificado');
+        const info=`${g.n} ${plural(g.n,'lançamento','lançamentos')} · ${g.qtde} ${plural(g.qtde,'unidade','unidades')}`;
+        const ir=esc(JSON.stringify({t:'vendas',g:'ven',f:{venPedido:g.ids}}));
+        return `<tr><td>${dt(g.data)}</td><td><b>${esc(label)}</b><br><span class="mini-note">${esc(info)}</span></td><td class="num">${g.n}</td><td class="num">${money(g.valor)}</td><td class="ctr">${stat==='Misto'?'<span class="badge cinza">Misto</span>':stat?bPag(stat):'—'}</td><td class="ctr">${ent==='Misto'?'<span class="badge cinza">Misto</span>':ent?bEntV(ent):'—'}</td><td class="ctr"><button type="button" class="btn sm" data-ir='${ir}' title="Abrir este pedido em Vendas">Ver pedido</button></td></tr>`;
+      }).join('') +
       `</tbody>`
     : `<tbody><tr><td class="empty">Nenhuma venda lançada.</td></tr></tbody>`;
 
@@ -1305,6 +1323,7 @@ function renderVen(){
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
   if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
   if(fil.venQ) rows = rows.filter(v=>norm(v.produto).includes(norm(fil.venQ))||norm(v.cliente).includes(norm(fil.venQ)));
+  if(fil.venPedido && Array.isArray(fil.venPedido)) rows = rows.filter(v=>fil.venPedido.includes(v.id));
   chipProduto('ven','venProdX');
 
   rows = ord(rows, sort.ven);
