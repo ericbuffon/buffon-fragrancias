@@ -1218,9 +1218,16 @@ function abrePedido(ids){
     kpi('Custos extras', money(custosExtras), 'ambar', custosExtras>0 ? 'despesas adicionais do pedido' : 'sem custos extras'),
     kpi('Lucro', money(lucro), lucro>=0?'verde':'vermelho', `Valor ${money(valor)} − custos ${money(custos)}`)
   ].join('');
-  $('#pedidoTab').innerHTML = `<thead><tr><th>Produto</th><th class="num">Qtde</th><th class="num">Valor</th><th class="num">Lucro</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>` +
-    vs.map(v=>{ const cv=calcVenda(v); return `<tr><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num">${money(cv.lucro)}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`; }).join('') +
-    `</tbody><tfoot><tr><td>Total</td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num">${money(lucro)}</td><td colspan="2"></td></tr><tr><td colspan="2"><b>Custos extras do pedido</b></td><td class="num"><b>${money(custosExtras)}</b></td><td colspan="3"></td></tr></tfoot>`;
+  $('#pedidoTab').innerHTML = vs.length
+    ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
+      vs.map(v=>{
+        const venda=Number(v.valorVenda)||0, custosExtra=Number(v.custosExtras)||0, liquido=venda-custosExtra;
+        return `<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
+          <td class="num">${money(venda)}</td><td class="num" style="color:var(--vermelho)">-${money(custosExtra)}</td><td class="num">${money(liquido)}</td>
+          <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`;
+      }).join('')+
+      `</tbody><tfoot><tr><td>Total</td><td></td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num" style="color:var(--vermelho)">-${money(custosExtras)}</td><td class="num">${money(valor-custosExtras)}</td><td colspan="2"></td></tr></tfoot>`
+    : `<tbody><tr><td class="empty">Nenhum item neste pedido.</td></tr></tbody>`;
   $('#pedidoVendas').onclick = ()=>{
     $('#modalPedido').classList.remove('open');
     aplicaFiltros('ven', {venPedido:ids});
