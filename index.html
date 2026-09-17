@@ -568,6 +568,8 @@
   const btn=document.getElementById('buffonPerfumeTipsBtn');
   const modal=document.getElementById('buffonPerfumeTipsModal');
   const close=document.getElementById('buffonPerfumeTipsClose');
+  const isCatalogo=location.pathname==='/catalogo' || location.pathname.startsWith('/catalogo/');
+  if(!isCatalogo){btn.style.display='none';modal.remove();return;}
   if(!btn||!modal||!close) return;
   const abrir=()=>{modal.classList.add('open');document.body.style.overflow='hidden';close.focus();};
   const fechar=()=>{modal.classList.remove('open');document.body.style.overflow='';btn.focus();};
