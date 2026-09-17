@@ -3493,6 +3493,23 @@ document.addEventListener('DOMContentLoaded', () => {
       window.dispatchEvent(new Event('scroll'));
     }, 1000);
   }
+
+  // Comportamento do modal de dicas no catálogo
+  const btnDicas = document.getElementById('btnDicasPerfume');
+  const modalDicas = document.getElementById('modalDicas');
+  if (btnDicas && modalDicas) {
+    btnDicas.addEventListener('click', () => modalDicas.classList.add('open'));
+    
+    const fecharDicas = document.getElementById('fecharDicas');
+    if (fecharDicas) fecharDicas.addEventListener('click', () => modalDicas.classList.remove('open'));
+    
+    const btnEntendi = document.getElementById('btnEntendiDicas');
+    if (btnEntendi) btnEntendi.addEventListener('click', () => modalDicas.classList.remove('open'));
+    
+    modalDicas.addEventListener('click', e => {
+      if (e.target.id === 'modalDicas') modalDicas.classList.remove('open');
+    });
+  }
 });
 
 

@@ -618,7 +618,8 @@ body.pdf-export #catalogo .pagina {
 @media print { #scrollControls { display: none !important; } }
 
 #scrollControls { display: none; }
-body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direction: column; }
+body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direction: row; align-items: flex-end; }
+#btnDicasPerfume:hover { transform: translateY(-2px); opacity: 1 !important; }
 
 /* 1. Força o CSS a respeitar o atributo 'hidden' do HTML para as bolinhas de status */
 .autostat[hidden], .nuvemstat[hidden], .chip[hidden], #balao[hidden] {
