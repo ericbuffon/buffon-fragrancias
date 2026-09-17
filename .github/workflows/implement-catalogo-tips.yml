@@ -1,0 +1,101 @@
+name: Implementar botão de dicas no catálogo
+on:
+  workflow_dispatch:
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inserir botão e modal no catálogo público
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          if 'id="buffonPerfumeTipsBtn"' in s:
+              print('Botão já existe; nada a fazer.')
+              raise SystemExit(0)
+          if '</body>' not in s.lower():
+              raise SystemExit('Fechamento </body> não encontrado')
+          script = r'''<script>
+(function(){
+  if(window.__buffonPerfumeTipsInstalled) return;
+  window.__buffonPerfumeTipsInstalled=true;
+  const ID='buffonPerfumeTips';
+  function install(){
+    const vitrine=document.getElementById('vitrine');
+    if(!vitrine) return;
+    const publico=document.body.classList.contains('publico');
+    const old=document.getElementById(ID);
+    if(!publico){ if(old) old.remove(); return; }
+    if(old) return;
+
+    const style=document.createElement('style');
+    style.id=ID+'Style';
+    style.textContent=`
+      #${ID}Actions{position:fixed;right:18px;bottom:18px;z-index:9998;display:flex;align-items:center;gap:10px}
+      #${ID}Btn{border:1px solid #9b772f;background:#14110d;color:#fff;border-radius:22px;padding:10px 14px;cursor:pointer;font:600 12px/1.2 system-ui,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.18)}
+      #${ID}Btn:hover{background:#8f6b22}
+      #${ID}Modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(20,16,14,.52)}
+      #${ID}Modal.open{display:flex}
+      #${ID}Box{width:min(620px,100%);max-height:86vh;overflow:auto;background:#fff;color:#2d2924;border:1px solid #d4c7b0;border-radius:14px;padding:22px;box-shadow:0 18px 55px rgba(0,0,0,.25)}
+      #${ID}Head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+      #${ID}Title{margin:0;font:700 21px/1.25 Georgia,serif}
+      #${ID}Close{width:32px;height:32px;border:1px solid #d4c7b0;border-radius:50%;background:#fff;cursor:pointer;font-size:20px;line-height:1}
+      #${ID}Box p{font-size:13px;line-height:1.6;margin:10px 0 14px}
+      #${ID}Box ol{margin:0;padding-left:21px;font-size:13px;line-height:1.65}
+      #${ID}Box li{margin-bottom:11px}
+      @media(max-width:640px){#${ID}Actions{right:12px;bottom:12px;gap:8px}#${ID}Btn{font-size:11px;padding:9px 12px}#${ID}Box{padding:18px;max-height:88vh}#${ID}Title{font-size:18px}}
+    `;
+    document.head.appendChild(style);
+
+    const actions=document.createElement('div');
+    actions.id=ID+'Actions';
+    actions.innerHTML=`<button id="${ID}Btn" type="button" aria-haspopup="dialog">✦ Como escolher um perfume?</button>`;
+    vitrine.appendChild(actions);
+
+    const modal=document.createElement('div');
+    modal.id=ID+'Modal';
+    modal.setAttribute('role','dialog');
+    modal.setAttribute('aria-modal','true');
+    modal.setAttribute('aria-labelledby',ID+'Title');
+    modal.innerHTML=`<div id="${ID}Box"><div id="${ID}Head"><h2 id="${ID}Title">Como escolher um perfume?</h2><button id="${ID}Close" type="button" aria-label="Fechar">×</button></div><p>Escolher a fragrância perfeita não é fácil. Aqui estão algumas dicas.</p><ol><li>Escolha fragrâncias pela manhã, quando seu corpo estiver descansado. Se isso não for possível, encontre um momento em que você não esteja com pressa e possa se concentrar totalmente nas fragrâncias que está testando.</li><li>Teste no máximo <b>3–4 fragrâncias ao mesmo tempo</b>. Com um número maior de fragrâncias diferentes, fica mais difícil fazer uma escolha racional.</li><li>Teste os perfumes <b>na pele</b>, não apenas em uma fita olfativa. Não tenha pressa para escolher; deixe a fragrância se desenvolver na sua pele pelo maior tempo possível.</li><li>Cheirar grãos de café entre diferentes fragrâncias é um mito! O café não “reseta” o olfato e apenas introduzirá um aroma adicional entre os perfumes que estão sendo testados.</li></ol></div>`;
+    vitrine.appendChild(modal);
+
+    const close=()=>modal.classList.remove('open');
+    document.getElementById(ID+'Btn').onclick=()=>modal.classList.add('open');
+    document.getElementById(ID+'Close').onclick=close;
+    modal.addEventListener('click',e=>{if(e.target===modal) close();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape') close();});
+
+    function position(){
+      const a=document.getElementById(ID+'Actions'); if(!a) return;
+      let target=null;
+      for(const b of document.querySelectorAll('button')){
+        if(b===document.getElementById(ID+'Btn')) continue;
+        const r=b.getBoundingClientRect(), cs=getComputedStyle(b);
+        if(cs.position==='fixed' && r.right>window.innerWidth-100 && r.bottom>window.innerHeight-100 && r.width>0){target=b;break;}
+      }
+      a.style.right=target ? (Math.max(12, window.innerWidth-target.getBoundingClientRect().right + target.getBoundingClientRect().width + 10))+'px' : '18px';
+    }
+    position(); window.addEventListener('resize',position);
+  }
+  const obs=new MutationObserver(install);
+  obs.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+  install();
+})();
+</script>'''
+          pos=s.lower().rfind('</body>')
+          s=s[:pos]+script+'\n'+s[pos:]
+          p.write_text(s,encoding='utf-8')
+          print('Botão/modal inseridos.')
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'feat: botão flutuante de dicas no catálogo público' || echo 'Sem alterações'
+          git push
