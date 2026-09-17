@@ -12,14 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Atualizar catálogo público
-        shell: python
         run: |
+          python3 - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
 
-          css = '''
-  /* ---------- dicas no catálogo público ---------- */
+          css = r'''
+  /* ---------- ferramentas flutuantes do catálogo público ---------- */
   #vitrine .buffon-float-actions{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:10px;align-items:center}
   #vitrine .buffon-float-btn{border:1px solid #8F6B22;background:#141109;color:#fff;border-radius:24px;box-shadow:0 5px 18px rgba(0,0,0,.18);cursor:pointer;font:600 12px/1.2 system-ui,sans-serif;padding:10px 14px;transition:transform .15s,background .15s}
   #vitrine .buffon-float-btn:hover{background:#8F6B22;transform:translateY(-1px)}
@@ -48,9 +48,9 @@ jobs:
                   raise SystemExit('marcador CSS não encontrado')
               s = s.replace(marker, css + marker, 1)
 
-          old = '''    </div>`;
-   const bp = $('#vitPdf');'''
-          new = '''    </div>
+          old = """    </div>`;
+   const bp = $('#vitPdf');"""
+          new = """    </div>
     <div class="buffon-float-actions" aria-label="Ferramentas do catálogo">
       <button class="buffon-float-btn" id="buffonPerfumeTipsBtn" type="button" aria-haspopup="dialog" aria-controls="buffonPerfumeTipsModal">✦ Como escolher um perfume?</button>
       <button class="buffon-float-btn buffon-float-top" id="buffonCatalogTopBtn" type="button" aria-label="Voltar ao topo" title="Voltar ao topo">↑</button>
@@ -70,15 +70,15 @@ jobs:
         </ol>
       </div>
     </div>`;
-   const bp = $('#vitPdf');'''
+   const bp = $('#vitPdf');"""
           if 'buffonPerfumeTipsBtn' not in s:
               if old not in s:
                   raise SystemExit('marcador da vitrine não encontrado')
               s = s.replace(old, new, 1)
 
-          hook = '''  const bp = $('#vitPdf');
-   if(bp) bp.addEventListener('click', ()=>{'''
-          hook_new = '''  const tipsBtn = $('#buffonPerfumeTipsBtn');
+          hook = """   const bp = $('#vitPdf');
+   if(bp) bp.addEventListener('click', ()=>{"""
+          hook_new = """   const tipsBtn = $('#buffonPerfumeTipsBtn');
    const tipsModal = $('#buffonPerfumeTipsModal');
    const tipsClose = $('#buffonPerfumeTipsClose');
    const topBtn = $('#buffonCatalogTopBtn');
@@ -91,10 +91,22 @@ jobs:
    }
    if(topBtn) topBtn.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
    const bp = $('#vitPdf');
-   if(bp) bp.addEventListener('click', ()=>{'''
+   if(bp) bp.addEventListener('click', ()=>{"""
           if 'const tipsBtn =' not in s:
               if hook not in s:
                   raise SystemExit('marcador JS não encontrado')
               s = s.replace(hook, hook_new, 1)
 
           p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commitar alteração
+        run: |
+          if git diff --quiet; then
+            echo "Nada para alterar"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "feat: adicionar dicas ao catálogo público"
+          git push
