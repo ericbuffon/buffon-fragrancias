@@ -1,0 +1,43 @@
+name: Fix perfume tips bubble
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-feature:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix floating bubble visibility
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          old = "  const qs=new URLSearchParams(location.search);\n  if(!qs.get('c') && !qs.get('p')) return;\n"
+          new = ""
+          if old in text:
+              text = text.replace(old, new, 1)
+              path.write_text(text, encoding='utf-8')
+              print('Visibility condition removed.')
+          elif '<!-- BUFFON_PERFUME_TIPS_V1 -->' in text:
+              print('Bubble already has no URL condition.')
+          else:
+              raise SystemExit('Perfume tips block not found')
+          PY
+      - name: Commit and remove installer
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/fix-perfume-tips.yml .github/workflows/trigger-perfume-tips-fix.txt
+          if git diff --quiet -- index.html; then
+            echo 'No index.html changes needed.'
+            exit 0
+          fi
+          git add index.html .github/workflows/fix-perfume-tips.yml .github/workflows/trigger-perfume-tips-fix.txt
+          git commit -m 'fix: show perfume tips bubble on all catalog pages'
+          git push
