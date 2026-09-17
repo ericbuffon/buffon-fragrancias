@@ -509,5 +509,76 @@
 <div id="relatorio"></div>
 
 <script src="/app.js?v=62" defer></script>
+<!-- BUFFON_PERFUME_TIPS_V1 -->
+<style>
+  #buffonPerfumeTipsBtn{
+    position:fixed;right:78px;bottom:20px;z-index:95;
+    border:1px solid rgba(198,160,82,.75);border-radius:999px;
+    background:rgba(20,17,14,.94);color:#d8b56a;
+    box-shadow:0 5px 22px rgba(0,0,0,.24);
+    padding:10px 14px;font:600 12px/1.1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    letter-spacing:.01em;cursor:pointer;backdrop-filter:blur(8px);
+    transition:transform .18s ease,background .18s ease,border-color .18s ease;
+  }
+  #buffonPerfumeTipsBtn:hover{transform:translateY(-2px);background:#17130f;border-color:#d8b56a}
+  #buffonPerfumeTipsModal{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    padding:20px;z-index:200;background:rgba(12,10,8,.58);backdrop-filter:blur(3px);
+  }
+  #buffonPerfumeTipsModal.open{display:flex}
+  #buffonPerfumeTipsBox{
+    width:min(520px,100%);max-height:min(82vh,650px);overflow:auto;
+    background:#fffdf8;color:#28231d;border:1px solid #c6a052;border-radius:14px;
+    box-shadow:0 18px 60px rgba(0,0,0,.32);padding:24px 24px 20px;position:relative;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  #buffonPerfumeTipsBox h3{margin:0 42px 7px 0;font:700 20px/1.25 Georgia,serif;color:#17130f}
+  #buffonPerfumeTipsBox .sub{margin:0 0 17px;color:#756b5d;font-size:13px;line-height:1.5}
+  #buffonPerfumeTipsBox ol{margin:0;padding-left:22px}
+  #buffonPerfumeTipsBox li{padding:0 0 12px 4px;font-size:13px;line-height:1.55}
+  #buffonPerfumeTipsBox li:last-child{padding-bottom:0}
+  #buffonPerfumeTipsClose{
+    position:absolute;right:12px;top:10px;width:34px;height:34px;border-radius:50%;
+    border:1px solid #ddd1bb;background:#fff;color:#4b4032;font-size:22px;line-height:1;cursor:pointer;
+  }
+  #buffonPerfumeTipsClose:hover{background:#f5efe5;border-color:#c6a052}
+  @media(max-width:640px){
+    #buffonPerfumeTipsBtn{right:66px;bottom:16px;padding:9px 11px;font-size:11px}
+    #buffonPerfumeTipsBox{padding:21px 18px 18px;border-radius:12px}
+    #buffonPerfumeTipsBox h3{font-size:18px}
+    #buffonPerfumeTipsBox li{font-size:12.5px}
+  }
+</style>
+<button id="buffonPerfumeTipsBtn" type="button" aria-haspopup="dialog" aria-controls="buffonPerfumeTipsModal">✦ Como escolher um perfume?</button>
+<div id="buffonPerfumeTipsModal" role="dialog" aria-modal="true" aria-labelledby="buffonPerfumeTipsTitle">
+  <div id="buffonPerfumeTipsBox">
+    <button id="buffonPerfumeTipsClose" type="button" aria-label="Fechar">×</button>
+    <h3 id="buffonPerfumeTipsTitle">Como escolher um perfume?</h3>
+    <p class="sub">Escolher a fragrância perfeita não é fácil. Aqui estão algumas dicas.</p>
+    <ol>
+      <li>Escolha fragrâncias pela manhã, quando seu corpo estiver descansado. Se isso não for possível, encontre um momento em que você não esteja com pressa e possa se concentrar totalmente nas fragrâncias que está testando.</li>
+      <li>Teste no máximo 3–4 fragrâncias ao mesmo tempo. Com um número maior de fragrâncias diferentes, fica mais difícil fazer uma escolha racional.</li>
+      <li>Teste os perfumes na pele, não apenas em uma fita olfativa. Não tenha pressa para escolher; deixe a fragrância se desenvolver na sua pele pelo maior tempo possível.</li>
+      <li>Cheirar grãos de café entre diferentes fragrâncias é um mito! O café não “reseta” o olfato e apenas introduzirá um aroma adicional entre os perfumes que estão sendo testados.</li>
+    </ol>
+  </div>
+</div>
+<script>
+(function(){
+  const qs=new URLSearchParams(location.search);
+  if(!qs.get('c') && !qs.get('p')) return;
+  const btn=document.getElementById('buffonPerfumeTipsBtn');
+  const modal=document.getElementById('buffonPerfumeTipsModal');
+  const close=document.getElementById('buffonPerfumeTipsClose');
+  if(!btn||!modal||!close) return;
+  const abrir=()=>{modal.classList.add('open');document.body.style.overflow='hidden';close.focus();};
+  const fechar=()=>{modal.classList.remove('open');document.body.style.overflow='';btn.focus();};
+  btn.addEventListener('click',abrir);
+  close.addEventListener('click',fechar);
+  modal.addEventListener('click',e=>{if(e.target===modal) fechar();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open')) fechar();});
+})();
+</script>
+<!-- /BUFFON_PERFUME_TIPS_V1 -->
 </body>
 </html>
