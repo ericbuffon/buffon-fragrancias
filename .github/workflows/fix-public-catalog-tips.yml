@@ -1,0 +1,39 @@
+name: Fix public catalog tips
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix catalog visibility logic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = """  const qs=new URLSearchParams(location.search);\n  const isCatalogo=!!(qs.get('c') || qs.get('p')) && (qs.get('c') || '').startsWith('cat_') || !!qs.get('p');\n  if(!isCatalogo){btn.style.display='none';modal.remove();return;}\n  if(!btn||!modal||!close) return;"""
+          new = """  if(!btn||!modal||!close) return;\n  const isCatalogo=document.body.classList.contains('publico');\n  if(!isCatalogo){btn.style.display='none';modal.remove();return;}"""
+          if old not in s:
+              print('Target snippet not found; nothing to change.')
+              raise SystemExit(0)
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          print('Updated public catalog detection.')
+          PY
+      - name: Commit change
+        run: |
+          if git diff --quiet -- index.html; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'fix: detect public catalog mode correctly'
+          git push
