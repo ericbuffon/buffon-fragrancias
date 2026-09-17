@@ -3481,6 +3481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Hide 'Up' when at top, hide 'Down' when at bottom
     window.addEventListener('scroll', () => {
+      if (!document.body.classList.contains('publico')) return;
       const scrollPos = window.scrollY || document.documentElement.scrollTop;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       
