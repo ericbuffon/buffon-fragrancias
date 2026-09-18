@@ -11,6 +11,7 @@ function carregaMemoriaCatalogo(){
     if(raw) {
       const opt = JSON.parse(raw);
       if($('#catGen')) $('#catGen').value = opt.genero || '';
+      if($('#catOcasi')) $('#catOcasi').value = opt.ocasiao || '';
       if($('#catSoFoto')) $('#catSoFoto').checked = !!opt.soFoto;
       if($('#catPreco')) $('#catPreco').checked = !!opt.preco;
       if($('#catEstoque')) $('#catEstoque').checked = !!opt.soEstoque;
@@ -20,6 +21,18 @@ function carregaMemoriaCatalogo(){
     }
   } catch(e) {}
 }
+
+const COR_OCASIAO = {
+  "Dias Quentes": "laranja",
+  "Dias Frios": "azul",
+  "Diurno": "teal",
+  "Noturno": "roxo",
+  "Casual / Trabalho": "cinza",
+  "Formal / Eventos": "terra",
+  "Romântico / Encontros": "vermelho",
+  "Balada / Festas": "rosa"
+};
+const badgeOcasiao = o => `<span class="badge ${COR_OCASIAO[o] || 'cinza'}" style="font-size:10.5px; font-weight:700; padding: 3px 8px;">${esc(o)}</span>`;
 
 const SEED = {"products":[],"purchases":[],"sales":[],"expenses":[],"consignments":[],"clients":[]};
 const PATCH_COMPRAS = [];
@@ -2097,6 +2110,7 @@ const POR_PAGINA = 3;
 function catalogoItens(opt){
   let itens = data.products.slice();
   if(opt.genero) itens = itens.filter(p=>p.genero===opt.genero);
+  if(opt.ocasiao) itens = itens.filter(p=>(p.ocasioes||[]).includes(opt.ocasiao));
   if(opt.soFoto) itens = itens.filter(p=>p.foto || p.fotoInsp);
   if(opt.soTester) itens = itens.filter(p=>temProvador(p));
   if(opt.soEstoque){
@@ -2138,6 +2152,7 @@ function itemHTML(p, n, opt){
       <div class="nome">${esc(p.nome)}</div>
       <div class="edp">${[p.conc, p.vol, p.genero==='Feminino'?'Feminino':'Masculino'].filter(Boolean).join(' · ')}</div>
       ${p.familia?`<div class="fam">${esc(p.familia)}</div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => badgeOcasiao(o)).join('')}</div>`:''}
       <div class="regua"></div>
       ${algumaNota
         ? `<div class="piramide">${piramideSVG(acc,tem)}<div class="niveis">
@@ -2292,7 +2307,7 @@ async function geraPdfCatalogoDireto(elCatalogo, filename){
   }
 }
 function opcoesCat(){
-  const opt = {genero:$('#catGen').value, soFoto:$('#catSoFoto').checked,
+  const opt = {genero:$('#catGen').value, ocasiao:$('#catOcasi').value, soFoto:$('#catSoFoto').checked,
     preco:$('#catPreco').checked, soEstoque:$('#catEstoque').checked,
     soTester:$('#catTester').checked, marcaTester:$('#catMarcaTester').checked,
     contato:$('#catContato').value};
@@ -2836,6 +2851,7 @@ function montaPublico(opt){
   const est = {}; estoque().forEach(r=>est[r.produto]=r.saldo+r.consig);
   let itens = data.products.slice();
   if(opt.genero) itens = itens.filter(p=>p.genero===opt.genero);
+  if(opt.ocasiao) itens = itens.filter(p=>(p.ocasioes||[]).includes(opt.ocasiao));
   if(opt.soFoto) itens = itens.filter(p=>p.foto || p.fotoInsp);
   if(opt.soTester) itens = itens.filter(p=>temProvador(p));
   if(opt.soEstoque) itens = itens.filter(p=>(est[p.nome]||0)>0);
@@ -3334,7 +3350,7 @@ function desenhaVitrine(c, auth){
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
-      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => `<span class="badge" style="background:#E2E8F0; color:#1E293B; font-size:10.5px; font-weight:700; padding: 3px 8px;">${esc(o)}</span>`).join('')}</div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => badgeOcasiao(o)).join('')}</div>`:''}
       ${p.inspiracao?`<div class="insp">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
         ${p.topo?`<b>Topo</b> ${esc(p.topo)}<br>`:''}
