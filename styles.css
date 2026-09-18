@@ -768,3 +768,6 @@ input[type="date"] {
 .mini-note{font-size:11px;color:var(--ink-faint)}
 .last-sales-card .twrap{max-height:none}
 @media screen and (max-width:640px){.last-sales-card .twrap{overflow-x:auto}.last-sales-card table{min-width:650px}.last-sales-card .btn.sm{white-space:nowrap}}
+
+#vitrineFiltrosWrap { transition: max-height 0.3s ease; }
+#vitrineFiltrosWrap.oculto { display: none !important; }

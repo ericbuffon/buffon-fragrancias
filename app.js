@@ -3218,7 +3218,13 @@ function desenhaVitrine(c, auth){
       <div class="rive">LA RIVE</div>
       <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
-    <div class="filtros-container">
+    <div style="text-align: center; margin: 1.5rem 0 0.5rem;">
+      <button id="btnToggleFiltros" class="btn" style="border-radius: 20px; font-weight: 600; padding: 8px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        Filtrar Perfumes <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
+      </button>
+    </div>
+    <div id="vitrineFiltrosWrap" class="filtros-container oculto">
       <div class="filtros-grupo">
         <div class="filtros-titulo">Gênero</div>
         <div class="filtros" style="gap:8px">
@@ -3258,6 +3264,18 @@ function desenhaVitrine(c, auth){
       ${zapNum?`<a class="zap" href="${zapLink('Oi! Vi o catálogo da Buffon Fragrâncias e queria mais informações.')}" target="_blank">${ICO_ZAP(17,'#fff')} Falar no WhatsApp</a>`:''}
       <a class="btnpdf" id="vitPdf" href="${pdfUrl}" target="_blank" download="Catalogo_Buffon_Fragrancias.pdf" style="display:inline-block; text-decoration:none; text-align:center;">Baixar catálogo em PDF</a>
     </div>`;
+
+  $('#vitrine').addEventListener('click', e=>{
+    const btnToggle = e.target.closest('#btnToggleFiltros');
+    if (btnToggle) {
+      const wrap = document.getElementById('vitrineFiltrosWrap');
+      if (wrap) {
+        wrap.classList.toggle('oculto');
+        const seta = btnToggle.querySelector('.seta');
+        if(seta) seta.textContent = wrap.classList.contains('oculto') ? '▼' : '▲';
+      }
+    }
+  });
 
   $('#vitrine').addEventListener('change', e=>{
     if(!e.target.classList.contains('fchk')) return;
