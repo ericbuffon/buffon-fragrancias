@@ -2234,33 +2234,6 @@ function montaFolhas(itens, opt){
     </div>`;
   });
 
-  // ADD GUIA DE OCASIOES TO PDF
-  html += `<div class="pagina">
-    <div class="topo">${logoImg(LOGO_P)}<div class="rive">LA RIVE</div></div>
-    <div style="padding: 40px; color: var(--ink); text-align: left;">
-      <h2 style="font-family: 'Fraunces', serif; font-size: 28px; margin-bottom: 20px; color: var(--acc); border-bottom: 2px solid var(--line); padding-bottom: 10px;">Guia de Ocasiões</h2>
-      
-      <div style="font-size: 12.5px; line-height: 1.8; color: var(--ink-soft); display: grid; grid-template-columns: 1fr; gap: 16px;">
-        <div><b style="color: var(--ink); font-size: 14px;">☀️ Dias Quentes:</b> Fragrâncias leves, frescas e revigorantes. Dominadas por notas cítricas, aquáticas e florais suaves. São perfumes que "respiram" bem no calor.</div>
-        <div><b style="color: var(--ink); font-size: 14px;">❄️ Dias Frios:</b> Perfumes densos, quentes e acolhedores. Ricos em notas amadeiradas, especiarias, couro, âmbar e baunilha.</div>
-        <div><b style="color: var(--ink); font-size: 14px;">🌅 Diurno:</b> Versáteis, luminosos e enérgicos. Trazem uma sensação de banho tomado e frescor para acompanhar a rotina.</div>
-        <div><b style="color: var(--ink); font-size: 14px;">🌃 Noturno:</b> Misteriosos, marcantes e sedutores. São fragrâncias de atitude, com notas profundas. Feitos para deixar rastro.</div>
-        <div><b style="color: var(--ink); font-size: 14px;">💼 Casual / Trabalho:</b> Conforto e elegância discreta. Transmitem profissionalismo e cuidado pessoal sem invadir o espaço alheio.</div>
-        <div><b style="color: var(--ink); font-size: 14px;">👔 Formal / Eventos:</b> Sofisticação engarrafada. Fragrâncias imponentes, clássicas e refinadas (chipres e amadeirados nobres).</div>
-        <div><b style="color: var(--ink); font-size: 14px;">❤️ Romântico / Encontros:</b> Envolventes, intimistas e convidativos. Trazem um toque de sensualidade e fundos levemente adocicados.</div>
-        <div><b style="color: var(--ink); font-size: 14px;">🪩 Balada / Festas:</b> Ousados, expansivos e de alta projeção. As "bombas", que misturam notas gourmand (doces) e madeiras fortes.</div>
-      </div>
-      
-      <h2 style="font-family: 'Fraunces', serif; font-size: 28px; margin-top: 40px; margin-bottom: 20px; color: var(--acc); border-bottom: 2px solid var(--line); padding-bottom: 10px;">Como escolher e aplicar seu perfume</h2>
-      <ul style="list-style: none; padding: 0; margin: 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.8;">
-        <li style="margin-bottom: 8px;">✓ Escolha as fragrâncias pela manhã, quando seu olfato está descansado.</li>
-        <li style="margin-bottom: 8px;">✓ Teste os perfumes na sua pele. A química corporal altera o resultado final da fragrância.</li>
-        <li style="margin-bottom: 8px;">✓ Aplique o perfume na pele limpa e seca. Não esfregue os pulsos, pois isso quebra as moléculas da fragrância.</li>
-        <li style="margin-bottom: 8px;">✓ Perfume as áreas de maior circulação sanguínea: pulsos, dobras dos cotovelos, atrás da orelha e pescoço.</li>
-      </ul>
-    </div>
-  </div>`;
-
 
   $('#catalogo').innerHTML = html;
   return itens.length;
