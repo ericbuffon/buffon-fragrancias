@@ -3781,7 +3781,13 @@ function updateOcasiDropdown() {
   const checked = Array.from(document.querySelectorAll('.pOcasi-chk:checked')).map(cb => cb.value);
   const btnText = document.getElementById('pOcasiText');
   if (btnText) {
-    btnText.textContent = checked.length > 0 ? checked.join(', ') : 'Selecionar ocasiões';
+    if (checked.length > 1) {
+      btnText.textContent = 'Múltiplas';
+    } else if (checked.length === 1) {
+      btnText.textContent = checked[0];
+    } else {
+      btnText.textContent = 'Selecionar ocasiões';
+    }
   }
 }
 
