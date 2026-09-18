@@ -31,6 +31,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  *:focus { outline: none !important; border-color: var(--ink-faint, #ccc) !important; }
+  select:focus, input:focus, button:focus, .btn:focus { box-shadow: none !important; border-color: var(--ink-faint, #ccc) !important; outline: none !important; }
+</style>
 </head>
 <body>
 <header class="top">
@@ -190,17 +194,26 @@
   </div>
   <div class="filters">
     <select id="filProdGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
-    <select id="filProdOcasi">
-      <option value="">Todas as ocasiões</option>
-      <option value="Dias Quentes">Dias Quentes</option>
-      <option value="Dias Frios">Dias Frios</option>
-      <option value="Diurno">Diurno</option>
-      <option value="Noturno">Noturno</option>
-      <option value="Casual / Trabalho">Casual / Trabalho</option>
-      <option value="Formal / Eventos">Formal / Eventos</option>
-      <option value="Romântico / Encontros">Romântico / Encontros</option>
-      <option value="Balada / Festas">Balada / Festas</option>
-    </select>
+    <div class="field" style="position: relative; display: inline-block; width: 190px; vertical-align: middle; margin-right: 6px;" id="filProdOcasiWrapper">
+      <style>
+        #btnDropFilOcc { min-height: 34px; padding: 6px 10px; background: #fff; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--ink); box-sizing: border-box; font-size: 13.5px; }
+        #dropFilOcc { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; white-space: nowrap; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); flex-direction: column; gap: 0; max-height: 220px; overflow-y: auto; box-sizing: border-box; text-align: left; }
+      </style>
+      <div id="btnDropFilOcc">
+        <span id="filProdOcasiText" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none;">Todas as ocasiões</span>
+        <span style="font-size: 10px; pointer-events: none; margin-left: 8px;">▼</span>
+      </div>
+      <div id="dropFilOcc">
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Dias Quentes"> ☀️ Dias Quentes</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Dias Frios"> ❄️ Dias Frios</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Diurno"> 🌅 Diurno</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Noturno"> 🌃 Noturno</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Casual / Trabalho"> 💼 Casual / Trabalho</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Formal / Eventos"> 👔 Formal / Eventos</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
+        <label class="chk-btn-occ"><input type="checkbox" class="filProdOcasi-chk" value="Balada / Festas"> 🪩 Balada / Festas</label>
+      </div>
+    </div>
     <select id="filProdFam"><option value="">Todas as famílias</option></select>
     <select id="filProdTester"><option value="">Com e sem provador</option><option value="sim">Só com provador</option><option value="nao">Só sem provador</option><option value="caminho">Provador a caminho</option></select>
     <select id="filProdFoto"><option value="">Todas as fotos</option><option value="semProd">Sem foto do produto</option><option value="semInsp">Sem foto da inspiração</option><option value="semAmbas">Sem nenhuma foto</option><option value="comAmbas">Com as duas fotos</option></select>

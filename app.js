@@ -44,7 +44,7 @@ let data = {products:[],purchases:[],sales:[],expenses:[],consignments:[]};
 let edit = {prod:null,com:null,ven:null,des:null,con:null,cli:null};
 let fotos = {prod:'', insp:''};
 let fil = {
-  prodGen:'',prodOcasi:'',prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
+  prodGen:'',prodOcasi:[],prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
   venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,
   estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
@@ -541,14 +541,38 @@ function limpaFiltros(g){
   setTimeout(guardaFiltros,0);
   if(g==='ven') fil.venPedido=null;
   const G = GRUPOS[g]; if(!G) return;
-  G.campos.forEach(c=>{ fil[c]=''; const el=$(G.els[c]); if(el) el.value=''; });
+  G.campos.forEach(c=>{ 
+    if(c === 'prodOcasi') {
+        fil[c] = [];
+        document.querySelectorAll('.filProdOcasi-chk').forEach(cb => cb.checked = false);
+        const textSpan = document.getElementById('filProdOcasiText');
+        if(textSpan) textSpan.textContent = "Todas as ocasiões";
+    } else {
+        fil[c]=''; 
+        const el=$(G.els[c]); if(el) el.value=''; 
+    }
+  });
   G.render();
 }
 function aplicaFiltros(g, vals){
   setTimeout(guardaFiltros,0);
   if(g==='ven' && !Object.prototype.hasOwnProperty.call(vals,'venPedido')) fil.venPedido=null;
   const G = GRUPOS[g]; if(!G) return;
-  G.campos.forEach(c=>{ fil[c] = vals[c]||''; const el=$(G.els[c]); if(el) el.value=fil[c]; });
+  G.campos.forEach(c=>{ 
+    if(c === 'prodOcasi') {
+        fil[c] = vals[c] || [];
+        document.querySelectorAll('.filProdOcasi-chk').forEach(cb => cb.checked = fil[c].includes(cb.value));
+        const textSpan = document.getElementById('filProdOcasiText');
+        if(textSpan) {
+            if (fil[c].length === 0) textSpan.textContent = "Todas as ocasiões";
+            else if (fil[c].length === 1) textSpan.textContent = fil[c][0];
+            else textSpan.textContent = fil[c].length + " ocasiões";
+        }
+    } else {
+        fil[c] = vals[c]||''; 
+        const el=$(G.els[c]); if(el) el.value=fil[c]; 
+    }
+  });
   G.render();
 }
 document.querySelectorAll('[data-limpa]').forEach(b=>b.addEventListener('click',()=>limpaFiltros(b.dataset.limpa)));
@@ -1440,7 +1464,7 @@ $('#tInad').addEventListener('click', e=>{
 function renderProd(){
   let rows = data.products.map(p=>({...p, temFoto:p.foto?1:0, temInsp:p.fotoInsp?1:0, provador: temProvador(p)?1:0}));
   if(fil.prodGen) rows = rows.filter(p=>p.genero===fil.prodGen);
-  if(fil.prodOcasi) rows = rows.filter(p=>(p.ocasioes||[]).includes(fil.prodOcasi));
+  if(fil.prodOcasi && fil.prodOcasi.length > 0) rows = rows.filter(p=> fil.prodOcasi.some(tag => (p.ocasioes||[]).includes(tag)));
   if(fil.prodFam) rows = rows.filter(p=>p.familia===fil.prodFam);
   if(fil.prodTester==='sim') rows = rows.filter(p=>temProvador(p));
   if(fil.prodTester==='nao') rows = rows.filter(p=>!temProvador(p));
@@ -2069,7 +2093,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lightbox').cla
 const LIGA = [
   ['#filProdTester','prodTester','change',renderProd],
   ['#filProdFam','prodFam','change',renderProd],
-  ['#filProdGen','prodGen','change',renderProd],['#filProdOcasi','prodOcasi','change',renderProd],['#filProdFoto','prodFoto','change',renderProd],['#filProdBusca','prodQ','input',renderProd],
+  ['#filProdGen','prodGen','change',renderProd],['#filProdFoto','prodFoto','change',renderProd],['#filProdBusca','prodQ','input',renderProd],
   ['#filComGen','comGen','change',renderCom],['#filComTipo','comTipo','change',renderCom],['#filComEnt','comEnt','change',renderCom],
   ['#filComDe','comDe','change',renderCom],['#filComAte','comAte','change',renderCom],['#filComBusca','comQ','input',renderCom],
   ['#filVenCanal','venCanal','change',renderVen],
@@ -3407,7 +3431,16 @@ function desenhaVitrine(c, auth){
       <div class="rive">LA RIVE</div>
       <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
+    
+    <style>
+      #vitrine .chk-btn { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-bottom: 2px !important; transition: background 0.2s; font-size: 13.5px; border: 1px solid transparent; color: var(--ink); }
+      #vitrine .chk-btn:hover { background: rgba(0,0,0,0.05); }
+      #vitrine .chk-btn input[type="checkbox"] { accent-color: var(--vermelho, #c92a2a); width: 14px; height: 14px; cursor: pointer; margin: 0; }
+      #vitrine .dropdown-content { display: flex; flex-direction: column; gap: 0; padding: 4px; }
+      #vitrine .dropdown-btn { padding: 6px 12px; font-size: 13.5px; }
+    </style>
     <div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin: 1.5rem 0 1rem;">
+
       <div class="dropdown-filtro">
         <button class="dropdown-btn" data-drop="gen">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
@@ -3850,3 +3883,77 @@ document.querySelectorAll('.pOcasi-chk').forEach(chk => {
   chk.addEventListener('change', updateOcasiDropdown);
 });
 
+
+window.updateOcasiDropdown = function() {
+    const checked = Array.from(document.querySelectorAll('.pOcasi-chk:checked')).map(cb => cb.value);
+    const textSpan = document.getElementById('pOcasiText');
+    if (textSpan) {
+        if (checked.length === 0) {
+            textSpan.textContent = "Selecionar ocasiões";
+        } else if (checked.length === 1) {
+            textSpan.textContent = checked[0];
+        } else {
+            textSpan.textContent = checked.length + " selecionadas";
+        }
+    }
+};
+
+document.querySelectorAll('.pOcasi-chk').forEach(cb => {
+    cb.addEventListener('change', window.updateOcasiDropdown);
+});
+
+document.querySelectorAll('.filProdOcasi-chk').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const checked = Array.from(document.querySelectorAll('.filProdOcasi-chk:checked')).map(x => x.value);
+    fil.prodOcasi = checked;
+    
+    const textSpan = document.getElementById('filProdOcasiText');
+    if (textSpan) {
+        if (checked.length === 0) {
+            textSpan.textContent = "Todas as ocasiões";
+        } else if (checked.length === 1) {
+            textSpan.textContent = checked[0];
+        } else {
+            textSpan.textContent = checked.length + " ocasiões";
+        }
+    }
+    renderProd();
+  });
+});
+
+document.addEventListener('click', e => {
+  const btnFormOcc = e.target.closest('#btnDropFormOcc');
+  const btnFilOcc = e.target.closest('#btnDropFilOcc');
+  
+  if (btnFormOcc) {
+    const content = document.getElementById('dropFormOcc');
+    if (content) {
+      content.style.display = content.style.display === 'flex' ? 'none' : 'flex';
+      const seta = btnFormOcc.querySelector('span:last-child');
+      if(seta) seta.textContent = content.style.display === 'flex' ? '▲' : '▼';
+    }
+  } else if (!e.target.closest('#pOcasiDropdownWrapper')) {
+    const content = document.getElementById('dropFormOcc');
+    if (content && content.style.display === 'flex') {
+      content.style.display = 'none';
+      const seta = document.querySelector('#btnDropFormOcc span:last-child');
+      if(seta) seta.textContent = '▼';
+    }
+  }
+  
+  if (btnFilOcc) {
+    const content = document.getElementById('dropFilOcc');
+    if (content) {
+      content.style.display = content.style.display === 'flex' ? 'none' : 'flex';
+      const seta = btnFilOcc.querySelector('span:last-child');
+      if(seta) seta.textContent = content.style.display === 'flex' ? '▲' : '▼';
+    }
+  } else if (!e.target.closest('#filProdOcasiWrapper')) {
+    const content = document.getElementById('dropFilOcc');
+    if (content && content.style.display === 'flex') {
+      content.style.display = 'none';
+      const seta = document.querySelector('#btnDropFilOcc span:last-child');
+      if(seta) seta.textContent = '▼';
+    }
+  }
+});
