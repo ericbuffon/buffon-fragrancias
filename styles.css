@@ -1,4 +1,5 @@
 :root{
+  --dourado:#D4AF37; --dourado-luz:#FBF5E2;
   --paper:#F4F6F9; --card:#FFF; --ink:#12161C; --ink-soft:#4E5866; --ink-faint:#8A94A3;
   --line:#DDE3EB; --line2:#EDF1F6; --accent:#C6341A; --accent-ink:#A32711; --accent-soft:#FDE4DE;
   /* paleta de significados — cada uso tem a sua cor */
@@ -247,6 +248,7 @@ tfoot td{font-weight:600;border-top:2px solid var(--ink);border-bottom:none;back
 .badge.rosa{background:var(--rosa-luz);color:var(--rosa)}
 .badge.cinza{background:var(--cinza-luz);color:var(--cinza)}
 .badge.roxo{background:var(--roxo-luz);color:var(--roxo)}
+.badge.dourado{background:var(--dourado);color:#fff;border-color:var(--dourado);}
 .badge.verde{background:var(--verde-luz);color:var(--verde)}
 .badge.ambar{background:var(--ambar-luz);color:var(--ambar)}
 .badge.teal{background:var(--teal-luz);color:var(--teal)}
