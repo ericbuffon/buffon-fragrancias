@@ -785,3 +785,10 @@ input[type="date"] {
 .crm-text { font-size: 13.5px; color: var(--ink); line-height: 1.5; }
 .crm-suggestions { margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(11, 99, 206, 0.2); }
 .crm-sug-item { display: inline-block; background: #fff; border: 1px solid var(--azul); color: var(--azul); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-bottom: 6px; cursor: default; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+#vitrine .chk-btn input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+#vitrine .chk-btn input { outline: none; }
+/* Ajustar o botão de limpar filtros */
+.btn-limpar-filtros { display: none; align-items: center; justify-content: center; background: none; border: none; font-size: 13px; color: var(--ink-faint); font-weight: 600; text-decoration: underline; cursor: pointer; padding: 8px; }
+.btn-limpar-filtros:hover { color: var(--ink); }
+.btn-limpar-filtros.mostrar { display: inline-flex; }

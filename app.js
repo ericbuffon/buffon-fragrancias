@@ -749,8 +749,6 @@ function abreFicha(id){
     document.getElementById('fichaKpis').after(crmBlock);
   }
   
-  const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
-  
   if (r.unidades > 0) {
     const frascosFalta = 5 - (r.unidades % 5);
     const atingiu = r.unidades % 5 === 0;
@@ -800,6 +798,7 @@ function abreFicha(id){
     crmBlock.innerHTML = '';
   }
 
+  const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
   $('#fichaTab').innerHTML = vs.length
     ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
       vs.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
@@ -3253,7 +3252,7 @@ function desenhaVitrine(c, auth){
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
-      ${p.ocasiao?`<div style="margin-top:6px;"><span class="badge" style="background:var(--line2); color:var(--ink); font-size:11px;">${esc(p.ocasiao)}</span></div>`:''}
+      ${p.ocasiao?`<div style="margin-top:6px;"><span class="badge" style="background:#E2E8F0; color:#1E293B; font-size:11.5px; font-weight:700; padding: 4px 10px;">${esc(p.ocasiao)}</span></div>`:''}
       ${p.inspiracao?`<div class="insp">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
         ${p.topo?`<b>Topo</b> ${esc(p.topo)}<br>`:''}
@@ -3276,7 +3275,7 @@ function desenhaVitrine(c, auth){
       <div class="rive">LA RIVE</div>
       <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
-    <div style="display: flex; gap: 12px; justify-content: center; margin: 1.5rem 0 1rem;">
+    <div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin: 1.5rem 0 1rem;">
       <div class="dropdown-filtro">
         <button class="dropdown-btn" data-drop="gen">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
@@ -3301,6 +3300,7 @@ function desenhaVitrine(c, auth){
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Eventos Formais"> 👔 Formais</label>
         </div>
       </div>
+      <button id="btnLimparFiltros" class="btn-limpar-filtros" onclick="window.limparFiltrosVitrine()">Limpar</button>
     </div>
     <div class="grade">${itens.map(card).join('')}</div>
 
@@ -3349,10 +3349,24 @@ function desenhaVitrine(c, auth){
     }
   });
 
+  window.limparFiltrosVitrine = () => {
+    document.querySelectorAll('.fchk').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#vitrine .item').forEach(it => it.style.display = '');
+    document.getElementById('btnLimparFiltros').classList.remove('mostrar');
+  };
+
   $('#vitrine').addEventListener('change', e=>{
     if(!e.target.classList.contains('fchk')) return;
     const gens = Array.from(document.querySelectorAll('.fchk[name="gen"]:checked')).map(cb => cb.value);
     const occs = Array.from(document.querySelectorAll('.fchk[name="occ"]:checked')).map(cb => cb.value);
+    
+    const btnLimpar = document.getElementById('btnLimparFiltros');
+    if (gens.length > 0 || occs.length > 0) {
+        btnLimpar.classList.add('mostrar');
+    } else {
+        btnLimpar.classList.remove('mostrar');
+    }
+
     document.querySelectorAll('#vitrine .item').forEach(it => {
       const matchGen = gens.length === 0 || gens.includes(it.dataset.g);
       const matchOcc = occs.length === 0 || occs.includes(it.dataset.o);
