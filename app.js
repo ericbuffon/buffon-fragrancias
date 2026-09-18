@@ -3429,6 +3429,9 @@ function desenhaVitrine(c, auth){
   window.vitrineContato = c.contato || '';
   const itens = c.itens||[];
   const zapNum = (c.contato||'').replace(/\D/g,'');
+  const countGen = val => itens.filter(p => p.genero === val).length;
+  const countOcc = val => itens.filter(p => p.ocasioes && p.ocasioes.includes(val)).length;
+  const countFam = val => itens.filter(p => p.familia === val).length;
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
   const foto = (src, alt, isRef) => src ? `<div style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:6px; text-align:center; font-size:8px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">Referência Olfativa</div>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
   const card = p => `<div class="item" data-g="${p.genero}" data-o="${esc(JSON.stringify(p.ocasioes||[]))}" data-f="${esc(p.familia||'')}">
@@ -3475,8 +3478,8 @@ function desenhaVitrine(c, auth){
           Gênero <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-gen" class="dropdown-content oculto">
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="gen" value="Masculino"> Homens</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="gen" value="Feminino"> Mulheres</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="gen" value="Masculino"> Masculino (${countGen("Masculino")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="gen" value="Feminino"> Feminino (${countGen("Feminino")})</label>
         </div>
       </div>
       <div class="dropdown-filtro">
@@ -3485,23 +3488,23 @@ function desenhaVitrine(c, auth){
           Ocasião <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-occ" class="dropdown-content oculto">
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> ☀️ Dias Quentes</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> ❄️ Dias Frios</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> 🌅 Diurno</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> 🌃 Noturno</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> 💼 Casual / Trabalho</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> ☀️ Dias Quentes (${countOcc("Dias Quentes")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> ❄️ Dias Frios (${countOcc("Dias Frios")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> 🌅 Diurno (${countOcc("Diurno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> 🌃 Noturno (${countOcc("Noturno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> 💼 Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos (${countOcc("Formal / Eventos")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas (${countOcc("Balada / Festas")})</label>
         </div>
       </div>
       <div class="dropdown-filtro">
         <button class="dropdown-btn" data-drop="fam">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
           Família <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-fam" class="dropdown-content oculto">
-          ${[...new Set(itens.map(p=>p.familia).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')).map(f => `<label class="chk-btn"><input type="checkbox" class="fchk" name="fam" value="${esc(f)}"> ${esc(f)}</label>`).join('')}
+          ${[...new Set(itens.map(p=>p.familia).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')).map(f => `<label class="chk-btn"><input type="checkbox" class="fchk" name="fam" value="${esc(f)}"> ${esc(f)} (${countFam(f)})</label>`).join('')}
         </div>
       </div>
       <button id="btnLimparFiltros" class="btn-limpar-filtros" onclick="window.limparFiltrosVitrine()">Limpar</button>
