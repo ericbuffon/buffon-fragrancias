@@ -784,17 +784,23 @@ function abreFicha(id){
   }
   
   if (r.unidades > 0) {
-    const metaAlcancada = Math.floor(r.unidades / 5) * 5;
-    const resgatado = (cli.metaResgatada || 0) >= metaAlcancada;
-    const proximaMeta = metaAlcancada + 5;
-    const frascosFalta = proximaMeta - r.unidades;
+    let resgatadosAte = cli.metaResgatada || 0;
+    let metaAlcancadaPendente = resgatadosAte + 5;
+    let temBeneficioPendente = metaAlcancadaPendente <= r.unidades;
     
+    const metaGlobalAlcancada = Math.floor(r.unidades / 5) * 5;
+    const proximaMetaFutura = metaGlobalAlcancada + 5;
+    const frascosFalta = proximaMetaFutura - r.unidades;
+
     let msgFidelidade = '';
-    if (metaAlcancada > 0 && !resgatado) {
-      msgFidelidade = `🎉 <b>Benefício Pendente!</b> O cliente já atingiu a meta de ${metaAlcancada} frascos (está com ${r.unidades} no total). Considere oferecer o brinde/desconto agora.<div style="margin-top:10px;"><button class="btn sm" style="border-color:var(--ambar); color:var(--ambar); font-weight:600;" onclick="window.marcarFidelidade('${cli.id}', ${metaAlcancada})">🎁 Marcar benefício dos ${metaAlcancada} como entregue</button></div>`;
+    if (temBeneficioPendente) {
+      let totalResgatesPendentes = Math.floor((r.unidades - resgatadosAte) / 5);
+      let textoAcumulado = totalResgatesPendentes > 1 ? ` (Atenção: existem ${totalResgatesPendentes} resgates acumulados)` : '';
+
+      msgFidelidade = `🎉 <b>Benefício Pendente!</b> O cliente atingiu a meta de ${metaAlcancadaPendente} frascos${textoAcumulado}.<div style="margin-top:10px;"><button class="btn sm" style="border-color:var(--ambar); color:var(--ambar); font-weight:600;" onclick="window.marcarFidelidade('${cli.id}', ${metaAlcancadaPendente})">🎁 Marcar benefício dos ${metaAlcancadaPendente} como entregue</button></div>`;
     } else {
-      msgFidelidade = `🌟 <b>Fidelidade:</b> O benefício dos ${metaAlcancada} já foi entregue. Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para a meta de ${proximaMeta}.`;
-      if (metaAlcancada === 0) {
+      msgFidelidade = `🌟 <b>Fidelidade:</b> Benefícios em dia. Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para a próxima meta de ${proximaMetaFutura}.`;
+      if (metaGlobalAlcancada === 0) {
         msgFidelidade = `🌟 <b>Fidelidade:</b> Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para o cliente completar o ciclo de 5 compras.`;
       }
     }
