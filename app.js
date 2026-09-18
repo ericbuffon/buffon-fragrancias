@@ -1325,10 +1325,15 @@ function renderDash(){
   data.sales.forEach(v=>{ if(!pp[v.produto]) pp[v.produto]={q:0,f:0,l:0};
     pp[v.produto].q+=Number(v.qtde); pp[v.produto].f+=Number(v.valorVenda); pp[v.produto].l+=calcVenda(v).lucro; });
   const arr = Object.entries(pp).map(([p,o])=>({p,...o,m:o.f>0?o.l/o.f:0}));
+  // Removed lTop rendering as the card was removed
+  /*
   const top = arr.slice().sort((a,b)=>b.q-a.q).slice(0,8);
-  $('#lTop').innerHTML = top.length
-    ? top.map(t=>`<li><span>${esc(t.p)}</span><span class="val">${t.q} un · ${money(t.f)}</span></li>`).join('')
-    : `<li><span class="empty">Nenhuma venda lançada.</span></li>`;
+  if ($('#lTop')) {
+    $('#lTop').innerHTML = top.length
+      ? top.map(t=>`<li><span>${esc(t.p)}</span><span class="val">${t.q} un · ${money(t.f)}</span></li>`).join('')
+      : `<li><span class="empty">Nenhuma venda lançada.</span></li>`;
+  }
+  */
   const luc = arr.slice().sort((a,b)=>b.m-a.m).slice(0,8);
   $('#lLucro').innerHTML = luc.length
     ? luc.map(t=>`<li><span>${esc(t.p)}</span><span class="val">${pct(t.m)} · ${t.q} un · ${money(t.l)}</span></li>`).join('')
