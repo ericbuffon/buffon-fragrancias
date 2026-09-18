@@ -1348,6 +1348,56 @@ function renderDash(){
   const varia = (a,b)=> b>0 ? `<span style="color:var(--${a>=b?'verde':'vermelho'})">${a>=b?'▲':'▼'} ${Math.abs((a/b-1)*100).toFixed(0)}%</span>` : '';
   const linhaMM = (rot, a, b, fmt) =>
     `<li><span>${rot}</span><span class="val">${fmt(a)} ${varia(a,b)}<br><span style="font-weight:400;color:var(--ink-faint);font-size:11.5px">antes ${fmt(b)}</span></span></li>`;
+  // ----- dashboard de fidelidade -----
+  const cliFidelidade = [];
+  let totalResgatados = 0;
+  let totalPendentes = 0;
+
+  data.clients.forEach(c => {
+      const r = resumoCliente(c.nome);
+      if (r.unidades > 0) {
+          let resgatadosAte = c.metaResgatada || 0;
+          totalResgatados += Math.floor(resgatadosAte / 5);
+
+          let metaAlcancadaPendente = resgatadosAte + 5;
+          let temBeneficioPendente = metaAlcancadaPendente <= r.unidades;
+
+          if (temBeneficioPendente) {
+              let resgatesPendentes = Math.floor((r.unidades - resgatadosAte) / 5);
+              totalPendentes += resgatesPendentes;
+              cliFidelidade.push({ c, r, status: 'Pendente', pendentes: resgatesPendentes, frascos: r.unidades });
+          } else {
+              const metaGlobalAlcancada = Math.floor(r.unidades / 5) * 5;
+              const proximaMetaFutura = metaGlobalAlcancada + 5;
+              const frascosFalta = proximaMetaFutura - r.unidades;
+              if (frascosFalta <= 2) {
+                   cliFidelidade.push({ c, r, status: 'Quase', falta: frascosFalta, frascos: r.unidades });
+              }
+          }
+      }
+  });
+
+  cliFidelidade.sort((a, b) => {
+      if (a.status === 'Pendente' && b.status !== 'Pendente') return -1;
+      if (b.status === 'Pendente' && a.status !== 'Pendente') return 1;
+      if (a.status === 'Quase' && b.status === 'Quase') return a.falta - b.falta;
+      return b.frascos - a.frascos;
+  });
+
+  const topFidelidade = cliFidelidade.slice(0, 5);
+
+  $('#lFidelidade').innerHTML = topFidelidade.length ?
+      topFidelidade.map(item => {
+          const nome = item.c.nome.split(' ')[0];
+          if (item.status === 'Pendente') {
+              return `<li class="clic" data-fichafid="${item.c.id}"><span>${esc(nome)}</span><span class="val" style="color:var(--ambar)">🎁 ${item.pendentes} a resgatar</span></li>`;
+          } else {
+              return `<li class="clic" data-fichafid="${item.c.id}"><span>${esc(nome)}</span><span class="val" style="color:var(--ink-soft)">falta ${item.falta} un</span></li>`;
+          }
+      }).join('') + `<li class="note">Histórico: ${totalResgatados} resgatados, ${totalPendentes} pendentes.</li>`
+      : `<li><span class="empty">Nenhum cliente próximo da meta.</span></li>`;
+
+  
   $('#lMesMes').innerHTML = (A.ped||B.ped)
     ? linhaMM('Faturamento', A.fat, B.fat, money)
       + linhaMM('Lucro', A.luc, B.luc, money)
