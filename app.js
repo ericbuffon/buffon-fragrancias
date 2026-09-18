@@ -3783,13 +3783,6 @@ function updateOcasiDropdown() {
   if (btnText) {
     btnText.textContent = checked.length > 0 ? checked.join(', ') : 'Selecionar ocasiões';
   }
-  document.querySelectorAll('.pOcasi-chk').forEach(chk => {
-    const wrapper = chk.closest('.chk-btn-occ');
-    if (wrapper) {
-      if(chk.checked) wrapper.classList.add('selected');
-      else wrapper.classList.remove('selected');
-    }
-  });
 }
 
 document.addEventListener('click', e => {
