@@ -359,7 +359,7 @@ function testers(){
 }
 
 const bGen   = v => v==='Feminino'?'<span class="badge rosa">Feminino</span>':v==='Masculino'?'<span class="badge azul">Masculino</span>':'—';
-const bTipo  = v => v==='Tester'?'<span class="badge roxo">Tester</span>':'<span class="badge cinza">Lacrado</span>';
+const bTipo  = v => v==='Tester'?'<span class="badge dourado">Tester</span>':'<span class="badge cinza">Lacrado</span>';
 const bEntC  = v => v==='Não'?'<span class="badge ambar">A caminho</span>':'<span class="badge verde">Recebida</span>';
 const bPag   = v => v==='Pendente'?'<span class="badge vermelho">Pendente</span>':'<span class="badge teal">Pago</span>';
 const bEntV  = v => v==='Não'?'<span class="badge laranja">Não entregue</span>':'<span class="badge oliva">Entregue</span>';
@@ -1547,7 +1547,7 @@ function renderProd(){
         <td><div class="inspcell">${thumb(p.fotoInsp,'Inspiração de '+p.nome)}<span>${esc(p.inspiracao)||'—'}</span></div></td>
         <td>${esc(p.familia)||'—'}</td>
         <td class="ctr">${temProvador(p)
-          ? `<span class="badge roxo">Sim</span>`
+          ? `<span class="badge dourado">Sim</span>`
           : (modoProvador(p)==='auto' && testerAcaminho(p.nome)
               ? `<span class="badge ambar">A caminho</span>`
               : `<span class="badge cinza">Não</span>`)}${modoProvador(p)==='manual'?' <span class="badge cinza">fixo</span>':''}</td>
@@ -1755,7 +1755,7 @@ function renderCon(){
     ['No parceiro', rows.reduce((s,c)=>s+c.saldo,0)+' un', 'am',
       'Ainda com o parceiro: enviado − vendido − devolvido.\nContinua sendo seu, mas fora da prateleira.'],
     ['Lacrados', lacr+' un'],
-    ['Testers', tst+' un', 'roxo'],
+    ['Testers', tst+' un', 'dourado'],
     ['Vendido', rows.reduce((s,c)=>s+c.vendida,0)+' un', 'ok', 'Acumulado desde o início da consignação.'],
     ['Devolvido', rows.reduce((s,c)=>s+c.devolvida,0)+' un'],
     ['Custo no parceiro', money(rows.reduce((s,c)=>s+c.saldo*custoMedio(c.produto),0))],
@@ -3431,7 +3431,7 @@ function desenhaVitrine(c, auth){
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
   const foto = (src, alt, isRef) => src ? `<div style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:6px; text-align:center; font-size:8px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">Referência Olfativa</div>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
-  const card = p => `<div class="item" data-g="${p.genero}" data-o="${esc(JSON.stringify(p.ocasioes||[]))}">
+  const card = p => `<div class="item" data-g="${p.genero}" data-o="${esc(JSON.stringify(p.ocasioes||[]))}" data-f="${esc(p.familia||'')}">
     <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
@@ -3444,7 +3444,7 @@ function desenhaVitrine(c, auth){
         ${p.fundo?`<b>Fundo</b> ${esc(p.fundo)}`:''}</div>`:''}
       <div class="rodape">
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
-        ${p.tester?'<span class="badge roxo">tem provador</span>':''}
+        ${p.tester?'<span class="badge dourado">tem provador</span>':''}
       </div>
       <div class="cart-item-wrap" data-nome="${esc(p.nome)}">
         ${cart[p.nome] ? `<div class="qtd-ctrl"><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, -1)">-</button><span class="qtd-num">${cart[p.nome].qtd}</span><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">+</button></div>` : `<button class="vitrine-add" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">Adicionar ao carrinho</button>`}
@@ -3493,6 +3493,15 @@ function desenhaVitrine(c, auth){
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos</label>
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas</label>
+        </div>
+      </div>
+      <div class="dropdown-filtro">
+        <button class="dropdown-btn" data-drop="fam">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          Família <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
+        </button>
+        <div id="drop-fam" class="dropdown-content oculto">
+          ${[...new Set(itens.map(p=>p.familia).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')).map(f => `<label class="chk-btn"><input type="checkbox" class="fchk" name="fam" value="${esc(f)}"> ${esc(f)}</label>`).join('')}
         </div>
       </div>
       <button id="btnLimparFiltros" class="btn-limpar-filtros" onclick="window.limparFiltrosVitrine()">Limpar</button>
@@ -3544,9 +3553,10 @@ function desenhaVitrine(c, auth){
     if(!e.target.classList.contains('fchk')) return;
     const gens = Array.from(document.querySelectorAll('.fchk[name="gen"]:checked')).map(cb => cb.value);
     const occs = Array.from(document.querySelectorAll('.fchk[name="occ"]:checked')).map(cb => cb.value);
+    const fams = Array.from(document.querySelectorAll('.fchk[name="fam"]:checked')).map(cb => cb.value);
     
     const btnLimpar = document.getElementById('btnLimparFiltros');
-    if (gens.length > 0 || occs.length > 0) {
+    if (gens.length > 0 || occs.length > 0 || fams.length > 0) {
         btnLimpar.classList.add('mostrar');
     } else {
         btnLimpar.classList.remove('mostrar');
@@ -3556,7 +3566,8 @@ function desenhaVitrine(c, auth){
       const matchGen = gens.length === 0 || gens.includes(it.dataset.g);
       const pOccs = JSON.parse(it.dataset.o || '[]');
       const matchOcc = occs.length === 0 || occs.some(tag => pOccs.includes(tag));
-      it.style.display = (matchGen && matchOcc) ? '' : 'none';
+      const matchFam = fams.length === 0 || fams.includes(it.dataset.f);
+      it.style.display = (matchGen && matchOcc && matchFam) ? '' : 'none';
     });
   });
 }
