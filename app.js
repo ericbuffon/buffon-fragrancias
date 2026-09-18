@@ -1876,7 +1876,7 @@ $('#fProd').addEventListener('submit',e=>{
   } else data.products.push({id:uid(),...payload});
   resetProd(); save(); renderAll();
 });
-function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino'; document.querySelectorAll('.pOcasi-chk').forEach(cb => cb.checked = false); $('#pPreco').value=90;
+function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino'; document.querySelectorAll('.pOcasi-chk').forEach(cb => cb.checked = false); if(typeof updateOcasiDropdown === 'function') updateOcasiDropdown(); $('#pPreco').value=90;
   setFotoPrev('prod',''); setFotoPrev('insp',''); }
 function cancProd(){ edit.prod=null; resetProd(); $('#tProdForm').textContent='Novo produto';
   $('#bProd').textContent='Adicionar produto'; $('#cancProd').hidden=true; }
@@ -1889,7 +1889,8 @@ $('#tProd').addEventListener('click',e=>{
     $('#pTopo').value=p.notasTopo||''; $('#pCoracao').value=p.notasCoracao||'';
     $('#pFundo').value=p.notasFundo||''; $('#pConc').value=p.concentracao||'';
     $('#pVol').value=p.volume||''; $('#pTester').value=modoProvador(p)==='manual'?p.temTester:'auto'; $('#pGen').value=p.genero; document.querySelectorAll('.pOcasi-chk').forEach(cb => cb.checked = (p.ocasioes||[]).includes(cb.value));
-     $('#pPreco').value=p.precoVenda;
+    if(typeof updateOcasiDropdown === 'function') updateOcasiDropdown();
+    $('#pPreco').value=p.precoVenda;
     setFotoPrev('prod',p.foto||''); setFotoPrev('insp',p.fotoInsp||'');
     $('#tProdForm').textContent='Editando: '+p.nome; $('#bProd').textContent='Salvar alterações'; $('#cancProd').hidden=false;
     window.scrollTo({top:0,behavior:'smooth'}); }
@@ -3776,12 +3777,32 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+function updateOcasiDropdown() {
+  const checked = Array.from(document.querySelectorAll('.pOcasi-chk:checked')).map(cb => cb.value);
+  const btnText = document.getElementById('pOcasiText');
+  if (btnText) {
+    btnText.textContent = checked.length > 0 ? checked.join(', ') : 'Selecionar ocasiões';
+  }
+  document.querySelectorAll('.pOcasi-chk').forEach(chk => {
+    const wrapper = chk.closest('.chk-btn-occ');
+    if (wrapper) {
+      if(chk.checked) wrapper.classList.add('selected');
+      else wrapper.classList.remove('selected');
+    }
+  });
+}
+
 document.addEventListener('click', e => {
   const btn = e.target.closest('#btnDropFormOcc');
-  const drop = $('#dropFormOcc');
+  const drop = document.getElementById('dropFormOcc');
   if(btn) {
-    if (drop) drop.classList.toggle('oculto');
+    if (drop) drop.style.display = drop.style.display === 'flex' ? 'none' : 'flex';
   } else if (!e.target.closest('#pOcasiDropdownWrapper') && drop) {
-    drop.classList.add('oculto');
+    drop.style.display = 'none';
   }
 });
+
+document.querySelectorAll('.pOcasi-chk').forEach(chk => {
+  chk.addEventListener('change', updateOcasiDropdown);
+});
+

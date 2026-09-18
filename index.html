@@ -136,18 +136,28 @@
         <div class="field"><label for="pGen">Gênero</label><select id="pGen"><option>Masculino</option><option>Feminino</option></select></div>
         <div class="field" style="grid-column: 1 / -1; position: relative;" id="pOcasiDropdownWrapper">
           <label>Ocasiões <span style="color:var(--ink-faint)">(marque todas que se aplicam)</span></label>
-          <button type="button" class="btn" id="btnDropFormOcc" style="width: 100%; text-align: left; justify-content: space-between; display: flex; align-items: center; background: #fff; border: 1px solid var(--line); color: var(--ink);">
-            Selecionar ocasiões <span style="font-size: 10px;">▼</span>
-          </button>
-          <div id="dropFormOcc" class="oculto" style="position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 8px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto;">
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Dias Quentes"> ☀️ Dias Quentes</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Dias Frios"> ❄️ Dias Frios</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Diurno"> 🌅 Diurno</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Noturno"> 🌃 Noturno</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Casual / Trabalho"> 💼 Casual / Trabalho</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Formal / Eventos"> 👔 Formal / Eventos</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
-            <label class="chk-btn" style="margin:0;"><input type="checkbox" class="pOcasi-chk" value="Balada / Festas"> 🪩 Balada / Festas</label>
+          <style>
+            #btnDropFormOcc { width: 100%; min-height: 38px; padding: 8px 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--ink); box-sizing: border-box; }
+            #dropFormOcc { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 8px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; box-sizing: border-box; }
+            .chk-btn-occ { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 4px; cursor: pointer; margin: 0; transition: background 0.2s; font-size: 14px; border: 1px solid transparent; color: var(--ink); }
+            .chk-btn-occ:hover { background: rgba(0,0,0,0.05); }
+            .chk-btn-occ.selected { background-color: var(--vermelho, #c92a2a); color: #fff; }
+            .chk-btn-occ input[type="checkbox"] { accent-color: var(--vermelho, #c92a2a); width: 16px; height: 16px; cursor: pointer; }
+            .chk-btn-occ.selected input[type="checkbox"] { accent-color: #fff; }
+          </style>
+          <div id="btnDropFormOcc">
+            <span id="pOcasiText" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none;">Selecionar ocasiões</span>
+            <span style="font-size: 10px; pointer-events: none; margin-left: 8px;">▼</span>
+          </div>
+          <div id="dropFormOcc">
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Dias Quentes"> ☀️ Dias Quentes</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Dias Frios"> ❄️ Dias Frios</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Diurno"> 🌅 Diurno</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Noturno"> 🌃 Noturno</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Casual / Trabalho"> 💼 Casual / Trabalho</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Formal / Eventos"> 👔 Formal / Eventos</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
+            <label class="chk-btn-occ"><input type="checkbox" class="pOcasi-chk" value="Balada / Festas"> 🪩 Balada / Festas</label>
           </div>
         </div>
         <div class="field"><label for="pPreco">Preço de venda (R$)</label><input type="number" id="pPreco" min="0" step="0.01" value="90"></div>
