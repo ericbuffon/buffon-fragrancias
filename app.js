@@ -751,6 +751,16 @@ function renderCli(){
     : `<tbody><tr><td class="empty">Nenhum cliente encontrado.</td></tr></tbody>`;
 }
 
+
+window.marcarFidelidade = function(idCli, meta) {
+  const cli = data.clients.find(c => c.id === idCli);
+  if(cli) {
+    cli.metaResgatada = meta;
+    save();
+    abreFicha(idCli);
+  }
+};
+
 function abreFicha(id){
   const cli = data.clients.find(c=>c.id===id); if(!cli) return;
   fichaAtual = cli;
@@ -775,9 +785,16 @@ function abreFicha(id){
   if (r.unidades > 0) {
     const frascosFalta = 5 - (r.unidades % 5);
     const atingiu = r.unidades % 5 === 0;
-    const msgFidelidade = atingiu
-      ? `🎉 <b>Meta de Fidelidade atingida!</b> O cliente chegou a ${r.unidades} frascos comprados. Considere oferecer um tester ou um desconto na próxima compra.`
-      : `🌟 <b>Fidelidade:</b> Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para o cliente completar o ciclo de 5 compras.`;
+    const resgatado = cli.metaResgatada === r.unidades;
+    
+    let msgFidelidade = '';
+    if (atingiu && !resgatado) {
+      msgFidelidade = `🎉 <b>Meta de Fidelidade atingida!</b> O cliente chegou a ${r.unidades} frascos comprados. Considere oferecer um tester ou um desconto na próxima compra.<div style="margin-top:10px;"><button class="btn sm" style="border-color:var(--ambar); color:var(--ambar); font-weight:600;" onclick="window.marcarFidelidade('${cli.id}', ${r.unidades})">🎁 Marcar benefício como entregue</button></div>`;
+    } else if (atingiu && resgatado) {
+      msgFidelidade = `🌟 <b>Fidelidade:</b> O benefício dos ${r.unidades} frascos já foi entregue! O ciclo recomeçará na próxima compra.`;
+    } else {
+      msgFidelidade = `🌟 <b>Fidelidade:</b> Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para o cliente completar o ciclo de 5 compras.`;
+    }
 
     let recomendacaoHTML = '';
     const pref = r.favorito || (vs.length ? vs[0].produto : null);
