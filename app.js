@@ -753,6 +753,7 @@ function renderCli(){
 
 
 window.marcarFidelidade = function(idCli, meta) {
+  if (!confirm(`Tem certeza que deseja marcar o benefício dos ${meta} frascos como entregue?`)) return;
   const cli = data.clients.find(c => c.id === idCli);
   if(cli) {
     cli.metaResgatada = meta;
@@ -783,17 +784,19 @@ function abreFicha(id){
   }
   
   if (r.unidades > 0) {
-    const frascosFalta = 5 - (r.unidades % 5);
-    const atingiu = r.unidades % 5 === 0;
-    const resgatado = cli.metaResgatada === r.unidades;
+    const metaAlcancada = Math.floor(r.unidades / 5) * 5;
+    const resgatado = (cli.metaResgatada || 0) >= metaAlcancada;
+    const proximaMeta = metaAlcancada + 5;
+    const frascosFalta = proximaMeta - r.unidades;
     
     let msgFidelidade = '';
-    if (atingiu && !resgatado) {
-      msgFidelidade = `🎉 <b>Meta de Fidelidade atingida!</b> O cliente chegou a ${r.unidades} frascos comprados. Considere oferecer um tester ou um desconto na próxima compra.<div style="margin-top:10px;"><button class="btn sm" style="border-color:var(--ambar); color:var(--ambar); font-weight:600;" onclick="window.marcarFidelidade('${cli.id}', ${r.unidades})">🎁 Marcar benefício como entregue</button></div>`;
-    } else if (atingiu && resgatado) {
-      msgFidelidade = `🌟 <b>Fidelidade:</b> O benefício dos ${r.unidades} frascos já foi entregue! O ciclo recomeçará na próxima compra.`;
+    if (metaAlcancada > 0 && !resgatado) {
+      msgFidelidade = `🎉 <b>Benefício Pendente!</b> O cliente já atingiu a meta de ${metaAlcancada} frascos (está com ${r.unidades} no total). Considere oferecer o brinde/desconto agora.<div style="margin-top:10px;"><button class="btn sm" style="border-color:var(--ambar); color:var(--ambar); font-weight:600;" onclick="window.marcarFidelidade('${cli.id}', ${metaAlcancada})">🎁 Marcar benefício dos ${metaAlcancada} como entregue</button></div>`;
     } else {
-      msgFidelidade = `🌟 <b>Fidelidade:</b> Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para o cliente completar o ciclo de 5 compras.`;
+      msgFidelidade = `🌟 <b>Fidelidade:</b> O benefício dos ${metaAlcancada} já foi entregue. Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para a meta de ${proximaMeta}.`;
+      if (metaAlcancada === 0) {
+        msgFidelidade = `🌟 <b>Fidelidade:</b> Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para o cliente completar o ciclo de 5 compras.`;
+      }
     }
 
     let recomendacaoHTML = '';
