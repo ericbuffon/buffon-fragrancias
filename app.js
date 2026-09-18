@@ -3390,12 +3390,14 @@ function desenhaVitrine(c, auth){
           Ocasião <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-occ" class="dropdown-content oculto">
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dia a dia e Trabalho"> ☀️ Dia a dia</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Esportes e Lazer"> 🏃 Esportes</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Festas Diurnas"> 🥂 Festas (Dia)</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Encontros"> ❤️ Encontros</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada e Noite"> 🪩 Balada/Noite</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Eventos Formais"> 👔 Formais</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> ☀️ Dias Quentes</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> ❄️ Dias Frios</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> 🌅 Diurno</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> 🌃 Noturno</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> 💼 Casual / Trabalho</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas</label>
         </div>
       </div>
       <button id="btnLimparFiltros" class="btn-limpar-filtros" onclick="window.limparFiltrosVitrine()">Limpar</button>
@@ -3773,3 +3775,13 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Falha ao registrar o Service Worker', err));
   });
 }
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('#btnDropFormOcc');
+  const drop = $('#dropFormOcc');
+  if(btn) {
+    if (drop) drop.classList.toggle('oculto');
+  } else if (!e.target.closest('#pOcasiDropdownWrapper') && drop) {
+    drop.classList.add('oculto');
+  }
+});
