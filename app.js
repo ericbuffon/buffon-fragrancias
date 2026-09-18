@@ -97,7 +97,23 @@ function migra(){
   }
   data.products.forEach(p=>{ if(!p.id)p.id=uid(); if(p.foto===undefined)p.foto=''; if(p.fotoInsp===undefined)p.fotoInsp=''; if(p.marcaInsp===undefined)p.marcaInsp='';
     ['familia','notasTopo','notasCoracao','notasFundo','concentracao','volume','ocasiao'].forEach(k=>{ if(p[k]===undefined)p[k]=''; });
-    if(p.temTester===undefined) p.temTester = ''; });
+    if(p.temTester===undefined) p.temTester = ''; 
+    if(p.ocasioes===undefined) p.ocasioes = [];
+    if(p.ocasiao!==undefined) {
+      if(typeof p.ocasiao==='string' && p.ocasiao.trim()!=='') {
+        const old = p.ocasiao; let tags = [];
+        if(old === 'Dia a dia e Trabalho') tags = ['Diurno', 'Casual / Trabalho'];
+        else if(old === 'Esportes e Lazer') tags = ['Dias Quentes', 'Diurno', 'Casual / Trabalho'];
+        else if(old === 'Festas Diurnas') tags = ['Dias Quentes', 'Diurno', 'Balada / Festas'];
+        else if(old === 'Encontros') tags = ['Noturno', 'Romântico / Encontros'];
+        else if(old === 'Balada e Noite') tags = ['Noturno', 'Balada / Festas'];
+        else if(old === 'Eventos Formais') tags = ['Noturno', 'Formal / Eventos'];
+        else tags = [old];
+        p.ocasioes = tags;
+      }
+      delete p.ocasiao;
+    }
+  });
   data.purchases.forEach(c=>{ if(!c.id)c.id=uid(); if(!c.entregue)c.entregue='Sim'; });
   data.sales.forEach(v=>{ if(!v.id)v.id=uid(); if(!v.entregue)v.entregue='Sim';
     if(v.canal===undefined) v.canal='Direto';
@@ -174,27 +190,35 @@ const PATCH_OCASIAO = {"I Am Ideal": "Dia a dia e Trabalho", "Charisme": "Dia a 
 
 function sugerirOcasiao(p) {
   const texto = [p.familia, p.descricao, p.notasTopo, p.notasCoracao, p.notasFundo].join(' ').toLowerCase();
+  let tags = [];
   
-  if (texto.includes('gourmand') || texto.includes('balada') || texto.includes('noite') || texto.includes('noturna') || texto.includes('intensa') || texto.includes('provocante') || texto.includes('café') || texto.includes('praliné')) return "Balada e Noite";
-  if (texto.includes('sedutora') || texto.includes('envolvente') || texto.includes('misteriosa') || texto.includes('sensual') || texto.includes('couro')) return "Encontros";
-  if (texto.includes('formal') || texto.includes('imponente') || texto.includes('clássica') || texto.includes('opulenta') || texto.includes('poderosa') || texto.includes('sofisticada') || texto.includes('chipre')) return "Eventos Formais";
-  if (texto.includes('aquática') || texto.includes('esportiva') || texto.includes('cítrica') || texto.includes('solar') || texto.includes('energética') || texto.includes('marinha')) return "Esportes e Lazer";
-  if (texto.includes('festa') || texto.includes('espumante') || texto.includes('alegre') || texto.includes('vibrante') || texto.includes('romântica') || texto.includes('frutada')) return "Festas Diurnas";
-  if (texto.includes('amadeirada')) return "Eventos Formais";
+  if (texto.includes('fresco') || texto.includes('cítric') || texto.includes('aquátic') || texto.includes('verão') || texto.includes('solar')) tags.push("Dias Quentes");
+  if (texto.includes('amadeirad') || texto.includes('oriental') || texto.includes('especiad') || texto.includes('couro') || texto.includes('inverno')) tags.push("Dias Frios");
   
-  return "Dia a dia e Trabalho";
+  if (texto.includes('leve') || texto.includes('limpo') || texto.includes('frescor')) tags.push("Diurno");
+  if (texto.includes('noite') || texto.includes('noturna') || texto.includes('intensa') || texto.includes('misterios')) tags.push("Noturno");
+  
+  if (texto.includes('dia a dia') || texto.includes('trabalho') || texto.includes('casual') || texto.includes('escritório')) tags.push("Casual / Trabalho");
+  if (texto.includes('formal') || texto.includes('elegante') || texto.includes('sofisticad') || texto.includes('imponente') || texto.includes('chipre')) tags.push("Formal / Eventos");
+  
+  if (texto.includes('sedutor') || texto.includes('envolvente') || texto.includes('sensual') || texto.includes('romântic')) tags.push("Romântico / Encontros");
+  if (texto.includes('balada') || texto.includes('festa') || texto.includes('vibrante') || texto.includes('alegre') || texto.includes('gourmand')) tags.push("Balada / Festas");
+  
+  if(tags.length === 0) tags = ["Casual / Trabalho"];
+  
+  return [...new Set(tags)];
 }
 
 function aplicaPatchOcasiao(){
-  if(data.patchOcasiao2) return 0;
+  if(data.patchOcasiao3) return 0;
   let n=0;
   data.products.forEach(p=>{
-    if(!p.ocasiao) { 
-      p.ocasiao = PATCH_OCASIAO[p.nome] || sugerirOcasiao(p); 
+    if(!p.ocasioes || p.ocasioes.length === 0) { 
+      p.ocasioes = sugerirOcasiao(p); 
       n++; 
     }
   });
-  data.patchOcasiao2 = true;
+  data.patchOcasiao3 = true;
   return n;
 }
 
@@ -1399,7 +1423,7 @@ $('#tInad').addEventListener('click', e=>{
 function renderProd(){
   let rows = data.products.map(p=>({...p, temFoto:p.foto?1:0, temInsp:p.fotoInsp?1:0, provador: temProvador(p)?1:0}));
   if(fil.prodGen) rows = rows.filter(p=>p.genero===fil.prodGen);
-  if(fil.prodOcasi) rows = rows.filter(p=>p.ocasiao===fil.prodOcasi);
+  if(fil.prodOcasi) rows = rows.filter(p=>(p.ocasioes||[]).includes(fil.prodOcasi));
   if(fil.prodFam) rows = rows.filter(p=>p.familia===fil.prodFam);
   if(fil.prodTester==='sim') rows = rows.filter(p=>temProvador(p));
   if(fil.prodTester==='nao') rows = rows.filter(p=>!temProvador(p));
@@ -1826,7 +1850,7 @@ $('#fProd').addEventListener('submit',e=>{
     familia:$('#pFam').value.trim(), notasTopo:$('#pTopo').value.trim(),
     notasCoracao:$('#pCoracao').value.trim(), notasFundo:$('#pFundo').value.trim(),
     concentracao:$('#pConc').value, volume:$('#pVol').value.trim(), temTester:$('#pTester').value,
-    genero:$('#pGen').value, ocasiao:$('#pOcasi').value,
+    genero:$('#pGen').value, ocasioes: Array.from(document.querySelectorAll('.pOcasi-chk:checked')).map(cb => cb.value),
     precoVenda:Number($('#pPreco').value)||90,
     foto:fotos.prod, fotoInsp:fotos.insp};
   if(edit.prod){
@@ -1839,7 +1863,7 @@ $('#fProd').addEventListener('submit',e=>{
   } else data.products.push({id:uid(),...payload});
   resetProd(); save(); renderAll();
 });
-function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino'; $('#pOcasi').value=''; $('#pPreco').value=90;
+function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino'; document.querySelectorAll('.pOcasi-chk').forEach(cb => cb.checked = false); $('#pPreco').value=90;
   setFotoPrev('prod',''); setFotoPrev('insp',''); }
 function cancProd(){ edit.prod=null; resetProd(); $('#tProdForm').textContent='Novo produto';
   $('#bProd').textContent='Adicionar produto'; $('#cancProd').hidden=true; }
@@ -1851,7 +1875,7 @@ $('#tProd').addEventListener('click',e=>{
     $('#pMarca').value=p.marcaInsp||''; $('#pFam').value=p.familia||'';
     $('#pTopo').value=p.notasTopo||''; $('#pCoracao').value=p.notasCoracao||'';
     $('#pFundo').value=p.notasFundo||''; $('#pConc').value=p.concentracao||'';
-    $('#pVol').value=p.volume||''; $('#pTester').value=modoProvador(p)==='manual'?p.temTester:'auto'; $('#pGen').value=p.genero; $('#pOcasi').value=p.ocasiao||'';
+    $('#pVol').value=p.volume||''; $('#pTester').value=modoProvador(p)==='manual'?p.temTester:'auto'; $('#pGen').value=p.genero; document.querySelectorAll('.pOcasi-chk').forEach(cb => cb.checked = (p.ocasioes||[]).includes(cb.value));
      $('#pPreco').value=p.precoVenda;
     setFotoPrev('prod',p.foto||''); setFotoPrev('insp',p.fotoInsp||'');
     $('#tProdForm').textContent='Editando: '+p.nome; $('#bProd').textContent='Salvar alterações'; $('#cancProd').hidden=false;
@@ -2097,7 +2121,7 @@ function piramideSVG(acc, tem){
 }
 /* formato único usado pelo catálogo impresso e pelo link público */
 const paraCatalogo = p => ({
-  nome:p.nome, genero:p.genero, inspiracao:p.inspiracao, marca:p.marcaInsp, familia:p.familia, ocasiao:p.ocasiao||'',
+  nome:p.nome, genero:p.genero, inspiracao:p.inspiracao, marca:p.marcaInsp, familia:p.familia, ocasioes:p.ocasioes||[],
   conc:p.concentracao, vol:p.volume, topo:p.notasTopo, coracao:p.notasCoracao, fundo:p.notasFundo,
   tester:temProvador(p), preco:Number(p.precoVenda)||0, foto:p.foto||'', fotoInsp:p.fotoInsp||''
 });
@@ -2824,7 +2848,7 @@ function montaPublico(opt){
     emitido: new Date().toISOString(),
     itens: [...bloco('Masculino'), ...bloco('Feminino')].map(p=>({
       nome:p.nome, genero:p.genero, inspiracao:p.inspiracao, marca:p.marcaInsp,
-      familia:p.familia, conc:p.concentracao, vol:p.volume, ocasiao:p.ocasiao||'',
+      familia:p.familia, conc:p.concentracao, vol:p.volume, ocasioes:p.ocasioes||[],
       topo:p.notasTopo, coracao:p.notasCoracao, fundo:p.notasFundo,
       tester:temProvador(p),
       preco: opt.preco ? Number(p.precoVenda)||0 : null,
@@ -3305,12 +3329,12 @@ function desenhaVitrine(c, auth){
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
   const foto = (src, alt, isRef) => src ? `<div style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:6px; text-align:center; font-size:8px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">Referência Olfativa</div>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
-  const card = p => `<div class="item" data-g="${p.genero}" data-o="${esc(p.ocasiao)}">
+  const card = p => `<div class="item" data-g="${p.genero}" data-o="${esc(JSON.stringify(p.ocasioes||[]))}">
     <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
-      ${p.ocasiao?`<div style="margin-top:6px;"><span class="badge" style="background:#E2E8F0; color:#1E293B; font-size:11.5px; font-weight:700; padding: 4px 10px;">${esc(p.ocasiao)}</span></div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => `<span class="badge" style="background:#E2E8F0; color:#1E293B; font-size:10.5px; font-weight:700; padding: 3px 8px;">${esc(o)}</span>`).join('')}</div>`:''}
       ${p.inspiracao?`<div class="insp">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
         ${p.topo?`<b>Topo</b> ${esc(p.topo)}<br>`:''}
@@ -3427,7 +3451,8 @@ function desenhaVitrine(c, auth){
 
     document.querySelectorAll('#vitrine .item').forEach(it => {
       const matchGen = gens.length === 0 || gens.includes(it.dataset.g);
-      const matchOcc = occs.length === 0 || occs.includes(it.dataset.o);
+      const pOccs = JSON.parse(it.dataset.o || '[]');
+      const matchOcc = occs.length === 0 || occs.some(tag => pOccs.includes(tag));
       it.style.display = (matchGen && matchOcc) ? '' : 'none';
     });
   });

@@ -134,7 +134,18 @@
         <div class="field"><label for="pInsp">Inspiração</label><input id="pInsp"></div>
         <div class="field"><label for="pMarca">Marca da inspiração</label><input id="pMarca" placeholder="Ex.: Dior"></div>
         <div class="field"><label for="pGen">Gênero</label><select id="pGen"><option>Masculino</option><option>Feminino</option></select></div>
-        <div class="field"><label for="pOcasi">Ocasião</label><select id="pOcasi"><option value="">—</option><option value="Dia a dia e Trabalho">Dia a dia e Trabalho</option><option value="Esportes e Lazer">Esportes e Lazer</option><option value="Festas Diurnas">Festas Diurnas</option><option value="Encontros">Encontros</option><option value="Balada e Noite">Balada e Noite</option><option value="Eventos Formais">Eventos Formais</option></select></div>
+        <div class="field" style="grid-column: 1 / -1;"><label>Ocasiões <span style="color:var(--ink-faint)">(marque todas que se aplicam)</span></label>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;" id="pOcasiWrap">
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Dias Quentes"> ☀️ Dias Quentes</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Dias Frios"> ❄️ Dias Frios</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Diurno"> 🌅 Diurno</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Noturno"> 🌃 Noturno</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Casual / Trabalho"> 💼 Casual / Trabalho</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Formal / Eventos"> 👔 Formal / Eventos</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Romântico / Encontros"> ❤️ Romântico / Encontros</label>
+            <label class="chk-btn"><input type="checkbox" class="pOcasi-chk" value="Balada / Festas"> 🪩 Balada / Festas</label>
+          </div>
+        </div>
         <div class="field"><label for="pPreco">Preço de venda (R$)</label><input type="number" id="pPreco" min="0" step="0.01" value="90"></div>
       </div>
       <div class="fgrid" style="margin-top:10px">
@@ -167,7 +178,17 @@
   </div>
   <div class="filters">
     <select id="filProdGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
-    <select id="filProdOcasi"><option value="">Todas as ocasiões</option><option value="Dia a dia e Trabalho">Dia a dia e Trabalho</option><option value="Esportes e Lazer">Esportes e Lazer</option><option value="Festas Diurnas">Festas Diurnas</option><option value="Encontros">Encontros</option><option value="Balada e Noite">Balada e Noite</option><option value="Eventos Formais">Eventos Formais</option></select>
+    <select id="filProdOcasi">
+      <option value="">Todas as ocasiões</option>
+      <option value="Dias Quentes">Dias Quentes</option>
+      <option value="Dias Frios">Dias Frios</option>
+      <option value="Diurno">Diurno</option>
+      <option value="Noturno">Noturno</option>
+      <option value="Casual / Trabalho">Casual / Trabalho</option>
+      <option value="Formal / Eventos">Formal / Eventos</option>
+      <option value="Romântico / Encontros">Romântico / Encontros</option>
+      <option value="Balada / Festas">Balada / Festas</option>
+    </select>
     <select id="filProdFam"><option value="">Todas as famílias</option></select>
     <select id="filProdTester"><option value="">Com e sem provador</option><option value="sim">Só com provador</option><option value="nao">Só sem provador</option><option value="caminho">Provador a caminho</option></select>
     <select id="filProdFoto"><option value="">Todas as fotos</option><option value="semProd">Sem foto do produto</option><option value="semInsp">Sem foto da inspiração</option><option value="semAmbas">Sem nenhuma foto</option><option value="comAmbas">Com as duas fotos</option></select>

@@ -151,9 +151,9 @@ body.publico{background:#fff}
 #vitrine .filtros-grupo { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; max-width: 700px; }
 #vitrine .filtros-titulo { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; }
 #vitrine .filtros{display:flex;gap:8px;justify-content:center;flex-wrap:wrap; width: 100%;}
-#vitrine .chk-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap;transition:all 0.2s;cursor:pointer;}
-#vitrine .chk-btn:hover{border-color:var(--ink-faint);}
-#vitrine .chk-btn input{margin:0;cursor:pointer;width:auto;min-height:auto;accent-color:var(--ink);}
+.chk-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap;transition:all 0.2s;cursor:pointer;}
+.chk-btn:hover{border-color:var(--ink-faint);}
+.chk-btn input{margin:0;cursor:pointer;width:auto;min-height:auto;accent-color:var(--ink);}
 #vitrine .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 #vitrine .item{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);
   display:flex;flex-direction:column}
@@ -786,8 +786,8 @@ input[type="date"] {
 .crm-suggestions { margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(11, 99, 206, 0.2); }
 .crm-sug-item { display: inline-block; background: #fff; border: 1px solid var(--azul); color: var(--azul); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-bottom: 6px; cursor: default; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-#vitrine .chk-btn input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-#vitrine .chk-btn input { outline: none; }
+.chk-btn input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.chk-btn input { outline: none; }
 /* Ajustar o botão de limpar filtros */
 .btn-limpar-filtros { display: none; align-items: center; justify-content: center; background: none; border: none; font-size: 13px; color: var(--ink-faint); font-weight: 600; text-decoration: underline; cursor: pointer; padding: 8px; }
 .btn-limpar-filtros:hover { color: var(--ink); }
