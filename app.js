@@ -3218,16 +3218,26 @@ function desenhaVitrine(c, auth){
       <div class="rive">LA RIVE</div>
       <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
-    <div class="filtros" style="gap:8px">
-      <button class="fbtn on" data-f="*">Todas</button>
-      <button class="fbtn" data-f="Masculino">Homens</button>
-      <button class="fbtn" data-f="Feminino">Mulheres</button>
-      <button class="fbtn" data-f="Dia a dia e Trabalho">☀️ Dia a dia</button>
-      <button class="fbtn" data-f="Esportes e Lazer">🏃 Esportes</button>
-      <button class="fbtn" data-f="Festas Diurnas">🥂 Festas (Dia)</button>
-      <button class="fbtn" data-f="Encontros">❤️ Encontros</button>
-      <button class="fbtn" data-f="Balada e Noite">🪩 Balada/Noite</button>
-      <button class="fbtn" data-f="Eventos Formais">👔 Formais</button>
+    <div class="filtros-container">
+      <div class="filtros-grupo">
+        <div class="filtros-titulo">Gênero</div>
+        <div class="filtros" style="gap:8px">
+          <button class="fbtn on" data-f="*">Todas</button>
+          <button class="fbtn" data-f="Masculino">Homens</button>
+          <button class="fbtn" data-f="Feminino">Mulheres</button>
+        </div>
+      </div>
+      <div class="filtros-grupo">
+        <div class="filtros-titulo">Ocasião</div>
+        <div class="filtros" style="gap:8px">
+          <button class="fbtn" data-f="Dia a dia e Trabalho">☀️ Dia a dia</button>
+          <button class="fbtn" data-f="Esportes e Lazer">🏃 Esportes</button>
+          <button class="fbtn" data-f="Festas Diurnas">🥂 Festas (Dia)</button>
+          <button class="fbtn" data-f="Encontros">❤️ Encontros</button>
+          <button class="fbtn" data-f="Balada e Noite">🪩 Balada/Noite</button>
+          <button class="fbtn" data-f="Eventos Formais">👔 Formais</button>
+        </div>
+      </div>
     </div>
     <div class="grade">${itens.map(card).join('')}</div>
 
