@@ -776,6 +776,7 @@ function abreFicha(id){
     kpi('Preferido', r.favorito||'sem repetição', 'roxo', r.ultima?('última em '+dt(r.ultima)):'')
   ].join('');
   
+  const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
   let crmBlock = document.getElementById('fichaCrm');
   if(!crmBlock) {
     crmBlock = document.createElement('div');
@@ -852,7 +853,7 @@ function abreFicha(id){
     crmBlock.innerHTML = '';
   }
 
-  const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  
   $('#fichaTab').innerHTML = vs.length
     ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
       vs.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
