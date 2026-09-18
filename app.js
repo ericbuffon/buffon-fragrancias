@@ -32,7 +32,7 @@ const COR_OCASIAO = {
   "Romântico / Encontros": "vermelho",
   "Balada / Festas": "rosa"
 };
-const badgeOcasiao = o => `<span class="badge ${COR_OCASIAO[o] || 'cinza'}" style="font-size:10.5px; font-weight:700; padding: 3px 8px;">${esc(o)}</span>`;
+const badgeOcasiao = o => `<span class="badge" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef;">${esc(o)}</span>`;
 
 const SEED = {"products":[],"purchases":[],"sales":[],"expenses":[],"consignments":[],"clients":[]};
 const PATCH_COMPRAS = [];
@@ -2234,9 +2234,9 @@ function itemHTML(p, n, opt){
       <div class="topolinha"><span class="num">${String(n).padStart(2,'0')}</span>
         ${(opt.marcaTester && p.tester)?`<span class="selotest">provador disponível</span>`:''}</div>
       <div class="nome">${esc(p.nome)}</div>
-      <div class="edp">${[p.conc, p.vol, p.genero==='Feminino'?'Feminino':'Masculino'].filter(Boolean).join(' · ')}</div>
+      <div class="edp" style="text-transform: none; letter-spacing: normal; font-weight: 500;">${[p.conc, p.vol, p.genero==='Feminino'?'Feminino':'Masculino'].filter(Boolean).join(' · ')}</div>
       ${p.familia?`<div class="fam">${esc(p.familia)}</div>`:''}
-      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => badgeOcasiao(o)).join('')}</div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
       <div class="regua"></div>
       ${algumaNota
         ? `<div class="piramide">${piramideSVG(acc,tem)}<div class="niveis">
@@ -3438,13 +3438,11 @@ function desenhaVitrine(c, auth){
     <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
-      <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
-      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => badgeOcasiao(o)).join('')}</div>`:''}
-      ${p.inspiracao?`<div class="insp">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
-      ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
-        ${p.topo?`<b>Topo</b> ${esc(p.topo)}<br>`:''}
-        ${p.coracao?`<b>Coração</b> ${esc(p.coracao)}<br>`:''}
-        ${p.fundo?`<b>Fundo</b> ${esc(p.fundo)}`:''}</div>`:''}
+      <div class="sub" style="text-transform: none; letter-spacing: normal; color: var(--ink-soft); font-size: 12px; margin-top: 2px; font-weight: 500;">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
+      ${p.inspiracao?`<div class="insp" style="margin-top:8px;">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
+      ${(p.topo||p.coracao||p.fundo)?`<div class="notas" style="font-size:12px; color:var(--ink-soft); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; margin-top:6px;">
+        <b>Notas:</b> ${[p.topo, p.coracao, p.fundo].filter(Boolean).map(esc).join(', ')}</div>`:''}
       <div class="rodape">
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
         ${p.tester?'<span class="badge dourado">tem provador</span>':''}
