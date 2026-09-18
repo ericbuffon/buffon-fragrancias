@@ -8,7 +8,7 @@ let data = {products:[],purchases:[],sales:[],expenses:[],consignments:[]};
 let edit = {prod:null,com:null,ven:null,des:null,con:null,cli:null};
 let fotos = {prod:'', insp:''};
 let fil = {
-  prodGen:'',prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
+  prodGen:'',prodOcasi:'',prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
   venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,
   estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
@@ -73,7 +73,7 @@ function migra(){
     data.clientesCriados = true;
   }
   data.products.forEach(p=>{ if(!p.id)p.id=uid(); if(p.foto===undefined)p.foto=''; if(p.fotoInsp===undefined)p.fotoInsp=''; if(p.marcaInsp===undefined)p.marcaInsp='';
-    ['familia','notasTopo','notasCoracao','notasFundo','concentracao','volume'].forEach(k=>{ if(p[k]===undefined)p[k]=''; });
+    ['familia','notasTopo','notasCoracao','notasFundo','concentracao','volume','ocasiao'].forEach(k=>{ if(p[k]===undefined)p[k]=''; });
     if(p.temTester===undefined) p.temTester = ''; });
   data.purchases.forEach(c=>{ if(!c.id)c.id=uid(); if(!c.entregue)c.entregue='Sim'; });
   data.sales.forEach(v=>{ if(!v.id)v.id=uid(); if(!v.entregue)v.entregue='Sim';
@@ -147,14 +147,42 @@ function aplicaPatchFamilia(){
   return n;
 }
 
+const PATCH_OCASIAO = {"I Am Ideal": "Dia a dia e Trabalho", "Charisme": "Dia a dia e Trabalho", "Cuté": "Dia a dia e Trabalho", "Miss Dream Pink": "Dia a dia e Trabalho", "Ironstone": "Dia a dia e Trabalho", "Extreme Story": "Dia a dia e Trabalho", "The Greatest": "Dia a dia e Trabalho", "Fearless Man": "Dia a dia e Trabalho", "Saffira": "Esportes e Lazer", "Aqua Man": "Esportes e Lazer", "Absolute Sport Men": "Esportes e Lazer", "Brave": "Esportes e Lazer", "315 Prestige Pink": "Festas Diurnas", "Her Choice": "Festas Diurnas", "Poetique": "Festas Diurnas", "Black Fury": "Festas Diurnas", "Look of Woman": "Encontros", "LR Password": "Encontros", "Heroic Man": "Encontros", "Cabana": "Encontros", "Miss Dream": "Balada e Noite", "Wild Kiss": "Balada e Noite", "Queen of Life": "Balada e Noite", "Eternal Kiss": "Balada e Noite", "Cash Woman": "Balada e Noite", "315 Prestige Black": "Balada e Noite", "Cash for Man": "Balada e Noite", "Just On Time": "Balada e Noite", "315 Prestige": "Balada e Noite", "Madame Isabelle": "Eventos Formais", "In Love": "Eventos Formais", "Destinée": "Eventos Formais", "In Flames": "Eventos Formais", "Black Water": "Eventos Formais", "Steel Essence": "Eventos Formais", "The Hunting Man": "Eventos Formais", "In Woman": "Eventos Formais", "Sweet Velvet": "Dia a dia e Trabalho", "Metaphor": "Balada e Noite", "Aftermath": "Dia a dia e Trabalho", "La Rive Isabel": "Eventos Formais"};
+
+function sugerirOcasiao(p) {
+  const texto = [p.familia, p.descricao, p.notasTopo, p.notasCoracao, p.notasFundo].join(' ').toLowerCase();
+  
+  if (texto.includes('gourmand') || texto.includes('balada') || texto.includes('noite') || texto.includes('noturna') || texto.includes('intensa') || texto.includes('provocante') || texto.includes('café') || texto.includes('praliné')) return "Balada e Noite";
+  if (texto.includes('sedutora') || texto.includes('envolvente') || texto.includes('misteriosa') || texto.includes('sensual') || texto.includes('couro')) return "Encontros";
+  if (texto.includes('formal') || texto.includes('imponente') || texto.includes('clássica') || texto.includes('opulenta') || texto.includes('poderosa') || texto.includes('sofisticada') || texto.includes('chipre')) return "Eventos Formais";
+  if (texto.includes('aquática') || texto.includes('esportiva') || texto.includes('cítrica') || texto.includes('solar') || texto.includes('energética') || texto.includes('marinha')) return "Esportes e Lazer";
+  if (texto.includes('festa') || texto.includes('espumante') || texto.includes('alegre') || texto.includes('vibrante') || texto.includes('romântica') || texto.includes('frutada')) return "Festas Diurnas";
+  if (texto.includes('amadeirada')) return "Eventos Formais";
+  
+  return "Dia a dia e Trabalho";
+}
+
+function aplicaPatchOcasiao(){
+  if(data.patchOcasiao2) return 0;
+  let n=0;
+  data.products.forEach(p=>{
+    if(!p.ocasiao) { 
+      p.ocasiao = PATCH_OCASIAO[p.nome] || sugerirOcasiao(p); 
+      n++; 
+    }
+  });
+  data.patchOcasiao2 = true;
+  return n;
+}
+
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
     if(raw){ data = Object.assign({products:[],purchases:[],sales:[],expenses:[],consignments:[]}, JSON.parse(raw));
-      migra(); const a=aplicaPatchCompras(), b=aplicaPatchFicha(), c=aplicaPatchFamilia(); if(a||b||c) save(); return; }
+      migra(); const a=aplicaPatchCompras(), b=aplicaPatchFicha(), c=aplicaPatchFamilia(), d=aplicaPatchOcasiao(); if(a||b||c||d) save(); return; }
   }catch(e){ flag('vermelho','este navegador bloqueou o salvamento — use backup'); }
   data = JSON.parse(JSON.stringify(SEED));
-  migra(); aplicaPatchCompras(); aplicaPatchFicha(); aplicaPatchFamilia(); save();
+  migra(); aplicaPatchCompras(); aplicaPatchFicha(); aplicaPatchFamilia(); aplicaPatchOcasiao(); save();
 }
 function flag(c,t){ $('#dot').style.background=`var(--${c})`; $('#saveTxt').textContent=t; }
 let tmr;
@@ -435,7 +463,7 @@ window.addEventListener('popstate', e=>{
 
 /* ---------------- limpar filtros ---------------- */
 const GRUPOS = {
-  prod:{campos:['prodGen','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
+  prod:{campos:['prodGen','prodOcasi','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodOcasi:'#filProdOcasi',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
   ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
   est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
@@ -1259,6 +1287,7 @@ $('#tInad').addEventListener('click', e=>{
 function renderProd(){
   let rows = data.products.map(p=>({...p, temFoto:p.foto?1:0, temInsp:p.fotoInsp?1:0, provador: temProvador(p)?1:0}));
   if(fil.prodGen) rows = rows.filter(p=>p.genero===fil.prodGen);
+  if(fil.prodOcasi) rows = rows.filter(p=>p.ocasiao===fil.prodOcasi);
   if(fil.prodFam) rows = rows.filter(p=>p.familia===fil.prodFam);
   if(fil.prodTester==='sim') rows = rows.filter(p=>temProvador(p));
   if(fil.prodTester==='nao') rows = rows.filter(p=>!temProvador(p));
@@ -1685,7 +1714,7 @@ $('#fProd').addEventListener('submit',e=>{
     familia:$('#pFam').value.trim(), notasTopo:$('#pTopo').value.trim(),
     notasCoracao:$('#pCoracao').value.trim(), notasFundo:$('#pFundo').value.trim(),
     concentracao:$('#pConc').value, volume:$('#pVol').value.trim(), temTester:$('#pTester').value,
-    genero:$('#pGen').value,
+    genero:$('#pGen').value, ocasiao:$('#pOcasi').value,
     precoVenda:Number($('#pPreco').value)||90,
     foto:fotos.prod, fotoInsp:fotos.insp};
   if(edit.prod){
@@ -1698,7 +1727,7 @@ $('#fProd').addEventListener('submit',e=>{
   } else data.products.push({id:uid(),...payload});
   resetProd(); save(); renderAll();
 });
-function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino';  $('#pPreco').value=90;
+function resetProd(){ $('#fProd').reset(); $('#pTester').value='auto'; $('#pGen').value='Masculino'; $('#pOcasi').value=''; $('#pPreco').value=90;
   setFotoPrev('prod',''); setFotoPrev('insp',''); }
 function cancProd(){ edit.prod=null; resetProd(); $('#tProdForm').textContent='Novo produto';
   $('#bProd').textContent='Adicionar produto'; $('#cancProd').hidden=true; }
@@ -1710,7 +1739,7 @@ $('#tProd').addEventListener('click',e=>{
     $('#pMarca').value=p.marcaInsp||''; $('#pFam').value=p.familia||'';
     $('#pTopo').value=p.notasTopo||''; $('#pCoracao').value=p.notasCoracao||'';
     $('#pFundo').value=p.notasFundo||''; $('#pConc').value=p.concentracao||'';
-    $('#pVol').value=p.volume||''; $('#pTester').value=modoProvador(p)==='manual'?p.temTester:'auto'; $('#pGen').value=p.genero;
+    $('#pVol').value=p.volume||''; $('#pTester').value=modoProvador(p)==='manual'?p.temTester:'auto'; $('#pGen').value=p.genero; $('#pOcasi').value=p.ocasiao||'';
      $('#pPreco').value=p.precoVenda;
     setFotoPrev('prod',p.foto||''); setFotoPrev('insp',p.fotoInsp||'');
     $('#tProdForm').textContent='Editando: '+p.nome; $('#bProd').textContent='Salvar alterações'; $('#cancProd').hidden=false;
@@ -1886,7 +1915,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lightbox').cla
 const LIGA = [
   ['#filProdTester','prodTester','change',renderProd],
   ['#filProdFam','prodFam','change',renderProd],
-  ['#filProdGen','prodGen','change',renderProd],['#filProdFoto','prodFoto','change',renderProd],['#filProdBusca','prodQ','input',renderProd],
+  ['#filProdGen','prodGen','change',renderProd],['#filProdOcasi','prodOcasi','change',renderProd],['#filProdFoto','prodFoto','change',renderProd],['#filProdBusca','prodQ','input',renderProd],
   ['#filComGen','comGen','change',renderCom],['#filComTipo','comTipo','change',renderCom],['#filComEnt','comEnt','change',renderCom],
   ['#filComDe','comDe','change',renderCom],['#filComAte','comAte','change',renderCom],['#filComBusca','comQ','input',renderCom],
   ['#filVenCanal','venCanal','change',renderVen],
@@ -1956,7 +1985,7 @@ function piramideSVG(acc, tem){
 }
 /* formato único usado pelo catálogo impresso e pelo link público */
 const paraCatalogo = p => ({
-  nome:p.nome, genero:p.genero, inspiracao:p.inspiracao, marca:p.marcaInsp, familia:p.familia,
+  nome:p.nome, genero:p.genero, inspiracao:p.inspiracao, marca:p.marcaInsp, familia:p.familia, ocasiao:p.ocasiao||'',
   conc:p.concentracao, vol:p.volume, topo:p.notasTopo, coracao:p.notasCoracao, fundo:p.notasFundo,
   tester:temProvador(p), preco:Number(p.precoVenda)||0, foto:p.foto||'', fotoInsp:p.fotoInsp||''
 });
@@ -2347,7 +2376,7 @@ function exportaXlsx(g){
 /* ---------------- relatórios por tela ---------------- */
 const RELATORIOS = {
   prod:{titulo:'Catálogo de produtos', tabela:'#tProd', contador:'#cntProd',
-    filtros:()=>[['Gênero',fil.prodGen],['Família',fil.prodFam],['Provador',{sim:'só com provador',nao:'só sem provador'}[fil.prodTester]],['Fotos',{semProd:'sem foto do produto',semInsp:'sem foto da inspiração',semAmbas:'sem nenhuma foto',comAmbas:'com as duas fotos'}[fil.prodFoto]],['Busca',fil.prodQ]]},
+    filtros:()=>[['Gênero',fil.prodGen],['Ocasião',fil.prodOcasi],['Família',fil.prodFam],['Provador',{sim:'só com provador',nao:'só sem provador'}[fil.prodTester]],['Fotos',{semProd:'sem foto do produto',semInsp:'sem foto da inspiração',semAmbas:'sem nenhuma foto',comAmbas:'com as duas fotos'}[fil.prodFoto]],['Busca',fil.prodQ]]},
   com:{titulo:'Compras', tabela:'#tCom', contador:'#cntCom',
     filtros:()=>[['Gênero',fil.comGen],['Tipo',fil.comTipo],['Situação',fil.comEnt==='Sim'?'recebidas':fil.comEnt==='Não'?'a caminho':''],['Período',periodo(fil.comDe,fil.comAte)],['Busca',fil.comQ]]},
   ven:{titulo:'Vendas', tabela:'#tVen', contador:'#cntVen',
@@ -2680,7 +2709,7 @@ function montaPublico(opt){
     emitido: new Date().toISOString(),
     itens: [...bloco('Masculino'), ...bloco('Feminino')].map(p=>({
       nome:p.nome, genero:p.genero, inspiracao:p.inspiracao, marca:p.marcaInsp,
-      familia:p.familia, conc:p.concentracao, vol:p.volume,
+      familia:p.familia, conc:p.concentracao, vol:p.volume, ocasiao:p.ocasiao||'',
       topo:p.notasTopo, coracao:p.notasCoracao, fundo:p.notasFundo,
       tester:temProvador(p),
       preco: opt.preco ? Number(p.precoVenda)||0 : null,
@@ -3161,11 +3190,12 @@ function desenhaVitrine(c, auth){
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const zapLink = t => zapNum ? `https://wa.me/${zapNum.length<=11?'55'+zapNum:zapNum}?text=${encodeURIComponent(t)}` : '';
   const foto = (src, alt, isRef) => src ? `<div style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;"><img src="${src}" alt="${esc(alt)}">${isRef ? '<div style="position:absolute; left:0; right:0; bottom:6px; text-align:center; font-size:8px; color:var(--ink); opacity:0.65; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; line-height:1.1; white-space:nowrap;">Referência Olfativa</div>' : ''}</div>` : `<div><span class="vazio">sem foto</span></div>`;
-  const card = p => `<div class="item" data-g="${p.genero}">
+  const card = p => `<div class="item" data-g="${p.genero}" data-o="${esc(p.ocasiao)}">
     <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
+      ${p.ocasiao?`<div style="font-size:12.5px; color:var(--accent); font-weight:600; margin-top:4px;">🎯 ${esc(p.ocasiao)}</div>`:''}
       ${p.inspiracao?`<div class="insp">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
         ${p.topo?`<b>Topo</b> ${esc(p.topo)}<br>`:''}
@@ -3188,10 +3218,16 @@ function desenhaVitrine(c, auth){
       <div class="rive">LA RIVE</div>
       <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
-    <div class="filtros">
-      <button class="fbtn on" data-f="">Todas (${itens.length})</button>
-      <button class="fbtn" data-f="Masculino">Masculinas (${itens.filter(p=>p.genero==='Masculino').length})</button>
-      <button class="fbtn" data-f="Feminino">Femininas (${itens.filter(p=>p.genero==='Feminino').length})</button>
+    <div class="filtros" style="gap:8px">
+      <button class="fbtn on" data-f="*">Todas</button>
+      <button class="fbtn" data-f="Masculino">Homens</button>
+      <button class="fbtn" data-f="Feminino">Mulheres</button>
+      <button class="fbtn" data-f="Dia a dia e Trabalho">☀️ Dia a dia</button>
+      <button class="fbtn" data-f="Esportes e Lazer">🏃 Esportes</button>
+      <button class="fbtn" data-f="Festas Diurnas">🥂 Festas (Dia)</button>
+      <button class="fbtn" data-f="Encontros">❤️ Encontros</button>
+      <button class="fbtn" data-f="Balada e Noite">🪩 Balada/Noite</button>
+      <button class="fbtn" data-f="Eventos Formais">👔 Formais</button>
     </div>
     <div class="grade">${itens.map(card).join('')}</div>
 
@@ -3216,10 +3252,18 @@ function desenhaVitrine(c, auth){
 
   $('#vitrine').addEventListener('click', e=>{
     const b=e.target.closest('.fbtn'); if(!b) return;
-    document.querySelectorAll('#vitrine .fbtn').forEach(x=>x.classList.toggle('on', x===b));
+    document.querySelectorAll('#vitrine .fbtn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
     const f=b.dataset.f;
     document.querySelectorAll('#vitrine .item').forEach(it=>{
-      it.style.display = (!f || it.dataset.g===f) ? '' : 'none'; });
+      if (f === '*') {
+        it.style.display = '';
+      } else if (f === 'Masculino' || f === 'Feminino') {
+        it.style.display = (it.dataset.g === f) ? '' : 'none';
+      } else {
+        it.style.display = (it.dataset.o === f) ? '' : 'none';
+      }
+    });
   });
 }
 
