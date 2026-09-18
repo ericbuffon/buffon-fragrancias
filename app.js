@@ -3252,7 +3252,7 @@ function desenhaVitrine(c, auth){
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
-      ${p.ocasiao?`<div style="font-size:12.5px; color:var(--accent); font-weight:600; margin-top:4px;">🎯 ${esc(p.ocasiao)}</div>`:''}
+      ${p.ocasiao?`<div style="margin-top:6px;"><span class="badge" style="background:var(--line2); color:var(--ink); font-size:11px;">${esc(p.ocasiao)}</span></div>`:''}
       ${p.inspiracao?`<div class="insp">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
         ${p.topo?`<b>Topo</b> ${esc(p.topo)}<br>`:''}
@@ -3275,23 +3275,23 @@ function desenhaVitrine(c, auth){
       <div class="rive">LA RIVE</div>
       <p>As melhores inspirações da perfumaria internacional.</p>
     </div>
-    <div style="text-align: center; margin: 1.5rem 0 0.5rem;">
-      <button id="btnToggleFiltros" class="btn" style="border-radius: 20px; font-weight: 600; padding: 8px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-        Filtrar Perfumes <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
-      </button>
-    </div>
-    <div id="vitrineFiltrosWrap" class="filtros-container oculto">
-      <div class="filtros-grupo">
-        <div class="filtros-titulo">Gênero</div>
-        <div class="filtros" style="gap:8px">
+    <div style="display: flex; gap: 12px; justify-content: center; margin: 1.5rem 0 1rem;">
+      <div class="dropdown-filtro">
+        <button class="dropdown-btn" data-drop="gen">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+          Gênero <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
+        </button>
+        <div id="drop-gen" class="dropdown-content oculto">
           <label class="chk-btn"><input type="checkbox" class="fchk" name="gen" value="Masculino"> Homens</label>
           <label class="chk-btn"><input type="checkbox" class="fchk" name="gen" value="Feminino"> Mulheres</label>
         </div>
       </div>
-      <div class="filtros-grupo">
-        <div class="filtros-titulo">Ocasião</div>
-        <div class="filtros" style="gap:8px">
+      <div class="dropdown-filtro">
+        <button class="dropdown-btn" data-drop="occ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+          Ocasião <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
+        </button>
+        <div id="drop-occ" class="dropdown-content oculto">
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dia a dia e Trabalho"> ☀️ Dia a dia</label>
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Esportes e Lazer"> 🏃 Esportes</label>
           <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Festas Diurnas"> 🥂 Festas (Dia)</label>
@@ -3323,14 +3323,28 @@ function desenhaVitrine(c, auth){
     </div>`;
 
   $('#vitrine').addEventListener('click', e=>{
-    const btnToggle = e.target.closest('#btnToggleFiltros');
-    if (btnToggle) {
-      const wrap = document.getElementById('vitrineFiltrosWrap');
-      if (wrap) {
-        wrap.classList.toggle('oculto');
-        const seta = btnToggle.querySelector('.seta');
-        if(seta) seta.textContent = wrap.classList.contains('oculto') ? '▼' : '▲';
+    const btnDrop = e.target.closest('.dropdown-btn');
+    if (btnDrop) {
+      const targetId = 'drop-' + btnDrop.dataset.drop;
+      const content = document.getElementById(targetId);
+      // Fechar outros
+      document.querySelectorAll('.dropdown-content').forEach(el => {
+        if (el.id !== targetId) el.classList.add('oculto');
+      });
+      // Alternar o atual
+      if (content) {
+        content.classList.toggle('oculto');
+        const seta = btnDrop.querySelector('.seta');
+        if(seta) seta.textContent = content.classList.contains('oculto') ? '▼' : '▲';
       }
+    } else if (!e.target.closest('.dropdown-filtro') && !e.target.classList.contains('fchk')) {
+      // Se clicar fora, fecha tudo
+      document.querySelectorAll('.dropdown-content').forEach(el => {
+        el.classList.add('oculto');
+      });
+      document.querySelectorAll('.dropdown-btn .seta').forEach(el => {
+        el.textContent = '▼';
+      });
     }
   });
 
