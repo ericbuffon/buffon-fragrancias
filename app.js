@@ -1,3 +1,26 @@
+
+function salvaMemoriaCatalogo(opt){
+  try {
+    localStorage.setItem('perfumes.cat.opt', JSON.stringify(opt));
+  } catch(e) {}
+}
+
+function carregaMemoriaCatalogo(){
+  try {
+    const raw = localStorage.getItem('perfumes.cat.opt');
+    if(raw) {
+      const opt = JSON.parse(raw);
+      if($('#catGen')) $('#catGen').value = opt.genero || '';
+      if($('#catSoFoto')) $('#catSoFoto').checked = !!opt.soFoto;
+      if($('#catPreco')) $('#catPreco').checked = !!opt.preco;
+      if($('#catEstoque')) $('#catEstoque').checked = !!opt.soEstoque;
+      if($('#catTester')) $('#catTester').checked = !!opt.soTester;
+      if($('#catMarcaTester')) $('#catMarcaTester').checked = !!opt.marcaTester;
+      if($('#catContato')) $('#catContato').value = opt.contato || '';
+    }
+  } catch(e) {}
+}
+
 const SEED = {"products":[],"purchases":[],"sales":[],"expenses":[],"consignments":[],"clients":[]};
 const PATCH_COMPRAS = [];
 const PATCH_FICHA = [{"nome":"Fearless Man","marcaInsp":"Yves Saint Laurent","descricao":"Floral amadeirada com flor de laranjeira, patchouli e almíscar. Moderna, limpa e elegante."},{"nome":"Saffira","marcaInsp":"Xerjoff","descricao":"Frutada almiscarada com cítricos e âmbar. Solar, doce e viciante."},{"nome":"Aqua Man","marcaInsp":"Giorgio Armani","descricao":"Aquática cítrica com bergamota, alecrim e notas marinhas. Fresca, leve e atemporal."},{"nome":"315 Prestige Black","marcaInsp":"Carolina Herrera","descricao":"Fougère aromática com absinto, lavanda e baunilha. Noturna, intensa e sedutora."},{"nome":"315 Prestige Pink","marcaInsp":"Carolina Herrera","descricao":"Floral frutada espumante, com pêssego e champanhe rosé. Jovem, festiva e vibrante."},{"nome":"Heroic Man","marcaInsp":"Giorgio Armani","descricao":"Aromática amadeirada com cardamomo, castanha e baunilha. Doce, envolvente e jovem."},{"nome":"Brave","marcaInsp":"Paco Rabanne","descricao":"Aquática amadeirada com toranja, louro e âmbar cinzento. Energética, esportiva e viciante."},{"nome":"Cash for Man","marcaInsp":"Paco Rabanne","descricao":"Especiada amadeirada com canela, couro e âmbar. Ousada, quente e marcante."},{"nome":"Extreme Story","marcaInsp":"Dior","descricao":"Fougère aromática com bergamota, pimenta e ambroxan. Fresca, potente e versátil."},{"nome":"Absolute Sport Men","marcaInsp":"Chanel","descricao":"Cítrica amadeirada com laranja, pimenta e almíscar. Fresca, esportiva e elegante."},{"nome":"315 Prestige","marcaInsp":"Carolina Herrera","descricao":"Amadeirada especiada com gengibre, vodka e couro. Urbana, festiva e marcante."},{"nome":"Black Water","marcaInsp":"Creed","descricao":"Frutada amadeirada com abacaxi, bétula e almíscar. Imponente, sofisticada e marcante."},{"nome":"Steel Essence","marcaInsp":"Jacques Bogart","descricao":"Aromática amadeirada com lavanda, cardamomo e sândalo. Fresca, sóbria e persistente."},{"nome":"Ironstone","marcaInsp":"Chanel","descricao":"Amadeirada aromática com cítricos, gengibre e sândalo. Sóbria, elegante e versátil."},{"nome":"The Greatest","marcaInsp":"Montblanc","descricao":"Amadeirada aromática com bergamota, vetiver e patchouli. Marcante, sofisticada e versátil."},{"nome":"Poetique","marcaInsp":"Parfums de Marly","descricao":"Floral frutada com lichia, rosa turca e ruibarbo. Refinada, doce e feminina."},{"nome":"Charisme","marcaInsp":"Prada","descricao":"Floral almiscarada moderna, com jasmim e âmbar. Contemporânea, limpa e sofisticada."},{"nome":"I Am Ideal","marcaInsp":"Lancôme","descricao":"Floral chipre com rosa e jasmim sobre fundo amadeirado. Limpa, elegante e feminina."},{"nome":"The Hunting Man","marcaInsp":"Azzaro","descricao":"Amadeirada especiada com gengibre, cardamomo e madeiras nobres. Vibrante, quente e masculina."},{"nome":"Her Choice","marcaInsp":"Giorgio Armani","descricao":"Floral branca com tuberosa e baunilha. Luminosa, moderna e envolvente."},{"nome":"Look of Woman","marcaInsp":"Narciso Rodriguez","descricao":"Almiscarada amadeirada com flor de laranjeira. Sensual, discreta e viciante."},{"nome":"Wild Kiss","marcaInsp":"Jean Paul Gaultier","descricao":"Floral gourmand com flor de laranjeira, mel e baunilha. Intensa, doce e sofisticada."},{"nome":"Queen of Life","marcaInsp":"Lancôme","descricao":"Floral gourmand com íris, praliné e patchouli. Doce, alegre e envolvente."},{"nome":"Eternal Kiss","marcaInsp":"Jean Paul Gaultier","descricao":"Floral gourmand com mel e gardênia. Doce, ousada e magnética."},{"nome":"Miss Dream","marcaInsp":"Carolina Herrera","descricao":"Floral gourmand com tuberosa, cacau e fava tonka. Sedutora, intensa e noturna."},{"nome":"In Flames","marcaInsp":"Paco Rabanne","descricao":"Floral aquática salgada com baunilha. Poderosa, radiante e marcante."},{"nome":"Madame Isabelle","marcaInsp":"Chanel","descricao":"Floral oriental com laranja, rosa e patchouli. Elegante, moderna e sofisticada."},{"nome":"Cuté","marcaInsp":"Chloé","descricao":"Floral almiscarada com rosa e peônia. Delicada, elegante e atemporal."},{"nome":"Black Fury","marcaInsp":"Ferrari","descricao":"Amadeirada especiada com cardamomo e âmbar. Vibrante, quente e masculina."},{"nome":"Cash Woman","marcaInsp":"Paco Rabanne","descricao":"Floral amadeirada com framboesa e mel. Luxuosa, marcante e envolvente."},{"nome":"Cabana","marcaInsp":"Jean Paul Gaultier","descricao":"Fougère oriental com lavanda, hortelã e baunilha. Doce, quente e inconfundível."},{"nome":"LR Password","marcaInsp":"Giorgio Armani","descricao":"Oriental amadeirada com bergamota, flor de laranjeira e fava tonka. Sedutora, sóbria e noturna."},{"nome":"Just On Time","marcaInsp":"Paco Rabanne","descricao":"Oriental amadeirada com gengibre, baunilha e almíscar. Sensual, quente e provocante."},{"nome":"Destinée","marcaInsp":"Yves Saint Laurent","descricao":"Floral aromática com lavanda e flor de laranjeira. Livre, quente e sensual."},{"nome":"In Love","marcaInsp":"Dior","descricao":"Floral buquê com ylang-ylang, rosa e jasmim. Clássica, opulenta e feminina."},{"nome":"Miss Dream Pink","marcaInsp":"Carolina Herrera","descricao":"Floral suave com jasmim, coco e sândalo. Luminosa, cremosa e delicada."}];
@@ -769,12 +792,17 @@ function abreFicha(id){
         const sug = estSaldos.slice(0, 3);
         
         if(sug.length > 0) {
+          const listaProdStr = sug.map(s => s.produto).join(', ');
+          const nomeCliente = cli.nome.split(' ')[0];
+          const textoZapSugestao = `Oi, ${nomeCliente}! Tudo bem? Lembrei de você! Como você gosta do ${pref}, separei algumas opções exclusivas da mesma família olfativa que tenho a pronta entrega: ${listaProdStr}. Quer dar uma olhada?`;
+          
           recomendacaoHTML = `
             <div class="crm-suggestions">
               <div style="font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;">💡 <b>O que oferecer agora?</b> Como o cliente gosta de <i>${pref}</i> (${fam}), você tem a pronta entrega:</div>
-              <div>
+              <div style="margin-bottom:10px;">
                 ${sug.map(s => `<span class="crm-sug-item" title="${s.saldo} unidades em estoque">${s.produto}</span>`).join('')}
               </div>
+              ${cli.telefone ? `<button class="btn sm primary" style="background:#1F7A44; border-color:#1F7A44; display:inline-flex; align-items:center; gap:6px; font-weight:600;" onclick="window.open('https://wa.me/${soDigitos(cli.telefone).length<=11?'55'+soDigitos(cli.telefone):soDigitos(cli.telefone)}?text=${encodeURIComponent(textoZapSugestao)}', '_blank')">🟢 Enviar sugestão</button>` : `<span class="mini-note" style="color:var(--vermelho);">Cadastre o WhatsApp do cliente para habilitar o envio da sugestão.</span>`}
             </div>`;
         } else {
           recomendacaoHTML = `
@@ -2213,12 +2241,15 @@ async function geraPdfCatalogoDireto(elCatalogo, filename){
   }
 }
 function opcoesCat(){
-  return {genero:$('#catGen').value, soFoto:$('#catSoFoto').checked,
+  const opt = {genero:$('#catGen').value, soFoto:$('#catSoFoto').checked,
     preco:$('#catPreco').checked, soEstoque:$('#catEstoque').checked,
     soTester:$('#catTester').checked, marcaTester:$('#catMarcaTester').checked,
     contato:$('#catContato').value};
+  salvaMemoriaCatalogo(opt);
+  return opt;
 }
 $('#btnCatalogo').addEventListener('click',()=>{
+  carregaMemoriaCatalogo();
   if(!data.products.length) return alert('Cadastre ao menos um produto antes de gerar o catálogo.');
   $('#catContato').value = (data.config && data.config.contato) || '';
   const jaTem = data.config && data.config.catalogoId && nvLigado();
