@@ -3444,29 +3444,7 @@ function desenhaVitrine(c, auth){
     </div>
     <div class="grade">${itens.map(card).join('')}</div>
 
-    <div style="margin: 3rem auto 1rem; max-width: 700px; padding: 2rem; background: var(--paper); border-radius: 12px; border: 1px solid var(--line); text-align: left;">
-      <h3 style="font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink); margin-bottom: 12px;">O ABC da Perfumaria</h3>
-      <p style="font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6;">Você tem certeza de que sabe como aplicar perfume para que as notas da fragrância se desenvolvam corretamente na sua pele?</p>
-      <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
-        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Aplique o perfume na pele limpa, lavada e seca.</li>
-        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Não esfregue o perfume no corpo.</li>
-        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Perfume as áreas de maior circulação sanguínea – a parte interna dos pulsos, dobras dos cotovelos e joelhos, e o pescoço.</li>
-        <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Lembre-se de que uma fragrância muito intensa pode incomodar as pessoas ao seu redor.</li>
-        <li style="display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Evite aplicar perfume nas roupas, pois pode ser difícil remover a fragrância depois.</li>
-      </ul>
-  <h4 style="font-family: 'Fraunces', serif; font-size: 18px; color: var(--ink); margin-top: 24px; margin-bottom: 12px;">Guia de Ocasiões</h4>
-  <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
-    <li style="margin-bottom: 12px;"><b>☀️ Dias Quentes:</b> Fragrâncias leves, frescas e revigorantes. Dominadas por notas cítricas, aquáticas e florais suaves.</li>
-    <li style="margin-bottom: 12px;"><b>❄️ Dias Frios:</b> Densos, quentes e acolhedores. Ricos em notas amadeiradas, especiarias, couro, âmbar e baunilha.</li>
-    <li style="margin-bottom: 12px;"><b>🌅 Diurno:</b> Versáteis, luminosos e enérgicos. Trazem uma sensação de banho tomado e frescor para acompanhar a rotina.</li>
-    <li style="margin-bottom: 12px;"><b>🌃 Noturno:</b> Misteriosos, marcantes e sedutores. Feitos para deixar um rastro inesquecível.</li>
-    <li style="margin-bottom: 12px;"><b>💼 Casual / Trabalho:</b> Conforto e elegância discreta. Transmitem profissionalismo sem invadir o espaço do colega.</li>
-    <li style="margin-bottom: 12px;"><b>👔 Formal / Eventos:</b> Sofisticação engarrafada. Imponentes, clássicos e refinados (chipres e amadeirados nobres).</li>
-    <li style="margin-bottom: 12px;"><b>❤️ Romântico / Encontros:</b> Envolventes e intimistas. Fundos levemente adocicados que instigam a aproximação.</li>
-    <li style="margin-bottom: 12px;"><b>🪩 Balada / Festas:</b> Ousados e de alta projeção. Misturam notas gourmand (doces) e madeiras fortes para você ser notado.</li>
-  </ul>
-
-    </div>
+    
     <div class="pe">
       <div>Disponibilidade sujeita a estoque — consulte antes de fechar o pedido.</div>
       <div>Atualizado em ${new Date(c.emitido).toLocaleDateString('pt-BR')}</div>
@@ -3801,11 +3779,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Comportamento do modal de dicas no catálogo
-  const btnDicas = document.getElementById('btnDicasPerfume');
   const modalDicas = document.getElementById('modalDicas');
-  if (btnDicas && modalDicas) {
-    btnDicas.addEventListener('click', () => modalDicas.classList.add('open'));
-    
+  if (modalDicas) {
     const fecharDicas = document.getElementById('fecharDicas');
     if (fecharDicas) fecharDicas.addEventListener('click', () => modalDicas.classList.remove('open'));
     
