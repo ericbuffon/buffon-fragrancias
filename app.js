@@ -3955,3 +3955,8 @@ document.getElementById('btnScrollUp')?.addEventListener('click', () => {
 document.getElementById('btnScrollDown')?.addEventListener('click', () => {
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 });
+
+document.getElementById('lFidelidade')?.addEventListener('click', e => {
+  const li = e.target.closest('[data-fichafid]');
+  if(li) abreFicha(li.dataset.fichafid);
+});
