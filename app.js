@@ -2219,7 +2219,6 @@ function opcoesCat(){
     contato:$('#catContato').value};
 }
 $('#btnCatalogo').addEventListener('click',()=>{
-  carregaMemoriaCatalogo();
   if(!data.products.length) return alert('Cadastre ao menos um produto antes de gerar o catálogo.');
   $('#catContato').value = (data.config && data.config.contato) || '';
   const jaTem = data.config && data.config.catalogoId && nvLigado();
