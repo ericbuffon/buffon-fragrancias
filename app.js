@@ -3896,3 +3896,12 @@ document.addEventListener('click', e => {
     }
   }
 });
+
+
+document.getElementById('btnScrollUp')?.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('btnScrollDown')?.addEventListener('click', () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+});
