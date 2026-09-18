@@ -741,6 +741,63 @@ function abreFicha(id){
     kpi('Lucro gerado', money(r.lucro), 'verde'),
     kpi('Preferido', r.favorito||'sem repetição', 'roxo', r.ultima?('última em '+dt(r.ultima)):'')
   ].join('');
+  
+  let crmBlock = document.getElementById('fichaCrm');
+  if(!crmBlock) {
+    crmBlock = document.createElement('div');
+    crmBlock.id = 'fichaCrm';
+    document.getElementById('fichaKpis').after(crmBlock);
+  }
+  
+  if (r.unidades > 0) {
+    const frascosFalta = 5 - (r.unidades % 5);
+    const atingiu = r.unidades % 5 === 0;
+    const msgFidelidade = atingiu
+      ? `🎉 <b>Meta de Fidelidade atingida!</b> O cliente chegou a ${r.unidades} frascos comprados. Considere oferecer um tester ou um desconto na próxima compra.`
+      : `🌟 <b>Fidelidade:</b> Faltam ${frascosFalta} frasco${frascosFalta>1?'s':''} para o cliente completar o ciclo de 5 compras.`;
+
+    let recomendacaoHTML = '';
+    const pref = r.favorito || (vs.length ? vs[0].produto : null);
+    if(pref) {
+      const pPref = byName(pref);
+      if(pPref && pPref.familia) {
+        const fam = pPref.familia;
+        const gen = pPref.genero;
+        // Filtra estoque com saldo positivo, mesma família e mesmo gênero, e tira o que o cliente já comprou (o preferido)
+        const estSaldos = estoque().filter(e => e.saldo > 0 && e.produto !== pref && e.familia === fam && e.genero === gen);
+        estSaldos.sort((a,b) => b.saldo - a.saldo);
+        const sug = estSaldos.slice(0, 3);
+        
+        if(sug.length > 0) {
+          recomendacaoHTML = `
+            <div class="crm-suggestions">
+              <div style="font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;">💡 <b>O que oferecer agora?</b> Como o cliente gosta de <i>${pref}</i> (${fam}), você tem a pronta entrega:</div>
+              <div>
+                ${sug.map(s => `<span class="crm-sug-item" title="${s.saldo} unidades em estoque">${s.produto}</span>`).join('')}
+              </div>
+            </div>`;
+        } else {
+          recomendacaoHTML = `
+            <div class="crm-suggestions">
+              <div style="font-size:12.5px; color:var(--ink-soft);">💡 <b>O que oferecer agora?</b> O cliente gosta de <i>${pref}</i> (${fam}), mas no momento você não tem opções dessa mesma família a pronta entrega.</div>
+            </div>`;
+        }
+      }
+    }
+
+    crmBlock.innerHTML = `
+      <div class="crm-box">
+        <div class="crm-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> 
+          Inteligência de Vendas
+        </div>
+        <div class="crm-text">${msgFidelidade}</div>
+        ${recomendacaoHTML}
+      </div>`;
+  } else {
+    crmBlock.innerHTML = '';
+  }
+
   const vs = r.vendas.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||''));
   $('#fichaTab').innerHTML = vs.length
     ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
