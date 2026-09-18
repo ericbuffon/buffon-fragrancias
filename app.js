@@ -223,14 +223,18 @@ function sugerirOcasiao(p) {
 }
 
 function aplicaPatchOcasiao(){
-  if(data.patchOcasiao3) return 0;
+  if(data.patchOcasiao4) return 0;
   let n=0;
   data.products.forEach(p=>{
-    if(!p.ocasioes || p.ocasioes.length === 0) { 
-      p.ocasioes = sugerirOcasiao(p); 
-      n++; 
+    const sugeridas = sugerirOcasiao(p);
+    const atuais = p.ocasioes || [];
+    const combinadas = [...new Set([...atuais, ...sugeridas])];
+    if (combinadas.length !== atuais.length) {
+      p.ocasioes = combinadas;
+      n++;
     }
   });
+  data.patchOcasiao4 = true;
   data.patchOcasiao3 = true;
   return n;
 }
