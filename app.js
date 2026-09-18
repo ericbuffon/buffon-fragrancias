@@ -3481,7 +3481,7 @@ function desenhaVitrine(c, auth){
         <li style="margin-bottom: 12px; display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Lembre-se de que uma fragrância muito intensa pode incomodar as pessoas ao seu redor.</li>
         <li style="display: flex; gap: 10px;"><span style="color: #D4AF37; font-weight: bold;">✓</span> Evite aplicar perfume nas roupas, pois pode ser difícil remover a fragrância depois.</li>
       </ul>
-  <h4 style="font-family: 'Fraunces', serif; font-size: 18px; color: var(--ink); margin-top: 24px; margin-bottom: 12px;">Guia de Ocasiões Buffon</h4>
+  <h4 style="font-family: 'Fraunces', serif; font-size: 18px; color: var(--ink); margin-top: 24px; margin-bottom: 12px;">Guia de Ocasiões</h4>
   <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6;">
     <li style="margin-bottom: 12px;"><b>☀️ Dias Quentes:</b> Fragrâncias leves, frescas e revigorantes. Dominadas por notas cítricas, aquáticas e florais suaves.</li>
     <li style="margin-bottom: 12px;"><b>❄️ Dias Frios:</b> Densos, quentes e acolhedores. Ricos em notas amadeiradas, especiarias, couro, âmbar e baunilha.</li>
@@ -3869,15 +3869,6 @@ function updateOcasiDropdown() {
   }
 }
 
-document.addEventListener('click', e => {
-  const btn = e.target.closest('#btnDropFormOcc');
-  const drop = document.getElementById('dropFormOcc');
-  if(btn) {
-    if (drop) drop.style.display = drop.style.display === 'flex' ? 'none' : 'flex';
-  } else if (!e.target.closest('#pOcasiDropdownWrapper') && drop) {
-    drop.style.display = 'none';
-  }
-});
 
 document.querySelectorAll('.pOcasi-chk').forEach(chk => {
   chk.addEventListener('change', updateOcasiDropdown);
