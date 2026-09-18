@@ -734,6 +734,87 @@ function abreFicha(id){
   const r = resumoCliente(cli.nome);
   $('#fichaNome').textContent = cli.nome;
   $('#fichaSub').textContent = [cli.telefone, cli.observacao].filter(Boolean).join(' · ') || 'Sem telefone cadastrado';
+  // FIDELIDADE
+  let fidelidadeMsg = '';
+  let fidelidadeCor = 'cinza';
+  if(r.unidades > 0) {
+      const resto = r.unidades % 5;
+      if(resto === 4) {
+          fidelidadeMsg = `🎁 Falta 1 frasco para completar um ciclo de 5 unidades. Que tal oferecer um desconto no próximo?`;
+          fidelidadeCor = "ambar";
+      } else if (resto === 0) {
+          fidelidadeMsg = `🎉 O cliente completou ${r.unidades} unidades compradas! Excelente momento para enviar um tester de brinde.`;
+          fidelidadeCor = "verde";
+      } else {
+          fidelidadeMsg = `🛍️ ${r.unidades} frascos comprados no total. Faltam ${5 - resto} para a marca de 5.`;
+          fidelidadeCor = "azul";
+      }
+  } else {
+      fidelidadeMsg = "Nenhuma compra finalizada ainda.";
+      fidelidadeCor = "cinza";
+  }
+  const elFidelidade = $('#fichaFidelidade');
+  if(elFidelidade) {
+      elFidelidade.innerHTML = `<div class="fidelidade-banner ${fidelidadeCor}">${fidelidadeMsg}</div>`;
+  }
+
+  // RECOMENDADOR
+  let recomendacoesHTML = '';
+  if(r.nCompras > 0) {
+      const basePerfumeName = r.favorito || r.vendas[0].produto;
+      const basePerfume = data.products.find(p => p.nome === basePerfumeName);
+      
+      if(basePerfume && basePerfume.familia) {
+          const familiaBase = basePerfume.familia;
+          const clientBought = new Set(r.vendas.map(v => v.produto));
+          
+          const emEstoque = estoque().filter(e => e.saldo > 0);
+          const similares = emEstoque
+              .filter(e => e.familia === familiaBase && !clientBought.has(e.produto))
+              .slice(0, 3);
+          
+          if(similares.length < 3) {
+              const fallback = emEstoque.filter(e => e.familia === familiaBase && clientBought.has(e.produto));
+              for(const f of fallback) {
+                  if(!similares.find(s => s.produto === f.produto) && similares.length < 3) similares.push(f);
+              }
+          }
+          
+          if(similares.length === 0) {
+             const fallbackGen = emEstoque.filter(e => e.genero === basePerfume.genero && !clientBought.has(e.produto));
+             similares.push(...fallbackGen.slice(0, 3));
+          }
+
+          if(similares.length > 0) {
+              const cards = similares.map(s => {
+                  const pData = data.products.find(x => x.nome === s.produto);
+                  const preco = pData ? money(pData.precoVenda) : '';
+                  const notasCompleta = pData ? [pData.notasTopo, pData.notasCoracao].filter(Boolean).join(', ') : '';
+                  const notas = notasCompleta.length > 45 ? notasCompleta.substring(0, 45) + '...' : notasCompleta;
+                  
+                  return `<div class="sugestao-card">
+                      <strong>${s.produto}</strong> <span class="badge ${s.genero === 'Feminino' ? 'rosa' : 'azul'}">${s.familia}</span>
+                      <div class="sug-notas">${notas}</div>
+                      <div class="sug-est">${s.saldo} un prontas · ${preco}</div>
+                  </div>`;
+              }).join('');
+              
+              const textZap = `Oi, ${cli.nome.split(' ')[0]}! Tudo bem? Lembrei de você porque sei que gosta do ${basePerfumeName}. Chegaram umas opções a pronta entrega na mesma pegada olfativa (${familiaBase}), quer dar uma olhada no catálogo?`;
+              
+              recomendacoesHTML = `
+                  <div class="recomendador">
+                      <div class="rec-title">💡 O que oferecer agora?</div>
+                      <div class="rec-sub">Baseado no gosto por <b>${basePerfumeName}</b> (${familiaBase}) e no seu estoque a pronta entrega.</div>
+                      <div class="rec-cards">${cards}</div>
+                      <button class="btn sm primary" style="margin-top:12px; width:100%" onclick="if(!'${soDigitos(cli.telefone)}') { alert('Cadastre o WhatsApp deste cliente primeiro.'); return; } window.open('${linkZap(cli, textZap)}', '_blank')">📱 Enviar Sugestões no WhatsApp</button>
+                  </div>
+              `;
+          }
+      }
+  }
+  const elRecomendacoes = $('#fichaRecomendacoes');
+  if(elRecomendacoes) elRecomendacoes.innerHTML = recomendacoesHTML;
+
   $('#fichaKpis').innerHTML = [
     kpi('Pedidos', r.pedidos, 'azul', `${r.nCompras} ${plural(r.nCompras,'item','itens')} · ${r.unidades} un`),
     kpi('Total gasto', money(r.total), 'verde', `ticket ${money(r.ticket)} por pedido`),
