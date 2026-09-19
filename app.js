@@ -37,7 +37,7 @@ const badgeOcasiao = o => `<span class="badge" style="background:#f1f3f5; color:
 
 const COR_FAMILIA = {
   "Amadeirado": "marrom-escuro",
-  "Cítrico": "dourado",
+  "Cítrico": "amarelo-claro",
   "Floral": "rosa",
   "Aromático": "verde",
   "Fougère": "oliva",

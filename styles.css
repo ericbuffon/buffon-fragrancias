@@ -805,4 +805,7 @@ input[type="date"] {
 .btn-limpar-filtros.mostrar { display: inline-flex; }
 
 /* Nova cor para Amadeirado */
-.badge.marrom-escuro { background: #603c23; color: #fff; border-color: #4a2b16; }
+.badge.marrom-escuro { background: #7c4a2a; color: #fff; border-color: #633b21; }
+
+/* Nova cor para Cítrico */
+.badge.amarelo-claro { background: #fdf0a6; color: #7a6000; border-color: #e5c94e; }
