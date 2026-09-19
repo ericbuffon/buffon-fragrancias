@@ -281,7 +281,8 @@
           <input id="venCanal" list="listaCanais" placeholder="Direto"><datalist id="listaCanais"></datalist></div>
         <div class="field"><label for="venCli">Cliente <span style="color:var(--ink-faint)">(opcional)</span></label>
           <input id="venCli" list="listaClientes" placeholder="deixe vazio se não souber"><datalist id="listaClientes"></datalist></div>
-        <div class="field"><label for="venStat">Pagamento</label><select id="venStat"><option>Pago</option><option>Pendente</option></select></div>
+        <div class="field"><label for="venStat">Pagamento</label><select id="venStat" onchange="document.getElementById('venPagoWrap').style.display = this.value==='Parcial' ? 'block' : 'none'"><option>Pago</option><option>Pendente</option><option value="Parcial">Parcial</option></select></div>
+        <div class="field" id="venPagoWrap" style="display:none"><label for="venPago">Valor pago (R$)</label><input type="number" id="venPago" min="0" step="0.01" placeholder="Ex: 50.00"></div>
         <div class="field"><label for="venEnt">Entrega</label><select id="venEnt"><option value="Sim">Entregue</option><option value="Não">Não entregue</option></select></div>
       </div>
       <div class="err" id="eVen"></div>
@@ -292,7 +293,7 @@
   <div class="filters">
     <select id="filVenGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
     <select id="filVenCanal"><option value="">Todos os canais</option></select>
-    <select id="filVenStat"><option value="">Todo pagamento</option><option>Pago</option><option>Pendente</option></select>
+    <select id="filVenStat"><option value="">Todo pagamento</option><option>Pago</option><option>Pendente</option><option value="Parcial">Parcial</option></select>
     <select id="filVenEnt"><option value="">Toda entrega</option><option value="Sim">Entregue</option><option value="Não">Não entregue</option></select>
     <input type="date" id="filVenDe" title="Data inicial"><span class="sep">até</span><input type="date" id="filVenAte" title="Data final">
     <input id="filVenBusca" placeholder="Buscar cliente ou produto…">

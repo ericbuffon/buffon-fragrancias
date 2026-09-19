@@ -34,6 +34,23 @@ const COR_OCASIAO = {
 };
 const badgeOcasiao = o => `<span class="badge" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef;">${esc(o)}</span>`;
 
+
+const COR_FAMILIA = {
+  "Amadeirado": "terra",
+  "Cítrico": "dourado",
+  "Floral": "rosa",
+  "Aromático": "verde",
+  "Fougère": "oliva",
+  "Ambarado": "laranja",
+  "Frutado": "vermelho",
+  "Chipre": "teal"
+};
+const badgeFamilia = f => {
+  if(!f) return '';
+  const cor = COR_FAMILIA[f] || 'cinza';
+  return `<span class="badge ${cor}">${esc(f)}</span>`;
+};
+
 const SEED = {"products":[],"purchases":[],"sales":[],"expenses":[],"consignments":[],"clients":[]};
 const PATCH_COMPRAS = [];
 const PATCH_FICHA = [{"nome":"Fearless Man","marcaInsp":"Yves Saint Laurent","descricao":"Floral amadeirada com flor de laranjeira, patchouli e almíscar. Moderna, limpa e elegante."},{"nome":"Saffira","marcaInsp":"Xerjoff","descricao":"Frutada almiscarada com cítricos e âmbar. Solar, doce e viciante."},{"nome":"Aqua Man","marcaInsp":"Giorgio Armani","descricao":"Aquática cítrica com bergamota, alecrim e notas marinhas. Fresca, leve e atemporal."},{"nome":"315 Prestige Black","marcaInsp":"Carolina Herrera","descricao":"Fougère aromática com absinto, lavanda e baunilha. Noturna, intensa e sedutora."},{"nome":"315 Prestige Pink","marcaInsp":"Carolina Herrera","descricao":"Floral frutada espumante, com pêssego e champanhe rosé. Jovem, festiva e vibrante."},{"nome":"Heroic Man","marcaInsp":"Giorgio Armani","descricao":"Aromática amadeirada com cardamomo, castanha e baunilha. Doce, envolvente e jovem."},{"nome":"Brave","marcaInsp":"Paco Rabanne","descricao":"Aquática amadeirada com toranja, louro e âmbar cinzento. Energética, esportiva e viciante."},{"nome":"Cash for Man","marcaInsp":"Paco Rabanne","descricao":"Especiada amadeirada com canela, couro e âmbar. Ousada, quente e marcante."},{"nome":"Extreme Story","marcaInsp":"Dior","descricao":"Fougère aromática com bergamota, pimenta e ambroxan. Fresca, potente e versátil."},{"nome":"Absolute Sport Men","marcaInsp":"Chanel","descricao":"Cítrica amadeirada com laranja, pimenta e almíscar. Fresca, esportiva e elegante."},{"nome":"315 Prestige","marcaInsp":"Carolina Herrera","descricao":"Amadeirada especiada com gengibre, vodka e couro. Urbana, festiva e marcante."},{"nome":"Black Water","marcaInsp":"Creed","descricao":"Frutada amadeirada com abacaxi, bétula e almíscar. Imponente, sofisticada e marcante."},{"nome":"Steel Essence","marcaInsp":"Jacques Bogart","descricao":"Aromática amadeirada com lavanda, cardamomo e sândalo. Fresca, sóbria e persistente."},{"nome":"Ironstone","marcaInsp":"Chanel","descricao":"Amadeirada aromática com cítricos, gengibre e sândalo. Sóbria, elegante e versátil."},{"nome":"The Greatest","marcaInsp":"Montblanc","descricao":"Amadeirada aromática com bergamota, vetiver e patchouli. Marcante, sofisticada e versátil."},{"nome":"Poetique","marcaInsp":"Parfums de Marly","descricao":"Floral frutada com lichia, rosa turca e ruibarbo. Refinada, doce e feminina."},{"nome":"Charisme","marcaInsp":"Prada","descricao":"Floral almiscarada moderna, com jasmim e âmbar. Contemporânea, limpa e sofisticada."},{"nome":"I Am Ideal","marcaInsp":"Lancôme","descricao":"Floral chipre com rosa e jasmim sobre fundo amadeirado. Limpa, elegante e feminina."},{"nome":"The Hunting Man","marcaInsp":"Azzaro","descricao":"Amadeirada especiada com gengibre, cardamomo e madeiras nobres. Vibrante, quente e masculina."},{"nome":"Her Choice","marcaInsp":"Giorgio Armani","descricao":"Floral branca com tuberosa e baunilha. Luminosa, moderna e envolvente."},{"nome":"Look of Woman","marcaInsp":"Narciso Rodriguez","descricao":"Almiscarada amadeirada com flor de laranjeira. Sensual, discreta e viciante."},{"nome":"Wild Kiss","marcaInsp":"Jean Paul Gaultier","descricao":"Floral gourmand com flor de laranjeira, mel e baunilha. Intensa, doce e sofisticada."},{"nome":"Queen of Life","marcaInsp":"Lancôme","descricao":"Floral gourmand com íris, praliné e patchouli. Doce, alegre e envolvente."},{"nome":"Eternal Kiss","marcaInsp":"Jean Paul Gaultier","descricao":"Floral gourmand com mel e gardênia. Doce, ousada e magnética."},{"nome":"Miss Dream","marcaInsp":"Carolina Herrera","descricao":"Floral gourmand com tuberosa, cacau e fava tonka. Sedutora, intensa e noturna."},{"nome":"In Flames","marcaInsp":"Paco Rabanne","descricao":"Floral aquática salgada com baunilha. Poderosa, radiante e marcante."},{"nome":"Madame Isabelle","marcaInsp":"Chanel","descricao":"Floral oriental com laranja, rosa e patchouli. Elegante, moderna e sofisticada."},{"nome":"Cuté","marcaInsp":"Chloé","descricao":"Floral almiscarada com rosa e peônia. Delicada, elegante e atemporal."},{"nome":"Black Fury","marcaInsp":"Ferrari","descricao":"Amadeirada especiada com cardamomo e âmbar. Vibrante, quente e masculina."},{"nome":"Cash Woman","marcaInsp":"Paco Rabanne","descricao":"Floral amadeirada com framboesa e mel. Luxuosa, marcante e envolvente."},{"nome":"Cabana","marcaInsp":"Jean Paul Gaultier","descricao":"Fougère oriental com lavanda, hortelã e baunilha. Doce, quente e inconfundível."},{"nome":"LR Password","marcaInsp":"Giorgio Armani","descricao":"Oriental amadeirada com bergamota, flor de laranjeira e fava tonka. Sedutora, sóbria e noturna."},{"nome":"Just On Time","marcaInsp":"Paco Rabanne","descricao":"Oriental amadeirada com gengibre, baunilha e almíscar. Sensual, quente e provocante."},{"nome":"Destinée","marcaInsp":"Yves Saint Laurent","descricao":"Floral aromática com lavanda e flor de laranjeira. Livre, quente e sensual."},{"nome":"In Love","marcaInsp":"Dior","descricao":"Floral buquê com ylang-ylang, rosa e jasmim. Clássica, opulenta e feminina."},{"nome":"Miss Dream Pink","marcaInsp":"Carolina Herrera","descricao":"Floral suave com jasmim, coco e sândalo. Luminosa, cremosa e delicada."}];
@@ -130,7 +147,8 @@ function migra(){
   data.purchases.forEach(c=>{ if(!c.id)c.id=uid(); if(!c.entregue)c.entregue='Sim'; });
   data.sales.forEach(v=>{ if(!v.id)v.id=uid(); if(!v.entregue)v.entregue='Sim';
     if(v.canal===undefined) v.canal='Direto';
-    if(v.cliente===undefined) v.cliente=''; });
+    if(v.cliente===undefined) v.cliente='';
+    if(v.valorPago===undefined) v.valorPago = (v.status==='Pago') ? Number(v.valorVenda) : 0; });
   data.expenses.forEach(d=>{ if(!d.id)d.id=uid(); });
   /* primeira carga: marca provador para quem já tem tester comprado.
      Roda depois do laço acima, senão o campo ainda não existe. */
@@ -361,7 +379,20 @@ function testers(){
 const bGen   = v => v==='Feminino'?'<span class="badge rosa">Feminino</span>':v==='Masculino'?'<span class="badge azul">Masculino</span>':'—';
 const bTipo  = v => v==='Tester'?'<span class="badge dourado">Tester</span>':'<span class="badge cinza">Lacrado</span>';
 const bEntC  = v => v==='Não'?'<span class="badge ambar">A caminho</span>':'<span class="badge verde">Recebida</span>';
-const bPag   = v => v==='Pendente'?'<span class="badge vermelho">Pendente</span>':'<span class="badge teal">Pago</span>';
+const bPag = v => {
+  if (typeof v === 'string') {
+    if(v === 'Pago') return '<span class="badge teal">Pago</span>';
+    if(v === 'Parcial') return '<span class="badge ambar">Parcial</span>';
+    if(v === 'Pendente') return '<span class="badge vermelho">Pendente</span>';
+    return '—';
+  }
+  const pago = Number(v.valorPago||0);
+  const total = Number(v.valorVenda||0);
+  if (v.status === 'Pago') return '<span class="badge teal">Pago</span>';
+  if (v.status === 'Pendente') return '<span class="badge vermelho">Pendente</span>';
+  if (v.status === 'Parcial') return `<span class="badge ambar">Parcial (${money(pago)})</span>`;
+  return '—';
+};
 const bEntV  = v => v==='Não'?'<span class="badge laranja">Não entregue</span>':'<span class="badge oliva">Entregue</span>';
 const bEst   = v => v==='REPOR'?'<span class="badge vermelho">Repor</span>'
   : v==='NOVO'?'<span class="badge azul">Novo</span>'
@@ -413,7 +444,7 @@ const ACOES_MASSA = {
              {txt:'Definir data de hoje', ok:r=>{r.data=hoje()}} ] },
   ven:{ alvo:()=>data.sales, render:()=>renderVen(), rotulo:'venda',
     botoes:[ {txt:'Marcar como entregues', ok:r=>{r.entregue='Sim'}},
-             {txt:'Marcar como pagas', ok:r=>{r.status='Pago'}},
+             {txt:'Marcar como pagas', ok:r=>{r.status='Pago'; r.valorPago = Number(r.valorVenda);}},
              {txt:'Definir data de hoje', ok:r=>{r.data=hoje()}} ] },
   con:{ alvo:()=>data.consignments, render:()=>renderCon(), rotulo:'consignação',
     botoes:[ {txt:'Dar baixa total como vendidos', ok:r=>{r.qtdeVendida=Number(r.qtde)-Number(r.qtdeDevolvida||0); }},
@@ -641,7 +672,7 @@ function resumoCliente(nome){
   const k = norm(nome);
   const vendas = data.sales.filter(v=>temNome(v) && norm(v.cliente)===k);
   const total = vendas.reduce((s,v)=>s+Number(v.valorVenda),0);
-  const pago = vendas.filter(v=>v.status==='Pago').reduce((s,v)=>s+Number(v.valorVenda),0);
+  const pago = vendas.reduce((s,v)=>s+Number(v.valorPago||0),0);
   /* em aberto conta só o que já foi entregue: é o dinheiro realmente na rua */
   const emAberto = vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim')
     .reduce((s,v)=>s+Number(v.valorVenda),0);
@@ -922,7 +953,7 @@ function abreFicha(id){
   $('#fichaTab').innerHTML = vs.length
     ? `<thead><tr><th>Data</th><th>Produto</th><th class="num">Qtde</th><th class="num">Venda</th><th class="num">Custos</th><th class="num">Líquido</th><th class="ctr">Pagamento</th><th class="ctr">Entrega</th></tr></thead><tbody>`+
       vs.map(v=>`<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
-        <td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money((v.valorVenda||0) - (v.custosExtras||0))}</td><td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('')+`</tbody>`
+        <td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money((v.valorVenda||0) - (v.custosExtras||0))}</td><td class="ctr">${bPag(v)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`).join('')+`</tbody>`
     : `<tbody><tr><td class="empty">Nenhuma compra registrada.</td></tr></tbody>`;
   const precisaTel = ()=>{ if(!soDigitos(cli.telefone)){ alert('Cadastre o WhatsApp deste cliente primeiro.'); return false; } return true; };
   const zap = $('#fichaZap');
@@ -958,7 +989,7 @@ function canaisRows(){
     o.itens++; o.pedidosSet.add(chavePedido(v));
     o.unidades+=Number(v.qtde); o.total+=Number(v.valorVenda);
     o.lucro+=calcVenda(v).lucro;
-    if(v.status==='Pendente' && v.entregue==='Sim') o.aAcertar+=Number(v.valorVenda);
+    if((Number(v.valorVenda) - Number(v.valorPago||0)) > 0 && v.entregue==='Sim') o.aAcertar+=(Number(v.valorVenda) - Number(v.valorPago||0));
     if(v.entregue!=='Sim') o.aEntregar+=Number(v.valorVenda);
     if(!temNome(v)) o.semNome++;
     if(v.data) o.datas.push(v.data);
@@ -1076,10 +1107,10 @@ function renderSugestao(est){
    o canal quando quem vendeu foi a barbearia ou outra pessoa. */
 function inadimplentes(){
   const m = {};
-  data.sales.filter(v=>v.status==='Pendente' && v.entregue==='Sim').forEach(v=>{
+  data.sales.filter(v=>(Number(v.valorVenda) - Number(v.valorPago||0)) > 0 && v.entregue==='Sim').forEach(v=>{
     const nome = responsavelDe(v), k = norm(nome);
     if(!m[k]) m[k]={nome, valor:0, n:0, qtd:0, canal: canalDe(v)!=='Direto'};
-    m[k].valor += Number(v.valorVenda); m[k].n++; m[k].qtd += Number(v.qtde);
+    m[k].valor += (Number(v.valorVenda) - Number(v.valorPago||0)); m[k].n++; m[k].qtd += Number(v.qtde);
   });
   return Object.values(m).sort((a,b)=>b.valor-a.valor);
 }
@@ -1129,8 +1160,8 @@ function renderABC(id, opt){
 
 function renderDash(){
   const vendas = data.sales.reduce((s,v)=>s+Number(v.valorVenda),0);
-  const recebido = data.sales.filter(v=>v.status==='Pago').reduce((s,v)=>s+Number(v.valorVenda),0);
-  const aReceber = data.sales.filter(v=>v.status==='Pendente').reduce((s,v)=>s+Number(v.valorVenda),0);
+  const recebido = data.sales.reduce((s,v)=>s+Number(v.valorPago||0),0);
+  const aReceber = data.sales.reduce((s,v)=>s + Math.max(0, Number(v.valorVenda) - Number(v.valorPago||0)),0);
   const lucro = data.sales.reduce((s,v)=>s+calcVenda(v).lucro,0);
   const margem = vendas>0?lucro/vendas:0;
   const est = estoque();
@@ -1157,7 +1188,7 @@ function renderDash(){
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
       +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
       {t:'vendas', g:'ven'}),
-    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status==='Pendente').length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
+    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status!=='Pago').length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
       `Todo o valor que falta ser pago pelos clientes.\n`
       + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
       {t:'vendas', g:'ven', f:{venStat:'Pendente'}}),
@@ -1485,7 +1516,7 @@ function abrePedido(ids){
         const venda=Number(v.valorVenda)||0, custosExtra=Number(v.custosExtras)||0, liquido=venda-custosExtra;
         return `<tr><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="num">${v.qtde}</td>
           <td class="num">${money(venda)}</td><td class="num" style="color:var(--vermelho)">-${money(custosExtra)}</td><td class="num">${money(liquido)}</td>
-          <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`;
+          <td class="ctr">${bPag(v)}</td><td class="ctr">${bEntV(v.entregue)}</td></tr>`;
       }).join('')+
       `</tbody><tfoot><tr><td>Total</td><td></td><td class="num">${qtde}</td><td class="num">${money(valor)}</td><td class="num" style="color:var(--vermelho)">-${money(custosExtras)}</td><td class="num">${money(valor-custosExtras)}</td><td colspan="2"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhum item neste pedido.</td></tr></tbody>`;
@@ -1664,7 +1695,7 @@ function renderVen(){
       rows.map(v=>`<tr>${chkLinha('ven',v.id)}<td class="ctr">${thumb(foto(v.produto),v.produto)}</td><td>${dt(v.data)}</td><td>${esc(v.produto)}</td><td class="ctr">${bGen(v.genero)}</td><td>${esc(canalDe(v))}</td>
         <td>${temNome(v)?esc(v.cliente):'<span style="color:var(--ink-faint)">não identificado</span>'}</td>
         <td class="num">${v.qtde}</td><td class="num">${money(v.valorVenda)}</td><td class="num" style="color:var(--vermelho)">-${money(v.custosExtras||0)}</td><td class="num">${money(v.lucro)}</td><td class="num">${pct(v.margem)}</td>
-        <td class="ctr">${bPag(v.status)}</td><td class="ctr">${bEntV(v.entregue)}</td>
+        <td class="ctr">${bPag(v)}</td><td class="ctr">${bEntV(v.entregue)}</td>
         <td><div class="rowacts"><button class="btn sm" data-ev="${v.id}">Editar</button><button class="btn sm ghost" data-dv="${v.id}">Excluir</button></div></td></tr>`).join('')+
       `</tbody><tfoot><tr><td colspan="7">Total</td><td class="num">${tq}</td><td class="num">${money(tv)}</td><td class="num" style="color:var(--vermelho)">-${money(tcE)}</td><td class="num">${money(tl)}</td><td colspan="4"></td></tr></tfoot>`
     : `<tbody><tr><td class="empty">Nenhuma venda encontrada.</td></tr></tbody>`;
@@ -2056,17 +2087,21 @@ $('#fVen').addEventListener('submit',e=>{
     valorVenda:Number($('#venValor').value)||0, custosExtras:Number($('#venCustos').value)||0, cliente,
     canal: ($('#venCanal').value.trim()||'Direto'),
     status:$('#venStat').value, entregue:$('#venEnt').value};
+  const st = $('#venStat').value;
+  if(st === 'Pago') payload.valorPago = payload.valorVenda;
+  else if(st === 'Parcial') payload.valorPago = Number($('#venPago').value)||0;
+  else payload.valorPago = 0;
   if(edit.ven){ const i=data.sales.findIndex(v=>v.id===edit.ven); data.sales[i]={...data.sales[i],...payload}; cancVen(); }
   else data.sales.push({id:uid(),...payload});
   if(cliente && !SEM_NOME.has(norm(cliente)) && !data.clients.some(c=>norm(c.nome)===norm(cliente)))
     data.clients.push({id:uid(), nome:cliente, telefone:'', observacao:''});
   const ultimoCanal = payload.canal;
-  $('#fVen').reset(); $('#venQtd').value=1; $('#venCustos').value=''; $('#venStat').value='Pago'; $('#venEnt').value='Sim';
+  $('#fVen').reset(); $('#venQtd').value=1; $('#venCustos').value=''; $('#venStat').value='Pago'; $('#venPagoWrap').style.display='none'; $('#venPago').value=''; $('#venEnt').value='Sim';
   $('#venCanal').value = ultimoCanal;          // mantém o canal para o próximo lançamento
   $('#venData').value = hoje();
   save(); renderAll();
 });
-function cancVen(){ edit.ven=null; $('#fVen').reset(); $('#venQtd').value=1; $('#venCustos').value=''; $('#venStat').value='Pago'; $('#venEnt').value='Sim'; $('#venCanal').value=''; $('#venData').value=hoje();
+function cancVen(){ edit.ven=null; $('#fVen').reset(); $('#venQtd').value=1; $('#venCustos').value=''; $('#venStat').value='Pago'; $('#venPagoWrap').style.display='none'; $('#venPago').value=''; $('#venEnt').value='Sim'; $('#venCanal').value=''; $('#venData').value=hoje();
   $('#tVenForm').textContent='Nova venda'; $('#bVen').textContent='Adicionar venda'; $('#cancVen').hidden=true; }
 $('#cancVen').addEventListener('click',cancVen);
 $('#tVen').addEventListener('click',e=>{
@@ -2075,7 +2110,7 @@ $('#tVen').addEventListener('click',e=>{
     if(!byName(v.produto)) return showErr('#eVen',`O produto "${v.produto}" não está no cadastro. Cadastre-o na aba Produtos antes de editar esta venda.`);
     edit.ven=ev; $('#venData').value=v.data||''; $('#venQtd').value=v.qtde; $('#venProd').value=v.produto;
     $('#venValor').value=v.valorVenda; $('#venCustos').value=v.custosExtras||''; $('#venCli').value=v.cliente||'';
-    $('#venCanal').value=canalDe(v); $('#venStat').value=v.status; $('#venEnt').value=v.entregue;
+    $('#venCanal').value=canalDe(v); $('#venStat').value=v.status; if(v.status==='Parcial'){ $('#venPagoWrap').style.display='block'; $('#venPago').value=v.valorPago||''; } else { $('#venPagoWrap').style.display='none'; $('#venPago').value=''; } $('#venEnt').value=v.entregue;
     hideErr('#eVen');
     $('#tVenForm').textContent='Editando venda'; $('#bVen').textContent='Salvar alterações'; $('#cancVen').hidden=false;
     window.scrollTo({top:0,behavior:'smooth'}); }
@@ -3438,7 +3473,7 @@ function desenhaVitrine(c, auth){
     <div class="fotos">${foto(p.foto,p.nome, false)}${p.fotoInsp?foto(p.fotoInsp,p.inspiracao||'', true):''}</div>
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
-      <div class="sub" style="text-transform: none; letter-spacing: normal; color: var(--ink-soft); font-size: 12px; margin-top: 2px; font-weight: 500;">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
+      <div class="sub" style="text-transform: none; letter-spacing: normal; color: var(--ink-soft); font-size: 12px; margin-top: 2px; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">${[p.conc,p.vol].filter(Boolean).map(esc).join(' · ')} ${p.familia ? badgeFamilia(p.familia) : ''}</div>
       ${p.inspiracao?`<div class="insp" style="margin-top:8px;">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
       ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" title="${esc(p.ocasioes.slice(3).join(', '))}" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef; cursor:help;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
