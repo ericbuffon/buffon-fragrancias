@@ -803,3 +803,6 @@ input[type="date"] {
 .btn-limpar-filtros { display: none; align-items: center; justify-content: center; background: none; border: none; font-size: 13px; color: var(--ink-faint); font-weight: 600; text-decoration: underline; cursor: pointer; padding: 8px; }
 .btn-limpar-filtros:hover { color: var(--ink); }
 .btn-limpar-filtros.mostrar { display: inline-flex; }
+
+/* Nova cor para Amadeirado */
+.badge.marrom-escuro { background: #603c23; color: #fff; border-color: #4a2b16; }

@@ -36,7 +36,7 @@ const badgeOcasiao = o => `<span class="badge" style="background:#f1f3f5; color:
 
 
 const COR_FAMILIA = {
-  "Amadeirado": "terra",
+  "Amadeirado": "marrom-escuro",
   "Cítrico": "dourado",
   "Floral": "rosa",
   "Aromático": "verde",
@@ -4014,4 +4014,15 @@ document.getElementById('btnScrollDown')?.addEventListener('click', () => {
 document.getElementById('lFidelidade')?.addEventListener('click', e => {
   const li = e.target.closest('[data-fichafid]');
   if(li) abreFicha(li.dataset.fichafid);
+});
+
+// Fechar submenu de dicas ao clicar fora
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('dicasMenu');
+  const btn = document.getElementById('btnDicasPerfume');
+  if (menu && (menu.style.display === 'flex' || menu.style.display === 'block')) {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  }
 });
