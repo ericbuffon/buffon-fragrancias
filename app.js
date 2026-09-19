@@ -2271,7 +2271,7 @@ function itemHTML(p, n, opt){
       <div class="nome">${esc(p.nome)}</div>
       <div class="edp" style="text-transform: none; letter-spacing: normal; font-weight: 500;">${[p.conc, p.vol, p.genero==='Feminino'?'Feminino':'Masculino'].filter(Boolean).join(' · ')}</div>
       ${p.familia?`<div class="fam">${esc(p.familia)}</div>`:''}
-      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => badgeOcasiao(o)).join('')}</div>`:''}
       <div class="regua"></div>
       ${algumaNota
         ? `<div class="piramide">${piramideSVG(acc,tem)}<div class="niveis">
@@ -3483,7 +3483,7 @@ function desenhaVitrine(c, auth){
       </div>`:''}
       <div class="rodape">
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
-        ${p.tester?'<span class="badge dourado">tem provador</span>':''}
+        ${p.tester?'<span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border:1.2px solid var(--dourado);color:var(--dourado);padding:3px 6px;border-radius:2px;display:inline-block;">provador disponível</span>':''}
       </div>
       <div class="cart-item-wrap" data-nome="${esc(p.nome)}">
         ${cart[p.nome] ? `<div class="qtd-ctrl"><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, -1)">-</button><span class="qtd-num">${cart[p.nome].qtd}</span><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">+</button></div>` : `<button class="vitrine-add" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">Adicionar ao carrinho</button>`}
