@@ -487,11 +487,20 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 #cartFloatWrap {
   position: fixed;
   bottom: 20px;
-  right: 20px;
-  z-index: 100;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
   display: none;
   align-items: center;
+  justify-content: center;
   gap: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+#cartFloatBtn {
+  flex: 1;
+  justify-content: center;
 }
 #cartFloatWrap.show {
   display: flex !important;
