@@ -3483,7 +3483,7 @@ function desenhaVitrine(c, auth){
       </div>`:''}
       <div class="rodape">
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
-        ${p.tester?'<span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border:1.2px solid var(--dourado);color:var(--dourado);padding:3px 6px;border-radius:2px;display:inline-block;">provador disponível</span>':''}
+        ${p.tester?'<span style="font-size:11px;font-weight:500;color:var(--ink-soft);background:var(--paper);padding:4px 10px;border-radius:16px;display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--dourado)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Provador disponível</span>':''}
       </div>
       <div class="cart-item-wrap" data-nome="${esc(p.nome)}">
         ${cart[p.nome] ? `<div class="qtd-ctrl"><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, -1)">-</button><span class="qtd-num">${cart[p.nome].qtd}</span><button class="qtd-btn" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">+</button></div>` : `<button class="vitrine-add" onclick="window.updateItemQtd(this.closest('.cart-item-wrap').dataset.nome, 1)">Adicionar ao carrinho</button>`}

@@ -831,18 +831,32 @@ input[type="date"] {
    Corrige o espaçamento entre os perfumes e aplica as tags coloridas
 ============================================================== */
 
-/* Remove o space-evenly que afastava demais os itens e restaura o gap fixo */
+/* Aumenta o espaço útil da página no PDF para acomodar as novas tags */
+.pdf-export #catalogo .pagina {
+  padding: 35px 50px 25px !important;
+}
+.pdf-export #catalogo .topo {
+  margin-bottom: 12px !important;
+}
+.pdf-export #catalogo .pe {
+  bottom: 25px !important;
+  left: 50px !important;
+  right: 50px !important;
+  position: absolute !important;
+}
+
+/* Ajusta o espaçamento da lista */
 .pdf-export #catalogo .lista {
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
-  gap: 25px !important;
+  gap: 15px !important;
 }
 
-/* Trava a altura de cada perfume para caber perfeitamente 3 na página A4 */
+/* Trava a altura de cada perfume permitindo mais espaço interno */
 .pdf-export #catalogo .item {
-  height: 287px !important;
-  max-height: 287px !important;
+  height: 310px !important;
+  max-height: 310px !important;
   padding: 15px 0 15px 19px !important;
   flex: none !important;
   margin-bottom: 0 !important;
