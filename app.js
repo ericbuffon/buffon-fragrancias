@@ -3439,10 +3439,13 @@ function desenhaVitrine(c, auth){
     <div class="txt">
       <h3>${esc(p.nome)}</h3>
       <div class="sub" style="text-transform: none; letter-spacing: normal; color: var(--ink-soft); font-size: 12px; margin-top: 2px; font-weight: 500;">${[p.conc,p.vol,p.familia].filter(Boolean).map(esc).join(' · ')}</div>
-      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
       ${p.inspiracao?`<div class="insp" style="margin-top:8px;">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
-      ${(p.topo||p.coracao||p.fundo)?`<div class="notas" style="font-size:12px; color:var(--ink-soft); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; margin-top:6px;">
-        <b>Notas:</b> ${[p.topo, p.coracao, p.fundo].filter(Boolean).map(esc).join(', ')}</div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" title="${esc(p.ocasioes.slice(3).join(', '))}" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef; cursor:help;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
+      ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
+        ${p.topo?`<b>TOPO</b> ${esc(p.topo)}<br>`:''}
+        ${p.coracao?`<b>CORAÇÃO</b> ${esc(p.coracao)}<br>`:''}
+        ${p.fundo?`<b>FUNDO</b> ${esc(p.fundo)}`:''}
+      </div>`:''}
       <div class="rodape">
         ${p.preco?`<span class="preco">${money(p.preco)}</span>`:'<span></span>'}
         ${p.tester?'<span class="badge dourado">tem provador</span>':''}
