@@ -486,11 +486,10 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- Carrinho Flutuante (Vitrine) ---------- */
 #cartFloatWrap {
   display: none;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-start;
   gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
+  flex: 1;
 }
 #cartFloatBtn {
   flex: 1;
@@ -500,19 +499,8 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   display: flex !important;
 }
 #cartFloatBtn {
-  background: #1F7A44;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  font-size: 14px;
-  transition: transform 0.2s ease;
+  flex: 1;
+  justify-content: center;
 }
 #cartFloatBtn:hover {
   background: #176034;
