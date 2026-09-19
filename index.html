@@ -623,10 +623,19 @@
   </div>
 </div></div>
 
-<div id="bottomFloatingBar" style="display:none; position:fixed; bottom:20px; left:20px; right:20px; z-index:1500; align-items:flex-end; justify-content:space-between; gap:12px; pointer-events:none;">
-  <div style="display:flex; flex:1; gap:12px; pointer-events:auto; align-items: flex-end; max-width: 600px; margin: 0 auto;">
-     <div style="position: relative; flex: none;">
-        <div id="dicasMenu" style="display: none; position: absolute; bottom: 100%; left: 0; flex-direction: column; gap: 8px; margin-bottom: 8px; min-width: 180px;">
+<div id="bottomFloatingBar" style="display:none; position:fixed; bottom:20px; left:20px; right:20px; z-index:1500; align-items:flex-end; justify-content:center; pointer-events:none;">
+  
+  <div id="cartFloatWrap" style="display:none; pointer-events:auto; gap:8px; width: 100%; max-width: 400px; margin: 0 auto;">
+    <button id="cartClear" title="Esvaziar carrinho">🗑️</button>
+    <button id="cartFloatBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+      <span id="cartCount">0</span> <span style="display:inline-block; margin:0 4px;">-</span> Pedir pelo WhatsApp
+    </button>
+  </div>
+
+  <div style="position:absolute; right:0; bottom:0; display:flex; align-items:flex-end; gap:8px; pointer-events:auto;">
+     <div style="position: relative;">
+        <div id="dicasMenu" style="display: none; position: absolute; bottom: 100%; right: 0; flex-direction: column; gap: 8px; margin-bottom: 8px; min-width: 180px; align-items: flex-end;">
           <button id="btnDica1" style="background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:20px; padding:10px 20px; font-size:13.5px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:pointer; white-space:nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="document.getElementById('dicasMenu').style.display='none'; document.getElementById('contentDica1').style.display='block'; document.getElementById('contentDica2').style.display='none'; document.getElementById('contentDica3').style.display='none'; document.getElementById('contentDica4').style.display='none'; document.getElementById('modalDicas').classList.add('open');">Como escolher?</button>
           <button id="btnDica2" style="background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:20px; padding:10px 20px; font-size:13.5px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:pointer; white-space:nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="document.getElementById('dicasMenu').style.display='none'; document.getElementById('contentDica1').style.display='none'; document.getElementById('contentDica2').style.display='block'; document.getElementById('contentDica3').style.display='none'; document.getElementById('contentDica4').style.display='none'; document.getElementById('modalDicas').classList.add('open');">Guia de Ocasiões</button>
           <button id="btnDica4" style="background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:20px; padding:10px 20px; font-size:13.5px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:pointer; white-space:nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="document.getElementById('dicasMenu').style.display='none'; document.getElementById('contentDica1').style.display='none'; document.getElementById('contentDica2').style.display='none'; document.getElementById('contentDica3').style.display='none'; document.getElementById('contentDica4').style.display='block'; document.getElementById('modalDicas').classList.add('open');">Famílias Olfativas</button>
@@ -635,16 +644,10 @@
         <button id="btnDicasPerfume" title="Dicas e Guias" onclick="var m = document.getElementById('dicasMenu'); m.style.display = (m.style.display === 'none' || m.style.display === '') ? 'flex' : 'none';" style="background:var(--ink); color:#fff; border:none; border-radius:50%; width:44px; height:44px; font-size:22px; box-shadow:0 2px 10px rgba(0,0,0,0.2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity: 0.9; transition: transform 0.2s, opacity 0.2s;">💡</button>
      </div>
      
-     <div id="cartFloatWrap" style="display:none; flex:1; gap:8px;">
-        <button id="cartClear" title="Esvaziar carrinho">🗑️</button>
-        <button id="cartFloatBtn">
-           🛒 <span id="cartCount">0</span> <span style="display:inline-block; margin:0 4px;">-</span> Pedir pelo WhatsApp
-        </button>
+     <div id="scrollControls" style="display:flex; flex-direction:column; gap:8px;">
+         <button id="btnScrollUp" title="Voltar ao topo" style="background:var(--ink); color:#fff; border:none; border-radius:50%; width:44px; height:44px; font-size:22px; box-shadow:0 2px 10px rgba(0,0,0,0.2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity: 0.85;">↑</button>
+         <button id="btnScrollDown" title="Ir para o final" style="background:var(--ink); color:#fff; border:none; border-radius:50%; width:44px; height:44px; font-size:22px; box-shadow:0 2px 10px rgba(0,0,0,0.2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity: 0.85;">↓</button>
      </div>
-  </div>
-  <div id="scrollControls" style="display:flex; flex-direction:column; gap:8px; pointer-events:auto; flex:none;">
-      <button id="btnScrollUp" title="Voltar ao topo" style="background:var(--ink); color:#fff; border:none; border-radius:50%; width:44px; height:44px; font-size:22px; box-shadow:0 2px 10px rgba(0,0,0,0.2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity: 0.85;">↑</button>
-      <button id="btnScrollDown" title="Ir para o final" style="background:var(--ink); color:#fff; border:none; border-radius:50%; width:44px; height:44px; font-size:22px; box-shadow:0 2px 10px rgba(0,0,0,0.2); cursor:pointer; display:flex; align-items:center; justify-content:center; opacity: 0.85;">↓</button>
   </div>
 </div>
 
