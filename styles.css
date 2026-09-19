@@ -141,7 +141,7 @@ button.kpi *{pointer-events:none}
   font-size:11px;line-height:1.5;overflow:auto;max-height:150px;margin:.5rem 0 0}
 #vitrine{display:none;max-width:940px;margin:0 auto;padding:2rem 1.1rem 4rem}
 #vitrine.on{display:block}
-body.publico:not(.pr-cat)>*:not(#vitrine):not(#cartFloatWrap):not(#scrollControls):not(#modalDicas){display:none!important}
+body.publico:not(.pr-cat)>*:not(#vitrine):not(#bottomFloatingBar):not(#modalDicas){display:none!important}
 body.publico{background:#fff}
 #vitrine .topo{text-align:center;padding:1rem 0 1.6rem;border-bottom:1px solid var(--line)}
 #vitrine .topo img{height:52px;width:auto;display:block;margin:0 auto}
@@ -485,17 +485,11 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 }
 /* ---------- Carrinho Flutuante (Vitrine) ---------- */
 #cartFloatWrap {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1500;
   display: none;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  width: 90%;
-  max-width: 400px;
+  gap: 8px;
+  width: 100%;
   box-sizing: border-box;
 }
 #cartFloatBtn {
@@ -629,11 +623,11 @@ body.pdf-export #catalogo .pagina {
   height: 1122px !important;
 }
 
-@media print { #scrollControls { display: none !important; } }
+@media print { #bottomFloatingBar { display: none !important; } }
 
-body:not(.publico) #scrollControls { display: none !important; }
-#scrollControls { display: none; }
-body.publico:not(.pr-cat) #scrollControls { display: flex !important; flex-direction: row; align-items: flex-end; }
+body:not(.publico) #bottomFloatingBar { display: none !important; }
+#bottomFloatingBar { display: none; }
+body.publico:not(.pr-cat) #bottomFloatingBar { display: flex !important; }
 #btnDicasPerfume:hover { transform: translateY(-2px); opacity: 1 !important; }
 
 /* 1. Força o CSS a respeitar o atributo 'hidden' do HTML para as bolinhas de status */
@@ -805,7 +799,7 @@ input[type="date"] {
 .btn-limpar-filtros.mostrar { display: inline-flex; }
 
 /* Nova cor para Amadeirado */
-.badge.marrom-escuro { background: #7c4a2a; color: #fff; border-color: #633b21; }
+.badge.marrom-escuro { background: #9c623d; color: #fff; border-color: #7a4a29; }
 
 /* Nova cor para Cítrico */
 .badge.amarelo-claro { background: #fdf0a6; color: #7a6000; border-color: #e5c94e; }
