@@ -2270,7 +2270,7 @@ function itemHTML(p, n, opt){
         ${(opt.marcaTester && p.tester)?`<span class="selotest">provador disponível</span>`:''}</div>
       <div class="nome">${esc(p.nome)}</div>
       <div class="edp" style="text-transform: none; letter-spacing: normal; font-weight: 500;">${[p.conc, p.vol, p.genero==='Feminino'?'Feminino':'Masculino'].filter(Boolean).join(' · ')}</div>
-      ${p.familia?`<div class="fam">${esc(p.familia)}</div>`:''}
+      ${p.familia ? `<div style=\"margin-top:8px;\">${badgeFamilia(p.familia)}</div>` : ''}
       ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.map(o => badgeOcasiao(o)).join('')}</div>`:''}
       <div class="regua"></div>
       ${algumaNota
