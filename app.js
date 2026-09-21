@@ -733,7 +733,7 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*? 🛒✨\n`
+    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*? \uD83D\uDED2\u2728\n`
       + `Agora você pode escolher seus perfumes e finalizar a compra direto pelo site, com toda a segurança!\n\n`
       + `Confira as fragrâncias disponíveis e faça seu pedido:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida, é só me chamar.`;
@@ -3728,7 +3728,18 @@ function updateCartUI() {
             wrap.classList.add('show');
             document.getElementById('cartCount').textContent = totalItems;
             if(document.getElementById('cartTotalBtn')) {
-                document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
+                let finalPrice = totalPrice;
+                if(cartDiscountValue && cartDiscountValue.value) {
+                    const dVal = parseFloat(cartDiscountValue.value);
+                    if(!isNaN(dVal) && dVal > 0) {
+                        if(cartDiscountType.value === 'R$') {
+                            finalPrice = Math.max(0, finalPrice - dVal);
+                        } else if(cartDiscountType.value === '%') {
+                            finalPrice = Math.max(0, finalPrice - (finalPrice * (dVal/100)));
+                        }
+                    }
+                }
+                document.getElementById('cartTotalBtn').textContent = finalPrice > 0 ? money(finalPrice) : '';
             }
         } else {
             wrap.classList.remove('show');
@@ -3764,10 +3775,35 @@ if(cartFloatBtn) {
         }
         
         let texto = "Olá! Dei uma olhada no seu catálogo e gostaria de encomendar:\n\n";
+        let subtotal = 0;
         for(let nome in cart) {
             const item = cart[nome];
+            const p = window.__vitrineItens ? window.__vitrineItens.find(x => x.nome === nome) : null;
+            if (p && p.preco) subtotal += p.preco * item.qtd;
             texto += `• ${item.qtd}x ${nome}\n`;
         }
+        
+        const dInput = document.getElementById('cartDiscountValue');
+        const tInput = document.getElementById('cartDiscountType');
+        let total = subtotal;
+        if(dInput && dInput.value && subtotal > 0) {
+            const dVal = parseFloat(dInput.value);
+            if(!isNaN(dVal) && dVal > 0) {
+                if(tInput.value === 'R$') {
+                    total = Math.max(0, subtotal - dVal);
+                    texto += `\nSubtotal: ${money(subtotal)}\nDesconto: -${money(dVal)}\n*Total a pagar: ${money(total)}*\n`;
+                } else if(tInput.value === '%') {
+                    const descReal = subtotal * (dVal/100);
+                    total = Math.max(0, subtotal - descReal);
+                    texto += `\nSubtotal: ${money(subtotal)}\nDesconto: -${dVal}% (-${money(descReal)})\n*Total a pagar: ${money(total)}*\n`;
+                }
+            } else {
+                texto += `\n*Total a pagar: ${money(total)}*\n`;
+            }
+        } else if(subtotal > 0) {
+             texto += `\n*Total a pagar: ${money(total)}*\n`;
+        }
+        
         texto += `\nComo podemos combinar a entrega e o pagamento?`;
         
         const zapLink = `https://wa.me/55${num}?text=${encodeURIComponent(texto)}`;
@@ -4068,12 +4104,34 @@ if(cartPayBtn) {
                 const p = window.__vitrineItens.find(x => x.nome === nome);
                 if (p && p.preco) {
                     totalPrice += p.preco * item.qtd;
-                    itensReq.push({ nome: p.nome, qtd: item.qtd, preco: p.preco });
+                    itensReq.push({ nome: p.nome, qtd: item.qtd, unit_price: p.preco * 100 });
                 }
             });
         }
         
-        if(totalPrice <= 0) return alert('Adicione itens com preço para pagar via cartão.');
+        if (totalPrice === 0) return alert('Carrinho vazio ou sem preço para pagar via cartão.');
+        
+        const dInput = document.getElementById('cartDiscountValue');
+        const tInput = document.getElementById('cartDiscountType');
+        let discountCents = 0;
+        if(dInput && dInput.value) {
+            const dVal = parseFloat(dInput.value);
+            if(!isNaN(dVal) && dVal > 0) {
+                if(tInput.value === 'R$') {
+                    discountCents = Math.round(dVal * 100);
+                    totalPrice = Math.max(0, totalPrice - dVal);
+                } else if(tInput.value === '%') {
+                    const descReal = totalPrice * (dVal/100);
+                    discountCents = Math.round(descReal * 100);
+                    totalPrice = Math.max(0, totalPrice - descReal);
+                }
+                
+                // Add discount item to infinitepay payload
+                if(discountCents > 0) {
+                    itensReq.push({ nome: 'Desconto aplicado', qtd: 1, unit_price: -discountCents });
+                }
+            }
+        }
         
         cartPayBtn.disabled = true;
         const originalText = cartPayBtn.innerHTML;
@@ -4101,3 +4159,10 @@ if(cartPayBtn) {
         }
     });
 }
+
+
+
+const cartDiscountValue = document.getElementById('cartDiscountValue');
+const cartDiscountType = document.getElementById('cartDiscountType');
+if(cartDiscountValue) cartDiscountValue.addEventListener('input', updateCartUI);
+if(cartDiscountType) cartDiscountType.addEventListener('change', updateCartUI);
