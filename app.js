@@ -3722,17 +3722,13 @@ function updateCartUI() {
         });
     }
     
-    const wrap = document.getElementById('cartFloatWrap');
+    const wrap = document.getElementById('bottomFloatingBar');
     if(wrap) {
-        if(totalItems > 0) {
-            wrap.classList.add('show');
-            document.getElementById('cartCount').textContent = totalItems;
+        wrap.style.display = 'flex';
+        document.getElementById('cartCount').textContent = totalItems;
             if(document.getElementById('cartTotalBtn')) {
                 document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
             }
-        } else {
-            wrap.classList.remove('show');
-        }
     }
 
     
