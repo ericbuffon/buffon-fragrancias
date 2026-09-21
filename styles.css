@@ -520,6 +520,8 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   font-size: 14.5px;
   height: 46px;
   transition: transform 0.2s ease, background 0.2s;
+  width: 100%;
+  flex: 1 1 0%;
 }
 
 #cartPayBtn:hover {
@@ -542,7 +544,8 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
   gap: 8px;
   font-size: 13.5px;
   height: 46px;
-  flex: 1;
+  flex: 1 1 0%;
+  width: 100%;
   max-width: 268px;
   transition: transform 0.2s ease, background 0.2s;
 }
