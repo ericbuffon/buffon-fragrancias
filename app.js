@@ -3724,11 +3724,11 @@ function updateCartUI() {
     
     const wrap = document.getElementById('bottomFloatingBar');
     if(wrap) {
-        wrap.style.display = 'flex';
+        wrap.style.display = totalItems > 0 ? 'flex' : 'none';
         document.getElementById('cartCount').textContent = totalItems;
-            if(document.getElementById('cartTotalBtn')) {
-                document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
-            }
+        if(document.getElementById('cartTotalBtn')) {
+            document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
+        }
     }
 
     
