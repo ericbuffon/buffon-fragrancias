@@ -4088,6 +4088,9 @@ if(cartPayBtn) {
                 throw new Error(data.error || 'Falha ao gerar pagamento.');
             }
             
+            // Restaura o botão antes de redirecionar para que, ao voltar, o botão esteja normal
+            cartPayBtn.disabled = false;
+            cartPayBtn.innerHTML = originalText;
             window.location.href = data.url;
             
         } catch(e) {

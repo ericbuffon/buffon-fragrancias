@@ -871,3 +871,8 @@ input[type="date"] {
 
 /* Esconder os botões flutuantes base fora da vitrine */
 body:not(.publico) #fixedBottomContainer { display: none !important; }
+
+
+body.publico:not(.pr-cat) #topRightLamp { display: block !important; }
+body:not(.publico) #topRightLamp { display: none !important; }
+@media print { #topRightLamp { display: none !important; } }
