@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
     const payload = {
       handle: HANDLE,
-      itens: itensMapeados,
+      items: itensMapeados,
       redirect_url: redirectUrl
     };
 
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       console.error("Erro InfinitePay:", data);
-      return res.status(400).json({ error: 'Erro ao gerar link de pagamento.' });
+      return res.status(400).json({ error: `A InfinitePay recusou o pedido: ${JSON.stringify(data)}` });
     }
 
     const checkoutUrl = data.url || data.link || (data.payment_link && data.payment_link.url);
