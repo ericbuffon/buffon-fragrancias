@@ -733,7 +733,7 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*? ` + decodeURIComponent('%F0%9F%9B%92%E2%9C%A8') + `\n`
+    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*?\n`
       + `Agora você pode escolher seus perfumes e finalizar a compra direto pelo site, com toda a segurança!\n\n`
       + `Confira as fragrâncias disponíveis e faça seu pedido:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida, é só me chamar.`;
