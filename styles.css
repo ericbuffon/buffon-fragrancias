@@ -861,3 +861,6 @@ input[type="date"] {
   letter-spacing: 0.1em !important;
   line-height: 1.2 !important;
 }
+
+/* Esconder os botões flutuantes base fora da vitrine */
+body:not(.publico) #fixedBottomContainer { display: none !important; }
