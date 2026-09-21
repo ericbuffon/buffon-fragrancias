@@ -503,10 +503,17 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 #cartClear:hover { background: var(--accent-soft) !important; transform: translateY(-2px); }
 
 /* Responsive Centering on PC */
+
+/* Ajustes para PC - Separa as Fabs e centraliza o carrinho */
 @media screen and (min-width: 768px) {
-  
-  
+  #fixedFabs {
+    position: fixed !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    margin-left: 0 !important;
+  }
 }
+
 
 .cart-item-wrap {
   margin-top: 10px;
