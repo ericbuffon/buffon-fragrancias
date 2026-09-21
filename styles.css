@@ -596,9 +596,9 @@ body.pdf-export #catalogo .pagina {
 
 @media print { #bottomFloatingBar { display: none !important; } }
 
-body:not(.publico) #bottomFloatingBar { display: none !important; }
+
 #bottomFloatingBar { display: none; }
-body.publico:not(.pr-cat) #bottomFloatingBar { display: flex !important; }
+
 #btnDicasPerfume:hover { transform: translateY(-2px); opacity: 1 !important; }
 
 /* 1. Força o CSS a respeitar o atributo 'hidden' do HTML para as bolinhas de status */
