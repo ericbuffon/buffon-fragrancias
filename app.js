@@ -733,9 +733,9 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Esse é o catálogo da *Buffon Fragrâncias*.\n`
-      + `O maior portfólio da *La Rive* você só encontra aqui.\n\n`
-      + `Confira as fotos e as notas das fragrâncias:\n${linkPublico(id)}\n\n`
+    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*? 🛒✨\n`
+      + `Agora você pode escolher seus perfumes e finalizar a compra direto pelo site, com toda a segurança!\n\n`
+      + `Confira as fragrâncias disponíveis e faça seu pedido:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida, é só me chamar.`;
   }
   return textoCatalogo('');
@@ -3507,7 +3507,10 @@ function desenhaVitrine(c, auth){
       #vitrine .dropdown-content { display: flex; flex-direction: column; gap: 0; padding: 4px; }
       #vitrine .dropdown-btn { padding: 6px 12px; font-size: 13.5px; }
     </style>
-    <div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin: 1.5rem 0 1rem;">
+    <div style="margin: 0 auto 1.5rem auto; width: 100%; max-width: 400px; padding: 0 1rem;">
+      <input type="text" id="vitrineBusca" placeholder="Pesquisar fragrância ou inspiração..." style="width: 100%; padding: 10px 16px; border-radius: 24px; border: 1px solid var(--line); font-size: 14.5px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); outline: none;">
+    </div>
+    <div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin: 0 0 1.5rem 0; flex-wrap: wrap;">
 
       <div class="dropdown-filtro">
         <button class="dropdown-btn" data-drop="gen">
@@ -3583,20 +3586,14 @@ function desenhaVitrine(c, auth){
     }
   });
 
-  window.limparFiltrosVitrine = () => {
-    document.querySelectorAll('.fchk').forEach(cb => cb.checked = false);
-    document.querySelectorAll('#vitrine .item').forEach(it => it.style.display = '');
-    document.getElementById('btnLimparFiltros').classList.remove('mostrar');
-  };
-
-  $('#vitrine').addEventListener('change', e=>{
-    if(!e.target.classList.contains('fchk')) return;
+  window.aplicarFiltrosVitrine = () => {
+    const q = (document.getElementById('vitrineBusca') ? document.getElementById('vitrineBusca').value : '').toLowerCase().trim();
     const gens = Array.from(document.querySelectorAll('.fchk[name="gen"]:checked')).map(cb => cb.value);
     const occs = Array.from(document.querySelectorAll('.fchk[name="occ"]:checked')).map(cb => cb.value);
     const fams = Array.from(document.querySelectorAll('.fchk[name="fam"]:checked')).map(cb => cb.value);
     
     const btnLimpar = document.getElementById('btnLimparFiltros');
-    if (gens.length > 0 || occs.length > 0 || fams.length > 0) {
+    if (gens.length > 0 || occs.length > 0 || fams.length > 0 || q) {
         btnLimpar.classList.add('mostrar');
     } else {
         btnLimpar.classList.remove('mostrar');
@@ -3607,9 +3604,29 @@ function desenhaVitrine(c, auth){
       const pOccs = JSON.parse(it.dataset.o || '[]');
       const matchOcc = occs.length === 0 || occs.some(tag => pOccs.includes(tag));
       const matchFam = fams.length === 0 || fams.includes(it.dataset.f);
-      it.style.display = (matchGen && matchOcc && matchFam) ? '' : 'none';
+      let matchBusca = true;
+      if(q) {
+        const norm = (s) => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        if(!norm(it.textContent).includes(norm(q))) matchBusca = false;
+      }
+      it.style.display = (matchGen && matchOcc && matchFam && matchBusca) ? '' : 'none';
     });
+  };
+
+  window.limparFiltrosVitrine = () => {
+    if(document.getElementById('vitrineBusca')) document.getElementById('vitrineBusca').value = '';
+    document.querySelectorAll('.fchk').forEach(cb => cb.checked = false);
+    window.aplicarFiltrosVitrine();
+  };
+
+  $('#vitrine').addEventListener('change', e=>{
+    if(!e.target.classList.contains('fchk')) return;
+    window.aplicarFiltrosVitrine();
   });
+  
+  if (document.getElementById('vitrineBusca')) {
+    document.getElementById('vitrineBusca').addEventListener('input', window.aplicarFiltrosVitrine);
+  }
 }
 
 
