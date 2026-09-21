@@ -486,45 +486,109 @@ ul.simple .pos{display:inline-block;min-width:1.4em;color:var(--ink-faint);font-
 /* ---------- Carrinho Flutuante (Vitrine) ---------- */
 #cartFloatWrap {
   display: none;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   flex: 1;
+  pointer-events: auto;
 }
-#cartFloatBtn {
-  flex: 1;
-  justify-content: center;
-}
+
 #cartFloatWrap.show {
   display: flex !important;
 }
-#cartFloatBtn {
-  flex: 1;
-  justify-content: center;
+
+.cart-float-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
 }
+
+#cartPayBtn {
+  background: #12161C;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 0 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14.5px;
+  height: 46px;
+  width: 100%;
+  max-width: 320px;
+  transition: transform 0.2s ease, background 0.2s;
+}
+
+#cartPayBtn:hover {
+  transform: translateY(-2px);
+  background: #1d232c;
+}
+
+#cartFloatBtn {
+  background: #1F7A44;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 0 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13.5px;
+  height: 46px;
+  flex: 1;
+  max-width: 268px;
+  transition: transform 0.2s ease, background 0.2s;
+}
+
 #cartFloatBtn:hover {
   background: #176034;
   transform: translateY(-2px);
 }
+
 #cartClear {
   background: #fff;
-  color: var(--accent);
+  color: var(--vermelho, #c92a2a);
   border: 1px solid var(--line);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   cursor: pointer;
-  transition: transform 0.2s ease;
-  font-size: 18px;
+  transition: transform 0.2s ease, background 0.2s;
+  flex: none;
 }
+
 #cartClear:hover {
   background: var(--accent-soft);
   transform: translateY(-2px);
 }
+
+/* Responsive Centering on PC */
+@media screen and (min-width: 768px) {
+  #cartFloatWrap {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    align-items: center;
+  }
+  .cart-float-row {
+    justify-content: center;
+  }
+}
+
 .cart-item-wrap {
   margin-top: 10px;
   width: 100%;
