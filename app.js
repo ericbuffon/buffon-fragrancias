@@ -733,7 +733,7 @@ const contaProvador = itens => {
 function mensagemCatalogo(){
   const id = data.config && data.config.catalogoId;
   if(id && NV.url && NV.key){
-    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*? 🛒✨\n`
+    return `Oi! Já conhece a nova loja virtual da *Buffon Fragrâncias*?\n`
       + `Agora você pode escolher seus perfumes e finalizar a compra direto pelo site, com toda a segurança!\n\n`
       + `Confira as fragrâncias disponíveis e faça seu pedido:\n${linkPublico(id)}\n\n`
       + `Qualquer dúvida, é só me chamar.`;
@@ -3722,16 +3722,12 @@ function updateCartUI() {
         });
     }
     
-    const wrap = document.getElementById('cartFloatWrap');
+    const wrap = document.getElementById('bottomFloatingBar');
     if(wrap) {
-        if(totalItems > 0) {
-            wrap.classList.add('show');
-            document.getElementById('cartCount').textContent = totalItems;
-            if(document.getElementById('cartTotalBtn')) {
-                document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
-            }
-        } else {
-            wrap.classList.remove('show');
+        wrap.style.display = totalItems > 0 ? 'flex' : 'none';
+        document.getElementById('cartCount').textContent = totalItems;
+        if(document.getElementById('cartTotalBtn')) {
+            document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
         }
     }
 
