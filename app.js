@@ -3462,6 +3462,7 @@ async function abreVitrine(cfg){
 }
 function desenhaVitrine(c, auth){
   window.vitrineContato = c.contato || '';
+  window.__vitrineItens = c.itens || [];
   const itens = c.itens||[];
   const zapNum = (c.contato||'').replace(/\D/g,'');
   const countGen = val => itens.filter(p => p.genero === val).length;
@@ -3696,15 +3697,27 @@ window.clearCart = () => {
 
 function updateCartUI() {
     const totalItems = Object.values(cart).reduce((a,b)=>a+b.qtd, 0);
+    let totalPrice = 0;
+    if (window.__vitrineItens) {
+        Object.entries(cart).forEach(([nome, item]) => {
+            const p = window.__vitrineItens.find(x => x.nome === nome);
+            if (p && p.preco) totalPrice += p.preco * item.qtd;
+        });
+    }
+    
     const wrap = document.getElementById('cartFloatWrap');
     if(wrap) {
         if(totalItems > 0) {
             wrap.classList.add('show');
             document.getElementById('cartCount').textContent = totalItems;
+            if(document.getElementById('cartTotalBtn')) {
+                document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
+            }
         } else {
             wrap.classList.remove('show');
         }
     }
+
     
     // Atualiza os cartões dinamicamente
     document.querySelectorAll('.cart-item-wrap').forEach(el => {
@@ -4026,3 +4039,48 @@ document.addEventListener('click', function(e) {
     }
   }
 });
+
+
+const cartPayBtn = document.getElementById('cartPayBtn');
+if(cartPayBtn) {
+    cartPayBtn.addEventListener('click', async () => {
+        let totalPrice = 0;
+        const itensReq = [];
+        if (window.__vitrineItens) {
+            Object.entries(cart).forEach(([nome, item]) => {
+                const p = window.__vitrineItens.find(x => x.nome === nome);
+                if (p && p.preco) {
+                    totalPrice += p.preco * item.qtd;
+                    itensReq.push({ nome: p.nome, qtd: item.qtd, preco: p.preco });
+                }
+            });
+        }
+        
+        if(totalPrice <= 0) return alert('Adicione itens com preço para pagar via cartão.');
+        
+        cartPayBtn.disabled = true;
+        const originalText = cartPayBtn.innerHTML;
+        cartPayBtn.innerHTML = 'Gerando link...';
+        
+        try {
+            const response = await fetch('/api/infinitepay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ total: totalPrice, itens: itensReq })
+            });
+            
+            const data = await response.json();
+            
+            if(!response.ok || !data.url) {
+                throw new Error(data.error || 'Falha ao gerar pagamento.');
+            }
+            
+            window.location.href = data.url;
+            
+        } catch(e) {
+            alert('Erro ao conectar com a InfinitePay: ' + e.message);
+            cartPayBtn.disabled = false;
+            cartPayBtn.innerHTML = originalText;
+        }
+    });
+}
