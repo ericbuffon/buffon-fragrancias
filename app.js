@@ -3762,6 +3762,16 @@ if (btnToggle && cartPanel) {
   });
 }
 
+// Fechar painel ao clicar fora
+document.addEventListener('click', (e) => {
+  if (cartPanel && cartPanel.style.display !== 'none') {
+    if (!cartPanel.contains(e.target) && (!btnToggle || !btnToggle.contains(e.target))) {
+      cartPanel.style.display = 'none';
+    }
+  }
+});
+
+
 // Ocultar painel automaticamente ao clicar no novo botão de limpar
 const btnClear = document.getElementById('cartClearInside');
 if (btnClear && cartPanel) {
