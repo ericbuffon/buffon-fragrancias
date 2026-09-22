@@ -3772,10 +3772,66 @@ if(cartFloatBtn) {
         updateCartUI();
     });
 }
+
 const cartClearBtn = document.getElementById('cartClear');
 if(cartClearBtn) {
-    cartClearBtn.addEventListener('click', window.clearCart);
+    cartClearBtn.addEventListener('click', () => {
+        // Open Cart Modal
+        const modal = document.getElementById('modalCarrinho');
+        if(!modal) return;
+        
+        const listDiv = document.getElementById('carrinhoItens');
+        listDiv.innerHTML = '';
+        
+        let totalPrice = 0;
+        
+        if (window.__vitrineItens && Object.keys(cart).length > 0) {
+            Object.entries(cart).forEach(([nome, item]) => {
+                if(item.qtd > 0) {
+                    const p = window.__vitrineItens.find(x => x.nome === nome);
+                    const preco = p && p.preco ? p.preco : 0;
+                    totalPrice += preco * item.qtd;
+                    
+                    listDiv.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <div style="flex:1;">
+                                <div style="font-weight:600; font-size:14px; color:var(--ink);">${esc(nome)}</div>
+                                <div style="font-size:12px; color:var(--ink-soft);">${money(preco)}</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button onclick="window.updateItemQtd('${esc(nome)}', -1); updateCartModal();" style="width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:#fff; font-weight:bold; cursor:pointer;">-</button>
+                                <span style="font-weight:600; font-size:14px; min-width:20px; text-align:center;">${item.qtd}</span>
+                                <button onclick="window.updateItemQtd('${esc(nome)}', 1); updateCartModal();" style="width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:#fff; font-weight:bold; cursor:pointer;">+</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        } else {
+            listDiv.innerHTML = '<div style="color:var(--ink-soft); font-size:14px; text-align:center; padding:20px 0;">Seu carrinho está vazio.</div>';
+        }
+        
+        document.getElementById('carrinhoTotalModal').textContent = money(totalPrice);
+        
+        modal.classList.add('open');
+    });
 }
+
+function updateCartModal() {
+    if(document.getElementById('modalCarrinho').classList.contains('open')) {
+        document.getElementById('cartClear').click();
+    }
+}
+
+// Ensure the floating WhatsApp button logic also binds to the final WhatsApp button inside the modal
+const btnFinalizarCarrinho = document.getElementById('btnFinalizarCarrinho');
+if (btnFinalizarCarrinho) {
+    btnFinalizarCarrinho.addEventListener('click', () => {
+        document.getElementById('cartFloatBtn').click(); // trigger existing WhatsApp send logic
+        document.getElementById('modalCarrinho').classList.remove('open');
+    });
+}
+
 
 /* ---------- Gráficos ---------- */
 let myChartFin = null;
