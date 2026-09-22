@@ -3726,12 +3726,15 @@ function updateCartUI() {
     if(wrap) {
         wrap.style.display = totalItems > 0 ? 'flex' : 'none';
         document.getElementById('cartCount').textContent = totalItems;
+        if(document.getElementById('cartIconCount')) document.getElementById('cartIconCount').textContent = totalItems;
         if(document.getElementById('cartTotalBtn')) {
             document.getElementById('cartTotalBtn').textContent = totalPrice > 0 ? money(totalPrice) : '';
         }
     }
 
     
+    if (document.getElementById('cartModal')?.classList.contains('on')) renderCartModal();
+
     // Atualiza os cartões dinamicamente
     document.querySelectorAll('.cart-item-wrap').forEach(el => {
         const nome = el.dataset.nome;
@@ -3749,89 +3752,71 @@ function updateCartUI() {
     });
 }
 
-const cartFloatBtn = document.getElementById('cartFloatBtn');
-if(cartFloatBtn) {
-    cartFloatBtn.addEventListener('click', () => {
-        const contato = window.vitrineContato || (data.config && data.config.contato ? data.config.contato : '');
-        const num = (contato || '').replace(/\D/g,'');
-        if(!num) {
-            alert('O catálogo ainda não tem um número de WhatsApp configurado pelo vendedor.');
-            return;
-        }
-        
-        let texto = "Olá! Dei uma olhada no seu catálogo e gostaria de encomendar:\n\n";
-        for(let nome in cart) {
-            const item = cart[nome];
-            texto += `• ${item.qtd}x ${nome}\n`;
-        }
-        texto += `\nComo podemos combinar a entrega e o pagamento?`;
-        
-        const zapLink = `https://wa.me/55${num}?text=${encodeURIComponent(texto)}`;
-        window.open(zapLink, '_blank');
-        cart = {}; // Limpa carrinho após enviar
-        updateCartUI();
-    });
+function openCartModal() {
+    const modal = document.getElementById('cartModal');
+    if (!modal) return;
+    renderCartModal();
+    modal.classList.add('on');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('cart-modal-open');
 }
-
-const cartClearBtn = document.getElementById('cartClear');
-if(cartClearBtn) {
-    cartClearBtn.addEventListener('click', () => {
-        // Open Cart Modal
-        const modal = document.getElementById('modalCarrinho');
-        if(!modal) return;
-        
-        const listDiv = document.getElementById('carrinhoItens');
-        listDiv.innerHTML = '';
-        
-        let totalPrice = 0;
-        
-        if (window.__vitrineItens && Object.keys(cart).length > 0) {
-            Object.entries(cart).forEach(([nome, item]) => {
-                if(item.qtd > 0) {
-                    const p = window.__vitrineItens.find(x => x.nome === nome);
-                    const preco = p && p.preco ? p.preco : 0;
-                    totalPrice += preco * item.qtd;
-                    
-                    listDiv.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                            <div style="flex:1;">
-                                <div style="font-weight:600; font-size:14px; color:var(--ink);">${esc(nome)}</div>
-                                <div style="font-size:12px; color:var(--ink-soft);">${money(preco)}</div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <button onclick="window.updateItemQtd('${esc(nome)}', -1); updateCartModal();" style="width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:#fff; font-weight:bold; cursor:pointer;">-</button>
-                                <span style="font-weight:600; font-size:14px; min-width:20px; text-align:center;">${item.qtd}</span>
-                                <button onclick="window.updateItemQtd('${esc(nome)}', 1); updateCartModal();" style="width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:#fff; font-weight:bold; cursor:pointer;">+</button>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        } else {
-            listDiv.innerHTML = '<div style="color:var(--ink-soft); font-size:14px; text-align:center; padding:20px 0;">Seu carrinho está vazio.</div>';
-        }
-        
-        document.getElementById('carrinhoTotalModal').textContent = money(totalPrice);
-        
-        modal.classList.add('open');
-    });
+function closeCartModal() {
+    const modal = document.getElementById('cartModal');
+    if (!modal) return;
+    modal.classList.remove('on');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('cart-modal-open');
 }
-
-function updateCartModal() {
-    if(document.getElementById('modalCarrinho').classList.contains('open')) {
-        document.getElementById('cartClear').click();
+function renderCartModal() {
+    const list = document.getElementById('cartItemsList');
+    const summary = document.getElementById('cartModalSummary');
+    if (!list) return;
+    const entries = Object.entries(cart);
+    const totalItems = entries.reduce((sum, [, item]) => sum + item.qtd, 0);
+    let totalPrice = 0;
+    entries.forEach(([nome, item]) => {
+        const p = (window.__vitrineItens || []).find(x => x.nome === nome);
+        if (p && p.preco) totalPrice += Number(p.preco) * item.qtd;
+    });
+    if (summary) summary.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+    if (!entries.length) {
+        list.innerHTML = `<div class="cart-empty"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg><strong>Seu carrinho está vazio</strong><span>Adicione as fragrâncias que deseja consultar.</span></div>`;
+    } else {
+        list.innerHTML = entries.map(([nome, item]) => {
+            const p = (window.__vitrineItens || []).find(x => x.nome === nome) || {};
+            const preco = Number(p.preco) || 0;
+            return `<div class="cart-modal-item"><div class="cart-modal-item-info"><strong>${esc(nome)}</strong>${preco ? `<span>${money(preco)} cada</span>` : ''}</div><div class="cart-modal-item-actions"><button type="button" onclick="window.updateItemQtd(${JSON.stringify(nome)}, -1)" aria-label="Diminuir quantidade">−</button><span>${item.qtd}</span><button type="button" onclick="window.updateItemQtd(${JSON.stringify(nome)}, 1)" aria-label="Aumentar quantidade">+</button></div></div>`;
+        }).join('') + `<div class="cart-modal-total"><span>Total</span><strong>${totalPrice > 0 ? money(totalPrice) : 'Consultar'}</strong></div>`;
     }
+    const clearBtn = document.getElementById('cartModalClear');
+    if (clearBtn) clearBtn.style.display = entries.length ? 'inline-flex' : 'none';
 }
-
-// Ensure the floating WhatsApp button logic also binds to the final WhatsApp button inside the modal
-const btnFinalizarCarrinho = document.getElementById('btnFinalizarCarrinho');
-if (btnFinalizarCarrinho) {
-    btnFinalizarCarrinho.addEventListener('click', () => {
-        document.getElementById('cartFloatBtn').click(); // trigger existing WhatsApp send logic
-        document.getElementById('modalCarrinho').classList.remove('open');
-    });
+function enviarCarrinhoWhatsApp() {
+    const contato = window.vitrineContato || (data.config && data.config.contato ? data.config.contato : '');
+    const num = (contato || '').replace(/\D/g,'');
+    if(!num) { alert('O catálogo ainda não tem um número de WhatsApp configurado pelo vendedor.'); return; }
+    if (!Object.keys(cart).length) { alert('Adicione pelo menos uma fragrância ao carrinho antes de verificar a disponibilidade.'); return; }
+    let texto = "Olá! Gostaria de verificar a disponibilidade destas fragrâncias:\n\n";
+    for(let nome in cart) texto += `• ${cart[nome].qtd}x ${nome}\n`;
+    texto += `\nPodem me informar a disponibilidade e as condições de compra?`;
+    window.open(`https://wa.me/55${num}?text=${encodeURIComponent(texto)}`, '_blank');
+    cart = {};
+    updateCartUI();
+    closeCartModal();
 }
-
+const cartFloatBtn = document.getElementById('cartFloatBtn');
+if(cartFloatBtn) cartFloatBtn.addEventListener('click', enviarCarrinhoWhatsApp);
+const cartOpenBtn = document.getElementById('cartOpenBtn');
+if(cartOpenBtn) cartOpenBtn.addEventListener('click', openCartModal);
+const cartModalClose = document.getElementById('cartModalClose');
+if(cartModalClose) cartModalClose.addEventListener('click', closeCartModal);
+const cartModal = document.getElementById('cartModal');
+if(cartModal) cartModal.addEventListener('click', e => { if (e.target.matches('[data-cart-close]')) closeCartModal(); });
+const cartModalClear = document.getElementById('cartModalClear');
+if(cartModalClear) cartModalClear.addEventListener('click', window.clearCart);
+const cartModalWhatsapp = document.getElementById('cartModalWhatsapp');
+if(cartModalWhatsapp) cartModalWhatsapp.addEventListener('click', enviarCarrinhoWhatsApp);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCartModal(); });
 
 /* ---------- Gráficos ---------- */
 let myChartFin = null;
