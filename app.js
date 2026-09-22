@@ -854,6 +854,7 @@ window.marcarFidelidade = function(idCli, meta) {
   if(cli) {
     cli.metaResgatada = meta;
     save();
+    renderAll(); // Força a atualização do dashboard e das tabelas imediatamente
     abreFicha(idCli);
   }
 };
