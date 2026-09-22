@@ -3825,12 +3825,12 @@ if(cartFloatBtn) {
             return;
         }
         
-        let texto = "Olá! Dei uma olhada no seu catálogo e gostaria de encomendar:\n\n";
+        let texto = "Olá! Dei uma olhada no seu catálogo e gostaria de verificar a disponibilidade:\n\n";
         for(let nome in cart) {
             const item = cart[nome];
             texto += `• ${item.qtd}x ${nome}\n`;
         }
-        texto += `\nComo podemos combinar a entrega e o pagamento?`;
+        texto += `\nVocês têm esses itens a pronta entrega?`;
         
         const zapLink = `https://wa.me/55${num}?text=${encodeURIComponent(texto)}`;
         window.open(zapLink, '_blank');
