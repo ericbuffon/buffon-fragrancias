@@ -3529,14 +3529,14 @@ function desenhaVitrine(c, auth){
           Ocasião <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-occ" class="dropdown-content oculto">
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> ☀️ Dias Quentes (${countOcc("Dias Quentes")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> ❄️ Dias Frios (${countOcc("Dias Frios")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> 🌅 Diurno (${countOcc("Diurno")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> 🌃 Noturno (${countOcc("Noturno")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> 💼 Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos (${countOcc("Formal / Eventos")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas (${countOcc("Balada / Festas")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> Dias Quentes (${countOcc("Dias Quentes")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> Dias Frios (${countOcc("Dias Frios")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> Diurno (${countOcc("Diurno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> Noturno (${countOcc("Noturno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> Formal / Eventos (${countOcc("Formal / Eventos")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> Balada / Festas (${countOcc("Balada / Festas")})</label>
         </div>
       </div>
       <div class="dropdown-filtro">
