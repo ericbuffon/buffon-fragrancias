@@ -1191,7 +1191,7 @@ function renderDash(){
   const conAtivo = data.consignments.filter(c=>saldoCon(c)>0);
   const inad = inadimplentes();
   const vendasAbertas = data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').length;
-  const valorEntregue = data.sales.filter(v=>v.entregue==='Sim').reduce((s,v)=>s+Number(v.valorVenda||0),0); // total das vendas já entregues
+  const valorEntregue = vendas; // valor exibido no card: mesmo total usado em 'Vendas totais'
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   const rendimentoCDI = valEst * selicMensalAtual;
