@@ -1172,7 +1172,7 @@ function renderABC(id, opt){
 function renderDash(){
   const vendas = data.sales.reduce((s,v)=>s+Number(v.valorVenda),0);
   const recebido = data.sales.reduce((s,v)=>s+Number(v.valorPago||0),0);
-  const aReceber = data.sales.reduce((s,v)=>s + Math.max(0, Number(v.valorVenda) - Number(v.valorPago||0)),0);
+  const aReceber = data.sales.reduce((s,v)=>s + saldoVenda(v),0);
   const lucro = data.sales.reduce((s,v)=>s+calcVenda(v).lucro,0);
   const margem = vendas>0?lucro/vendas:0;
   const est = estoque();
@@ -1202,7 +1202,7 @@ function renderDash(){
     kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status!=='Pago').length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
       `Todo o valor que falta ser pago pelos clientes.\n`
       + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
-      {t:'vendas', g:'ven', f:{venStat:'Pendente'}}),
+      {t:'vendas', g:'ven'}),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
@@ -1690,7 +1690,7 @@ function renderVen(){
   const tcE = rows.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
-  const vPend = rows.filter(v=>v.status==='Pendente'), vEnt = rows.filter(v=>v.entregue!=='Sim');
+  const vPend = rows.filter(v=>saldoVenda(v)>0), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
     ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDuas compras da mesma pessoa no mesmo dia contam como um só.'],
     ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
@@ -1698,7 +1698,7 @@ function renderVen(){
     ['Faturado', money(tv)],
     ['Lucro', money(tl), 'ok'],
     ['Margem', tv?pct(tl/tv):'—'],
-    ['A receber', money(vPend.reduce((s,v)=>s+Number(v.valorVenda),0)), vPend.length?'al':'ok'],
+    ['A receber', money(vPend.reduce((s,v)=>s+saldoVenda(v),0)), vPend.length?'al':'ok'],
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
