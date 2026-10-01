@@ -1190,6 +1190,8 @@ function renderDash(){
   const aEntregar = data.sales.filter(v=>v.entregue==='Não');
   const conAtivo = data.consignments.filter(c=>saldoCon(c)>0);
   const inad = inadimplentes();
+  const vendasAbertas = data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').length;
+  const valorEntregue = data.sales.filter(v=>v.entregue==='Sim').reduce((s,v)=>s+Number(v.valorVenda||0),0);
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   const rendimentoCDI = valEst * selicMensalAtual;
@@ -1199,10 +1201,10 @@ function renderDash(){
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
       +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
       {t:'vendas', g:'ven'}),
-    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${inad.length} em aberto - ${money(vendas)} já entregue`,
+    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${vendasAbertas} em aberto - ${money(valorEntregue)} já entregue`,
       `Todo o valor que falta ser pago pelos clientes.\n`
       + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
-      {t:'vendas', g:'ven'}),
+      {t:'vendas', g:'ven', f:{venStat:'__A_RECEBER__', venEnt:'Sim'} }),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
@@ -1675,7 +1677,8 @@ function renderVen(){
     return {...v, ord:i, canal:canalDe(v), genero:gen(v.produto), lucro:c.lucro, margem:c.margem}; });
   if(fil.venCanal) rows = rows.filter(v=>v.canal===fil.venCanal);
   if(fil.venGen) rows = rows.filter(v=>v.genero===fil.venGen);
-  if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
+  if(fil.venStat === '__A_RECEBER__') rows = rows.filter(v=>saldoVenda(v)>0);
+  else if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
   if(fil.venEnt) rows = rows.filter(v=>v.entregue===fil.venEnt);
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
   if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
