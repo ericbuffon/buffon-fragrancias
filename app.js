@@ -63,7 +63,7 @@ let fotos = {prod:'', insp:''};
 let fil = {
   prodGen:'',prodOcasi:[],prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
-  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,
+  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,venAberto:false,
   estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
@@ -560,7 +560,7 @@ window.addEventListener('popstate', e=>{
 const GRUPOS = {
   prod:{campos:['prodGen','prodOcasi','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodOcasi:'#filProdOcasi',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
-  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
+  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido','venAberto'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal',venAberto:null}, render:()=>renderVen()},
   est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
@@ -674,8 +674,8 @@ function resumoCliente(nome){
   const total = vendas.reduce((s,v)=>s+Number(v.valorVenda),0);
   const pago = vendas.reduce((s,v)=>s+Number(v.valorPago||0),0);
   /* em aberto conta só o que já foi entregue: é o dinheiro realmente na rua */
-  const emAberto = vendas.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim')
-    .reduce((s,v)=>s+saldoVenda(v),0);
+  const emAberto = vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim')
+    .reduce((s,v)=>s+Number(v.valorVenda),0);
   const aEntregar = vendas.filter(v=>v.entregue!=='Sim')
     .reduce((s,v)=>s+Number(v.valorVenda),0);
   const lucro = vendas.reduce((s,v)=>s+calcVenda(v).lucro,0);
@@ -1104,24 +1104,17 @@ function renderSugestao(est){
 }
 
 /* ---------------- dashboard ---------------- */
-/* Saldo financeiro de uma venda: valor da venda menos tudo o que já foi pago. */
+/* A receber: agrupa por cliente, mantendo o canal apenas como identificação quando não há cliente informado. */
 function saldoVenda(v){
   return Math.max(0, Number(v.valorVenda||0) - Number(v.valorPago||0));
 }
 
-/* O que está efetivamente em aberto no Dashboard: ainda há saldo e a venda já foi entregue. */
-function vendasEmAbertoEntregues(){
-  return data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim');
-}
-
-/* Soma do faturamento das vendas já entregues. */
-function valorVendasEntregues(){
-  return data.sales.reduce((s,v)=>s + (v.entregue==='Sim' ? Number(v.valorVenda||0) : 0), 0);
-}
-
 function inadimplentes(){
   const m = {};
-  vendasEmAbertoEntregues().forEach(v=>{
+  data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').forEach(v=>{
+    // No card do Dashboard, mostrar cada cliente individualmente.
+    // O canal continua identificado separadamente, mas não deve juntar
+    // clientes diferentes (ex.: Marcela e Jessica da Estel).
     const temCliente = temNome(v);
     const nome = temCliente ? v.cliente.trim() : canalDe(v);
     const k = norm(nome);
@@ -1197,8 +1190,6 @@ function renderDash(){
   const aEntregar = data.sales.filter(v=>v.entregue==='Não');
   const conAtivo = data.consignments.filter(c=>saldoCon(c)>0);
   const inad = inadimplentes();
-  const vendasAbertas = vendasEmAbertoEntregues().length;
-  const valorEntregue = valorVendasEntregues();
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   const rendimentoCDI = valEst * selicMensalAtual;
@@ -1208,10 +1199,10 @@ function renderDash(){
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
       +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
       {t:'vendas', g:'ven'}),
-    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${vendasAbertas} em aberto - ${money(valorEntregue)} já entregue`,
+    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>saldoVenda(v)>0).length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
       `Todo o valor que falta ser pago pelos clientes.\n`
       + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
-      {t:'vendas', g:'ven', f:{venStat:'__A_RECEBER__', venEnt:'Sim'}}),
+      {t:'vendas', g:'ven', f:{venAberto:true}}),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
@@ -1559,10 +1550,11 @@ $('#modalPedido').addEventListener('click', e=>{ if(e.target.id==='modalPedido')
 $('#tInad').addEventListener('click', e=>{
   const b = e.target.closest('[data-cli]'); if(!b) return;
   const nome = b.dataset.cli;
+  const ehCanal = canaisRows().some(c=>norm(c.canal)===norm(nome) && norm(nome)!=='direto');
+  if(ehCanal){ aplicaFiltros('ven', {venCanal:nome, venEnt:'Sim'}); return goTab('vendas'); }
   const c = data.clients.find(x=>norm(x.nome)===norm(nome));
   if(c) return abreFicha(c.id);
-  aplicaFiltros('ven', {venStat:'__A_RECEBER__', venEnt:'Sim', venQ:nome});
-  goTab('vendas');
+  aplicaFiltros('ven', {venEnt:'Sim', venQ:nome}); goTab('vendas');
 });
 
 /* ---------------- produtos ---------------- */
@@ -1683,8 +1675,8 @@ function renderVen(){
     return {...v, ord:i, canal:canalDe(v), genero:gen(v.produto), lucro:c.lucro, margem:c.margem}; });
   if(fil.venCanal) rows = rows.filter(v=>v.canal===fil.venCanal);
   if(fil.venGen) rows = rows.filter(v=>v.genero===fil.venGen);
-  if(fil.venStat === '__A_RECEBER__') rows = rows.filter(v=>saldoVenda(v)>0);
-  else if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
+  if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
+  if(fil.venAberto) rows = rows.filter(v=>saldoVenda(v)>0);
   if(fil.venEnt) rows = rows.filter(v=>v.entregue===fil.venEnt);
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
   if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
@@ -1699,7 +1691,7 @@ function renderVen(){
   const tcE = rows.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
-  const vAReceber = rows.filter(v=>saldoVenda(v)>0), vEnt = rows.filter(v=>v.entregue!=='Sim');
+  const vPend = rows.filter(v=>saldoVenda(v)>0), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
     ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDuas compras da mesma pessoa no mesmo dia contam como um só.'],
     ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
@@ -1707,7 +1699,7 @@ function renderVen(){
     ['Faturado', money(tv)],
     ['Lucro', money(tl), 'ok'],
     ['Margem', tv?pct(tl/tv):'—'],
-    ['A receber', money(vAReceber.reduce((s,v)=>s+saldoVenda(v),0)), vAReceber.length?'al':'ok'],
+    ['A receber', money(vPend.reduce((s,v)=>s+saldoVenda(v),0)), vPend.length?'al':'ok'],
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
@@ -2735,7 +2727,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'a-receber · 01/10 · v2';
+const VERSAO = 'canal-pct · 20/08';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
