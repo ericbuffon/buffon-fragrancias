@@ -1191,7 +1191,7 @@ function renderDash(){
   const conAtivo = data.consignments.filter(c=>saldoCon(c)>0);
   const inad = inadimplentes();
   const vendasAbertas = data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').length;
-  const valorEntregue = vendas;
+  const valorEntregue = data.sales.reduce((s,v)=>s+Number(v.valorVenda||0),0); // total de vendas, mesma base do KPI Vendas totais
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   const rendimentoCDI = valEst * selicMensalAtual;
@@ -1678,6 +1678,7 @@ function renderVen(){
   if(fil.venCanal) rows = rows.filter(v=>v.canal===fil.venCanal);
   if(fil.venGen) rows = rows.filter(v=>v.genero===fil.venGen);
   if(fil.venStat === '__A_RECEBER__') rows = rows.filter(v=>saldoVenda(v)>0);
+  else if(fil.venStat === '__A_RECEBER__') rows = rows.filter(v=>saldoVenda(v)>0);
   else if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
   if(fil.venEnt) rows = rows.filter(v=>v.entregue===fil.venEnt);
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
