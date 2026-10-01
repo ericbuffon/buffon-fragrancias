@@ -674,8 +674,8 @@ function resumoCliente(nome){
   const total = vendas.reduce((s,v)=>s+Number(v.valorVenda),0);
   const pago = vendas.reduce((s,v)=>s+Number(v.valorPago||0),0);
   /* em aberto conta só o que já foi entregue: é o dinheiro realmente na rua */
-  const emAberto = vendas.filter(v=>v.status==='Pendente' && v.entregue==='Sim')
-    .reduce((s,v)=>s+Number(v.valorVenda),0);
+  const emAberto = vendas.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim')
+    .reduce((s,v)=>s+saldoVenda(v),0);
   const aEntregar = vendas.filter(v=>v.entregue!=='Sim')
     .reduce((s,v)=>s+Number(v.valorVenda),0);
   const lucro = vendas.reduce((s,v)=>s+calcVenda(v).lucro,0);
@@ -1104,17 +1104,24 @@ function renderSugestao(est){
 }
 
 /* ---------------- dashboard ---------------- */
-/* A receber: agrupa por cliente, mantendo o canal apenas como identificação quando não há cliente informado. */
+/* Saldo financeiro de uma venda: valor da venda menos tudo o que já foi pago. */
 function saldoVenda(v){
   return Math.max(0, Number(v.valorVenda||0) - Number(v.valorPago||0));
 }
 
+/* O que está efetivamente em aberto no Dashboard: ainda há saldo e a venda já foi entregue. */
+function vendasEmAbertoEntregues(){
+  return data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim');
+}
+
+/* Soma do faturamento das vendas já entregues. */
+function valorVendasEntregues(){
+  return data.sales.reduce((s,v)=>s + (v.entregue==='Sim' ? Number(v.valorVenda||0) : 0), 0);
+}
+
 function inadimplentes(){
   const m = {};
-  data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').forEach(v=>{
-    // No card do Dashboard, mostrar cada cliente individualmente.
-    // O canal continua identificado separadamente, mas não deve juntar
-    // clientes diferentes (ex.: Marcela e Jessica da Estel).
+  vendasEmAbertoEntregues().forEach(v=>{
     const temCliente = temNome(v);
     const nome = temCliente ? v.cliente.trim() : canalDe(v);
     const k = norm(nome);
@@ -1190,8 +1197,8 @@ function renderDash(){
   const aEntregar = data.sales.filter(v=>v.entregue==='Não');
   const conAtivo = data.consignments.filter(c=>saldoCon(c)>0);
   const inad = inadimplentes();
-  const vendasAbertas = data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').length;
-  const valorEntregue = vendas; // valor exibido no card: mesmo total usado em 'Vendas totais'
+  const vendasAbertas = vendasEmAbertoEntregues().length;
+  const valorEntregue = valorVendasEntregues();
 
   const invCompras = data.purchases.reduce((s,c)=>s+Number(c.custoTotal),0);
   const rendimentoCDI = valEst * selicMensalAtual;
@@ -1204,7 +1211,7 @@ function renderDash(){
     kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${vendasAbertas} em aberto - ${money(valorEntregue)} já entregue`,
       `Todo o valor que falta ser pago pelos clientes.\n`
       + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
-      {t:'vendas', g:'ven', f:{venStat:'__A_RECEBER__', venEnt:'Sim'} }),
+      {t:'vendas', g:'ven', f:{venStat:'__A_RECEBER__', venEnt:'Sim'}}),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
@@ -1552,11 +1559,10 @@ $('#modalPedido').addEventListener('click', e=>{ if(e.target.id==='modalPedido')
 $('#tInad').addEventListener('click', e=>{
   const b = e.target.closest('[data-cli]'); if(!b) return;
   const nome = b.dataset.cli;
-  const ehCanal = canaisRows().some(c=>norm(c.canal)===norm(nome) && norm(nome)!=='direto');
-  if(ehCanal){ aplicaFiltros('ven', {venCanal:nome, venEnt:'Sim'}); return goTab('vendas'); }
   const c = data.clients.find(x=>norm(x.nome)===norm(nome));
   if(c) return abreFicha(c.id);
-  aplicaFiltros('ven', {venEnt:'Sim', venQ:nome}); goTab('vendas');
+  aplicaFiltros('ven', {venStat:'__A_RECEBER__', venEnt:'Sim', venQ:nome});
+  goTab('vendas');
 });
 
 /* ---------------- produtos ---------------- */
@@ -1678,7 +1684,6 @@ function renderVen(){
   if(fil.venCanal) rows = rows.filter(v=>v.canal===fil.venCanal);
   if(fil.venGen) rows = rows.filter(v=>v.genero===fil.venGen);
   if(fil.venStat === '__A_RECEBER__') rows = rows.filter(v=>saldoVenda(v)>0);
-  else if(fil.venStat === '__A_RECEBER__') rows = rows.filter(v=>saldoVenda(v)>0);
   else if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
   if(fil.venEnt) rows = rows.filter(v=>v.entregue===fil.venEnt);
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
@@ -1694,7 +1699,7 @@ function renderVen(){
   const tcE = rows.reduce((s,v)=>s+(Number(v.custosExtras)||0),0);
   const tl = rows.reduce((s,v)=>s+v.lucro,0);
   $('#cntVen').textContent = `${rows.length} de ${data.sales.length}`;
-  const vPend = rows.filter(v=>saldoVenda(v)>0), vEnt = rows.filter(v=>v.entregue!=='Sim');
+  const vAReceber = rows.filter(v=>saldoVenda(v)>0), vEnt = rows.filter(v=>v.entregue!=='Sim');
   resumo('resVen', [
     ['Pedidos', contaPedidos(rows), '', 'Mesma pessoa, mesmo dia, mesmo canal = um pedido.\nDuas compras da mesma pessoa no mesmo dia contam como um só.'],
     ['Lançamentos', rows.length, '', 'Cada linha da tabela — um produto por linha.\nTrês perfumes diferentes = três lançamentos.\nTrês frascos do mesmo perfume = um lançamento só.'],
@@ -1702,7 +1707,7 @@ function renderVen(){
     ['Faturado', money(tv)],
     ['Lucro', money(tl), 'ok'],
     ['Margem', tv?pct(tl/tv):'—'],
-    ['A receber', money(vPend.reduce((s,v)=>s+saldoVenda(v),0)), vPend.length?'al':'ok'],
+    ['A receber', money(vAReceber.reduce((s,v)=>s+saldoVenda(v),0)), vAReceber.length?'al':'ok'],
     ['A entregar', vEnt.length+' un', vEnt.length?'am':'ok']
   ]);
   $('#tVen').innerHTML = rows.length
@@ -2730,7 +2735,7 @@ document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho
    continua funcionando offline; a nuvem serve para igualar os aparelhos. */
-const VERSAO = 'canal-pct · 20/08';
+const VERSAO = 'a-receber · 01/10 · v2';
 /* Se você preencher estas duas linhas com os dados do seu projeto, o link do
    catálogo fica curto (só o código). A chave "anon public" é feita para ser
    pública — quem a tem não acessa nada, porque as permissões exigem login. */
