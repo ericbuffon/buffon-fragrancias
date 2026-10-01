@@ -63,7 +63,7 @@ let fotos = {prod:'', insp:''};
 let fil = {
   prodGen:'',prodOcasi:[],prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
-  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,
+  venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,venAberto:false,
   estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
@@ -560,7 +560,7 @@ window.addEventListener('popstate', e=>{
 const GRUPOS = {
   prod:{campos:['prodGen','prodOcasi','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodOcasi:'#filProdOcasi',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
-  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal'}, render:()=>renderVen()},
+  ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido','venAberto'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal',venAberto:null}, render:()=>renderVen()},
   est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
@@ -1199,10 +1199,10 @@ function renderDash(){
       `Soma de todas as vendas lançadas (${data.sales.length} ${plural(data.sales.length,'item','itens')}).\n`
       +`Recebido ${money(recebido)} + a receber ${money(aReceber)} = ${money(vendas)}`,
       {t:'vendas', g:'ven'}),
-    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>v.status!=='Pago').length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
+    kpi('A receber',money(aReceber),aReceber>0?'ambar':'verde',`${data.sales.filter(v=>saldoVenda(v)>0).length} em aberto · ${money(inad.reduce((s,c)=>s+c.valor,0))} já entregue`,
       `Todo o valor que falta ser pago pelos clientes.\n`
       + `Dinheiro na rua: ${money(inad.reduce((s,c)=>s+c.valor,0))} (produtos que já saíram da sua mão e não foram pagos).`,
-      {t:'vendas', g:'ven'}),
+      {t:'vendas', g:'ven', f:{venAberto:true}}),
     kpi('Lucro bruto',money(lucro),'verde',`Margem ${pct(margem)}`,
       `Para cada venda: valor da venda − (custo médio do produto × quantidade).\n`
       +`Margem = lucro ÷ vendas = ${money(lucro)} ÷ ${money(vendas)} = ${pct(margem)}\n`
@@ -1676,6 +1676,7 @@ function renderVen(){
   if(fil.venCanal) rows = rows.filter(v=>v.canal===fil.venCanal);
   if(fil.venGen) rows = rows.filter(v=>v.genero===fil.venGen);
   if(fil.venStat) rows = rows.filter(v=>v.status===fil.venStat);
+  if(fil.venAberto) rows = rows.filter(v=>saldoVenda(v)>0);
   if(fil.venEnt) rows = rows.filter(v=>v.entregue===fil.venEnt);
   rows = rows.filter(v=>noPeriodo(v.data, fil.venDe, fil.venAte));
   if(fil.venProdX) rows = rows.filter(v=>v.produto===fil.venProdX);
