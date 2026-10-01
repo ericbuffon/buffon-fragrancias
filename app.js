@@ -1104,14 +1104,24 @@ function renderSugestao(est){
 }
 
 /* ---------------- dashboard ---------------- */
-/* Agrupa por quem responde pelo dinheiro: o comprador nas vendas diretas,
-   o canal quando quem vendeu foi a barbearia ou outra pessoa. */
+/* A receber: agrupa por cliente, mantendo o canal apenas como identificação quando não há cliente informado. */
+function saldoVenda(v){
+  return Math.max(0, Number(v.valorVenda||0) - Number(v.valorPago||0));
+}
+
 function inadimplentes(){
   const m = {};
-  data.sales.filter(v=>(Number(v.valorVenda) - Number(v.valorPago||0)) > 0 && v.entregue==='Sim').forEach(v=>{
-    const nome = responsavelDe(v), k = norm(nome);
-    if(!m[k]) m[k]={nome, valor:0, n:0, qtd:0, canal: canalDe(v)!=='Direto'};
-    m[k].valor += (Number(v.valorVenda) - Number(v.valorPago||0)); m[k].n++; m[k].qtd += Number(v.qtde);
+  data.sales.filter(v=>saldoVenda(v)>0 && v.entregue==='Sim').forEach(v=>{
+    // No card do Dashboard, mostrar cada cliente individualmente.
+    // O canal continua identificado separadamente, mas não deve juntar
+    // clientes diferentes (ex.: Marcela e Jessica da Estel).
+    const temCliente = temNome(v);
+    const nome = temCliente ? v.cliente.trim() : canalDe(v);
+    const k = norm(nome);
+    if(!m[k]) m[k]={nome, valor:0, n:0, qtd:0, canal:!temCliente && canalDe(v)!=='Direto'};
+    m[k].valor += saldoVenda(v);
+    m[k].n++;
+    m[k].qtd += Number(v.qtde)||0;
   });
   return Object.values(m).sort((a,b)=>b.valor-a.valor);
 }
@@ -1541,10 +1551,10 @@ $('#tInad').addEventListener('click', e=>{
   const b = e.target.closest('[data-cli]'); if(!b) return;
   const nome = b.dataset.cli;
   const ehCanal = canaisRows().some(c=>norm(c.canal)===norm(nome) && norm(nome)!=='direto');
-  if(ehCanal){ aplicaFiltros('ven', {venCanal:nome, venStat:'Pendente', venEnt:'Sim'}); return goTab('vendas'); }
+  if(ehCanal){ aplicaFiltros('ven', {venCanal:nome, venEnt:'Sim'}); return goTab('vendas'); }
   const c = data.clients.find(x=>norm(x.nome)===norm(nome));
   if(c) return abreFicha(c.id);
-  aplicaFiltros('ven', {venStat:'Pendente', venEnt:'Sim', venQ:nome}); goTab('vendas');
+  aplicaFiltros('ven', {venEnt:'Sim', venQ:nome}); goTab('vendas');
 });
 
 /* ---------------- produtos ---------------- */
@@ -3529,14 +3539,14 @@ function desenhaVitrine(c, auth){
           Ocasião <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-occ" class="dropdown-content oculto">
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> Dias Quentes (${countOcc("Dias Quentes")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> Dias Frios (${countOcc("Dias Frios")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> Diurno (${countOcc("Diurno")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> Noturno (${countOcc("Noturno")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> Formal / Eventos (${countOcc("Formal / Eventos")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> Balada / Festas (${countOcc("Balada / Festas")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> ☀️ Dias Quentes (${countOcc("Dias Quentes")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> ❄️ Dias Frios (${countOcc("Dias Frios")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> 🌅 Diurno (${countOcc("Diurno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> 🌃 Noturno (${countOcc("Noturno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> 💼 Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos (${countOcc("Formal / Eventos")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas (${countOcc("Balada / Festas")})</label>
         </div>
       </div>
       <div class="dropdown-filtro">
