@@ -2744,8 +2744,12 @@ async function geraPdfEstoqueCliente(){
     const lote=rows.slice(i,i+porPagina);
     paginas.push(`<div class="pagina estoque-cliente-pagina">
       <div class="ecab">
-        <div>${logoImg(LOGO_P)}</div>
-        <div><h1>Disponibilidade de produtos</h1><p>Buffon Fragrâncias · atualizado em ${dataGeracao}</p></div>
+        <div class="elogo">${logoImg(LOGO_P)}</div>
+        <div class="ediv"></div>
+        <div class="etit">
+          <h1>Produtos disponíveis</h1>
+          <p>ATUALIZADO EM ${dataGeracao}</p>
+        </div>
       </div>
       <div class="enota">Lista comercial de produtos. A disponibilidade deve ser confirmada antes do fechamento do pedido.</div>
       <table class="etab"><thead><tr><th>Foto</th><th>Produto</th><th>Gênero</th><th>Família olfativa</th><th>Disponibilidade</th></tr></thead><tbody>
