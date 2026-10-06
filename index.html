@@ -361,11 +361,13 @@
     <select id="filEstGen"><option value="">Todos os gêneros</option><option>Masculino</option><option>Feminino</option></select>
     <select id="filEstFam"><option value="">Todas as famílias</option></select>
     <select id="filEstStat"><option value="">Toda situação</option><option value="REPOR">Repor</option><option value="NORMAL">Normal</option><option value="EXCESSO">Excesso</option><option value="NOVO">Novo no catálogo</option></select>
+    <select id="filEstDisp"><option value="">Com e sem estoque</option><option value="COM">Com estoque</option><option value="SEM">Sem estoque</option></select>
     <input id="filEstBusca" placeholder="Buscar produto…">
     <label class="chk" style="display:flex;align-items:center;gap:6px;font-size:12.5px;white-space:nowrap">
       <input type="checkbox" id="estCompacto" style="width:auto"> Menos colunas</label>
     <button class="btn sm" data-limpa="est">Limpar filtros</button>
     <button class="btn sm" data-rel="est">Imprimir relatório</button>
+    <button class="btn sm" data-pdf-cliente="est">PDF para cliente</button>
     <button class="btn sm" data-xls="est">Exportar Excel</button>
     <span class="chip" id="chipEst" hidden></span>
     <span class="chip" id="chipEstAbc" hidden></span>

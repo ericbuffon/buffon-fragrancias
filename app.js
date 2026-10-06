@@ -64,7 +64,7 @@ let fil = {
   prodGen:'',prodOcasi:[],prodFoto:'',prodQ:'',prodTester:'',prodFam:'',
   comGen:'',comTipo:'',comEnt:'',comDe:'',comAte:'',comQ:'',comProdX:'',
   venGen:'',venStat:'',venEnt:'',venDe:'',venAte:'',venQ:'',venCanal:'',venProdX:'',venPedido:null,venAberto:false,
-  estGen:'',estStat:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
+  estGen:'',estStat:'',estDisp:'',estQ:'',estProdX:'',estClasseAbc:'',estFam:'',
   conParc:'',conTipo:'',conSit:'',conDe:'',conAte:'',conQ:'',conProdX:'',
   tesGen:'',tesQ:'', cliSit:'',cliQ:'', canSit:'',canDe:'',canAte:'',canQ:'',
   desDe:'',desAte:'',desQ:''
@@ -561,7 +561,7 @@ const GRUPOS = {
   prod:{campos:['prodGen','prodOcasi','prodFoto','prodQ','prodTester','prodFam'], els:{prodGen:'#filProdGen',prodOcasi:'#filProdOcasi',prodFoto:'#filProdFoto',prodQ:'#filProdBusca',prodTester:'#filProdTester',prodFam:'#filProdFam'}, render:()=>renderProd()},
   com:{campos:['comGen','comTipo','comEnt','comDe','comAte','comQ','comProdX'], els:{comGen:'#filComGen',comTipo:'#filComTipo',comEnt:'#filComEnt',comDe:'#filComDe',comAte:'#filComAte',comQ:'#filComBusca'}, render:()=>renderCom()},
   ven:{campos:['venGen','venStat','venEnt','venDe','venAte','venQ','venCanal','venProdX','venPedido','venAberto'], els:{venGen:'#filVenGen',venStat:'#filVenStat',venEnt:'#filVenEnt',venDe:'#filVenDe',venAte:'#filVenAte',venQ:'#filVenBusca',venCanal:'#filVenCanal',venAberto:null}, render:()=>renderVen()},
-  est:{campos:['estGen','estStat','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
+  est:{campos:['estGen','estStat','estDisp','estQ','estProdX','estClasseAbc','estFam'], els:{estGen:'#filEstGen',estStat:'#filEstStat',estDisp:'#filEstDisp',estQ:'#filEstBusca',estFam:'#filEstFam'}, render:()=>renderEst()},
   con:{campos:['conParc','conTipo','conSit','conDe','conAte','conQ','conProdX'], els:{conParc:'#filConParc',conTipo:'#filConTipo',conSit:'#filConSit',conDe:'#filConDe',conAte:'#filConAte',conQ:'#filConBusca'}, render:()=>renderCon()},
   can:{campos:['canSit','canDe','canAte','canQ'], els:{canSit:'#filCanSit',canDe:'#filCanDe',canAte:'#filCanAte',canQ:'#filCanBusca'}, render:()=>renderCanal()},
   cli:{campos:['cliSit','cliQ'], els:{cliSit:'#filCliSit',cliQ:'#filCliBusca'}, render:()=>renderCli()},
@@ -1723,6 +1723,8 @@ function renderEst(){
   if(fil.estGen) rows = rows.filter(r=>r.genero===fil.estGen);
   if(fil.estFam) rows = rows.filter(r=>r.familia===fil.estFam);
   if(fil.estStat) rows = rows.filter(r=>r.status===fil.estStat);
+  if(fil.estDisp==='COM') rows = rows.filter(r=>Number(r.saldo)>0);
+  if(fil.estDisp==='SEM') rows = rows.filter(r=>Number(r.saldo)<=0);
   if(fil.estProdX) rows = rows.filter(r=>r.produto===fil.estProdX);
   if(fil.estClasseAbc) rows = rows.filter(r=>(r.classeAbc||'')===fil.estClasseAbc || (fil.estClasseAbc==='—' && !r.classeAbc));
   if(fil.estQ) rows = rows.filter(r=>norm(r.produto).includes(norm(fil.estQ)));
@@ -2201,7 +2203,7 @@ const LIGA = [
   ['#filVenCanal','venCanal','change',renderVen],
   ['#filVenGen','venGen','change',renderVen],['#filVenStat','venStat','change',renderVen],['#filVenEnt','venEnt','change',renderVen],
   ['#filVenDe','venDe','change',renderVen],['#filVenAte','venAte','change',renderVen],['#filVenBusca','venQ','input',renderVen],
-  ['#filEstGen','estGen','change',renderEst],['#filEstStat','estStat','change',renderEst],['#filEstFam','estFam','change',renderEst],['#filEstBusca','estQ','input',renderEst],
+  ['#filEstGen','estGen','change',renderEst],['#filEstStat','estStat','change',renderEst],['#filEstDisp','estDisp','change',renderEst],['#filEstFam','estFam','change',renderEst],['#filEstBusca','estQ','input',renderEst],
   ['#filConParc','conParc','change',renderCon],['#filConTipo','conTipo','change',renderCon],['#filConSit','conSit','change',renderCon],
   ['#filConDe','conDe','change',renderCon],['#filConAte','conAte','change',renderCon],['#filConBusca','conQ','input',renderCon],
   ['#filCanSit','canSit','change',renderCanal],['#filCanDe','canDe','change',renderCanal],
@@ -2669,7 +2671,7 @@ const RELATORIOS = {
   ven:{titulo:'Vendas', tabela:'#tVen', contador:'#cntVen',
     filtros:()=>[['Canal',fil.venCanal],['Gênero',fil.venGen],['Pagamento',fil.venStat],['Entrega',fil.venEnt==='Sim'?'entregues':fil.venEnt==='Não'?'não entregues':''],['Período',periodo(fil.venDe,fil.venAte)],['Busca',fil.venQ]]},
   est:{titulo:'Posição de estoque', tabela:'#tEst', contador:'#cntEst',
-    filtros:()=>[['Gênero',fil.estGen],['Família',fil.estFam],['Situação',fil.estStat],['Busca',fil.estQ]]},
+    filtros:()=>[['Gênero',fil.estGen],['Família',fil.estFam],['Situação',fil.estStat],['Disponibilidade',{COM:'com estoque',SEM:'sem estoque'}[fil.estDisp]],['Busca',fil.estQ]]},
   con:{titulo:'Estoque consignado', tabela:'#tCon', contador:'#cntCon',
     filtros:()=>[['Parceiro',fil.conParc],['Tipo',fil.conTipo],['Situação',fil.conSit],['Período',periodo(fil.conDe,fil.conAte)],['Busca',fil.conQ]]},
   can:{titulo:'Canais de venda', tabela:'#tCanal', contador:'#cntCan',
@@ -2721,8 +2723,47 @@ function imprimeRelatorio(g){
     <div class="pe">Buffon Fragrâncias · documento interno</div>`;
   imprime('pr-rel');
 }
+async function geraPdfEstoqueCliente(){
+  const abcMapa = calculaABC().porProduto;
+  let rows = estoque().map(r=>({...r, classeAbc: abcMapa[r.produto]||''}));
+  if(fil.estGen) rows = rows.filter(r=>r.genero===fil.estGen);
+  if(fil.estFam) rows = rows.filter(r=>r.familia===fil.estFam);
+  if(fil.estStat) rows = rows.filter(r=>r.status===fil.estStat);
+  if(fil.estDisp==='COM') rows = rows.filter(r=>Number(r.saldo)>0);
+  if(fil.estDisp==='SEM') rows = rows.filter(r=>Number(r.saldo)<=0);
+  if(fil.estProdX) rows = rows.filter(r=>r.produto===fil.estProdX);
+  if(fil.estClasseAbc) rows = rows.filter(r=>(r.classeAbc||'')===fil.estClasseAbc || (fil.estClasseAbc==='—' && !r.classeAbc));
+  if(fil.estQ) rows = rows.filter(r=>norm(r.produto).includes(norm(fil.estQ)));
+  rows = ord(rows, sort.est);
+  if(!rows.length) return alert('Não há produtos para gerar o PDF com os filtros atuais.');
+
+  const porPagina = 12;
+  const paginas=[];
+  const dataGeracao = new Date().toLocaleDateString('pt-BR');
+  for(let i=0;i<rows.length;i+=porPagina){
+    const lote=rows.slice(i,i+porPagina);
+    paginas.push(`<div class="pagina estoque-cliente-pagina">
+      <div class="ecab">
+        <div>${logoImg(LOGO_P)}</div>
+        <div><h1>Disponibilidade de produtos</h1><p>Buffon Fragrâncias · atualizado em ${dataGeracao}</p></div>
+      </div>
+      <div class="enota">Lista comercial de produtos. A disponibilidade deve ser confirmada antes do fechamento do pedido.</div>
+      <table class="etab"><thead><tr><th>Foto</th><th>Produto</th><th>Gênero</th><th>Família olfativa</th><th>Disponibilidade</th></tr></thead><tbody>
+      ${lote.map(r=>`<tr><td class="efoto">${foto(r.produto)?`<img src="${foto(r.produto)}" alt="">`:'—'}</td><td><b>${esc(r.produto)}</b></td><td>${r.genero?esc(r.genero):'—'}</td><td>${r.familia?esc(r.familia):'—'}</td><td><span class="edisp ${Number(r.saldo)>0?'sim':'nao'}">${Number(r.saldo)>0?'Disponível':'Indisponível'}</span></td></tr>`).join('')}
+      </tbody></table>
+      <div class="epe">Buffon Fragrâncias · disponibilidade sujeita a confirmação</div>
+    </div>`);
+  }
+  const el=$('#catalogo');
+  const old=el.innerHTML, oldDisplay=el.style.display;
+  el.innerHTML=paginas.join(''); el.style.display='block';
+  document.body.classList.add('pdf-export');
+  try{ await geraPdfCatalogoDireto(el,'Disponibilidade_Estoque_Buffon_Fragrancias.pdf'); }
+  finally{ el.innerHTML=old; el.style.display=oldDisplay; document.body.classList.remove('pdf-export'); }
+}
 document.querySelectorAll('[data-rel]').forEach(b=>b.addEventListener('click',()=>imprimeRelatorio(b.dataset.rel)));
 document.querySelectorAll('[data-xls]').forEach(b=>b.addEventListener('click',()=>exportaXlsx(b.dataset.xls)));
+document.querySelectorAll('[data-pdf-cliente]').forEach(b=>b.addEventListener('click',()=>geraPdfEstoqueCliente().catch(e=>alert('Não consegui gerar o PDF: '+(e?.message||e)))));
 
 /* ---------------- sincronização na nuvem (Supabase) ----------------
    Guarda todo o conteúdo num registro só, ligado à sua conta. O aparelho

@@ -876,3 +876,23 @@ body:not(.publico) #fixedBottomContainer { display: none !important; }
 body.publico:not(.pr-cat) #topRightLamp { display: block !important; }
 body:not(.publico) #topRightLamp { display: none !important; }
 @media print { #topRightLamp { display: none !important; } }
+
+
+/* ---------- PDF comercial de estoque ---------- */
+#catalogo .estoque-cliente-pagina{padding:45px 50px 38px;background:#fff;color:var(--ink);font-family:'Inter',-apple-system,system-ui,sans-serif;}
+#catalogo .estoque-cliente-pagina .ecab{display:flex;align-items:center;gap:22px;border-bottom:2px solid var(--accent);padding-bottom:18px;margin-bottom:18px;}
+#catalogo .estoque-cliente-pagina .ecab img{width:190px;height:auto;display:block;}
+#catalogo .estoque-cliente-pagina .ecab h1{font-family:'Fraunces',Georgia,serif;font-size:25px;margin:0 0 4px;color:var(--ink);}
+#catalogo .estoque-cliente-pagina .ecab p{margin:0;color:var(--ink-soft);font-size:11.5px;}
+#catalogo .estoque-cliente-pagina .enota{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:10px 13px;color:var(--ink-soft);font-size:11.5px;margin-bottom:18px;}
+#catalogo .estoque-cliente-pagina .etab{width:100%;border-collapse:collapse;font-size:12px;}
+#catalogo .estoque-cliente-pagina .etab th{text-align:left;background:#f4f6f9;color:var(--ink-soft);font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:9px 8px;border-bottom:1px solid var(--line);}
+#catalogo .estoque-cliente-pagina .etab td{padding:8px;border-bottom:1px solid var(--line2);vertical-align:middle;}
+#catalogo .estoque-cliente-pagina .etab .efoto{width:65px;text-align:center;}
+#catalogo .estoque-cliente-pagina .etab .efoto img{width:48px;height:48px;object-fit:contain;display:block;margin:auto;}
+#catalogo .estoque-cliente-pagina .edisp{display:inline-block;padding:4px 9px;border-radius:12px;font-size:10.5px;font-weight:700;}
+#catalogo .estoque-cliente-pagina .edisp.sim{background:var(--verde-luz);color:var(--verde);}
+#catalogo .estoque-cliente-pagina .edisp.nao{background:var(--cinza-luz);color:var(--cinza);}
+#catalogo .estoque-cliente-pagina .epe{position:absolute;left:50px;right:50px;bottom:28px;border-top:1px solid var(--line);padding-top:10px;color:var(--ink-faint);font-size:9.5px;text-align:center;}
+.pdf-export #catalogo .estoque-cliente-pagina{padding:45px 50px 38px !important;width:794px !important;height:1122px !important;min-width:794px !important;max-width:794px !important;}
+.pdf-export #catalogo .estoque-cliente-pagina .ecab img{width:190px !important;}
