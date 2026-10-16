@@ -2652,6 +2652,18 @@ function exportaXlsx(g){
   if(iFoto>=0) clone.querySelectorAll('tr').forEach(tr=>{ const c=tr.children[iFoto]; if(c&&c.colSpan===1) c.remove(); });
   const cabecalhos = [...clone.querySelectorAll('thead th')].map(t=>t.textContent.replace(/[▲▼↕]/g,'').trim());
   const linhas = [...clone.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim()));
+  // A tabela administrativa não mostra ocasiões; acrescenta esse campo à exportação de produtos.
+  // O nome do produto é usado como chave para manter a correspondência com as linhas filtradas.
+  if(g === 'prod'){
+    cabecalhos.push('Ocasiões');
+    linhas.forEach(linha=>{
+      const nomeProduto = norm(linha[0] || '');
+      const produto = data.products.find(p=>norm(p.nome) === nomeProduto);
+      linha.push(produto && Array.isArray(produto.ocasioes) && produto.ocasioes.length
+        ? produto.ocasioes.join(' · ')
+        : '—');
+    });
+  }
   [...clone.querySelectorAll('tfoot tr')].forEach(tr=>linhas.push([...tr.children].map(td=>td.textContent.trim())));
   const ativos = R.filtros().filter(([,v])=>v).map(([l,v])=>`${l}: ${v}`);
   const resumo = `${new Date().toLocaleString('pt-BR')} · ${ativos.length?ativos.join(' · '):'sem filtros'}`;
