@@ -899,35 +899,3 @@ body:not(.publico) #topRightLamp { display: none !important; }
 #catalogo .estoque-cliente-pagina .epe{position:absolute;left:50px;right:50px;bottom:28px;border-top:1px solid var(--line);padding-top:10px;color:var(--ink-faint);font-size:9.5px;text-align:center;}
 .pdf-export #catalogo .estoque-cliente-pagina{padding:45px 50px 38px !important;width:794px !important;height:1122px !important;min-width:794px !important;max-width:794px !important;}
 .pdf-export #catalogo .estoque-cliente-pagina .ecab .elogo img{width:176px !important;}
-
-/* ---------- Correção da tabela de Despesas no celular ---------- */
-/* Evita que o Safari/iOS amplie automaticamente o texto das observações. */
-#tDes {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
-#tDes th,
-#tDes td {
-  font-size: 13px !important;
-  line-height: 1.45;
-}
-#tDes td:nth-child(5) {
-  white-space: normal;
-  overflow-wrap: anywhere;
-  min-width: 180px;
-  max-width: 280px;
-}
-@media screen and (max-width: 600px) {
-  #tDes th,
-  #tDes td {
-    padding: 8px 9px;
-    font-size: 13px !important;
-  }
-  #tDes td:nth-child(5) {
-    min-width: 170px;
-    max-width: 220px;
-  }
-  #tDes td:nth-child(4) {
-    white-space: nowrap;
-  }
-}
