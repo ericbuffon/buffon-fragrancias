@@ -257,30 +257,14 @@ function aplicaPatchOcasiao(){
   return n;
 }
 
-// Atualização pontual das ocasiões revisadas para os 47 perfumes.
-const PATCH_OCASIOES_REVISADAS = {"315 Prestige":["Noturno","Balada / Festas","Dias Frios","Romântico / Encontros"],"315 Prestige Black":["Noturno","Balada / Festas","Dias Frios","Romântico / Encontros"],"315 Prestige Pink":["Diurno","Casual / Trabalho","Romântico / Encontros","Dias Quentes"],"Absolute Sport":["Dias Quentes","Diurno","Casual / Trabalho","Academia / Esportes"],"Aftermath":["Diurno","Casual / Trabalho","Formal / Eventos"],"Aqua Man":["Dias Quentes","Diurno","Casual / Trabalho","Academia / Esportes"],"Aqua Woman":["Dias Quentes","Diurno","Casual / Trabalho","Romântico / Encontros"],"Black Fury":["Noturno","Balada / Festas","Dias Frios","Casual / Trabalho"],"Black Water":["Diurno","Casual / Trabalho","Formal / Eventos","Dias Frios"],"Brave Man":["Dias Quentes","Diurno","Casual / Trabalho","Academia / Esportes"],"Cabana":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Cash for Men":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Cash Woman":["Noturno","Balada / Festas","Dias Frios","Romântico / Encontros","Formal / Eventos"],"Charisme":["Diurno","Casual / Trabalho","Formal / Eventos","Romântico / Encontros"],"Cuté":["Diurno","Casual / Trabalho","Formal / Eventos","Romântico / Encontros"],"Destinée":["Diurno","Noturno","Formal / Eventos","Romântico / Encontros"],"Elixir":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Eternal Kiss":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios","Formal / Eventos"],"Extreme Story":["Diurno","Casual / Trabalho","Dias Quentes","Dias Frios","Balada / Festas"],"Fearless Man":["Diurno","Casual / Trabalho","Formal / Eventos","Dias Quentes","Dias Frios"],"Her Choice":["Diurno","Casual / Trabalho","Dias Quentes","Romântico / Encontros","Formal / Eventos"],"Heroic Man":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"I Am Ideal":["Diurno","Casual / Trabalho","Formal / Eventos","Dias Quentes"],"In Flames":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"In Love":["Diurno","Casual / Trabalho","Formal / Eventos","Romântico / Encontros"],"In Woman":["Noturno","Formal / Eventos","Casual / Trabalho","Romântico / Encontros"],"Ironstone":["Diurno","Casual / Trabalho","Dias Quentes","Dias Frios","Formal / Eventos"],"Just on Time":["Noturno","Balada / Festas","Dias Frios","Romântico / Encontros"],"La Rive Isabel":["Diurno","Casual / Trabalho","Formal / Eventos","Romântico / Encontros"],"Look of Woman":["Noturno","Romântico / Encontros","Dias Frios","Formal / Eventos"],"LR Password":["Noturno","Romântico / Encontros","Dias Frios","Formal / Eventos"],"Metaphor":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Miss Dream":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Miss Dream Pink":["Diurno","Casual / Trabalho","Dias Quentes","Romântico / Encontros"],"Move on":["Diurno","Casual / Trabalho","Dias Quentes","Formal / Eventos"],"Poetique":["Diurno","Casual / Trabalho","Romântico / Encontros","Formal / Eventos","Dias Quentes"],"Queen of Life":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"River of Love":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Saffira":["Dias Quentes","Diurno","Casual / Trabalho","Balada / Festas"],"Steel Essence":["Noturno","Balada / Festas","Dias Frios","Casual / Trabalho"],"Sweet Hope":["Noturno","Balada / Festas","Dias Frios","Romântico / Encontros"],"Sweet Velvet":["Diurno","Casual / Trabalho","Dias Quentes","Balada / Festas"],"Taste of Kiss":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"The Greatest":["Diurno","Casual / Trabalho","Dias Quentes","Dias Frios","Formal / Eventos"],"The Hunting Man":["Noturno","Balada / Festas","Dias Frios","Formal / Eventos"],"Touch of Woman":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios"],"Wild Kiss":["Noturno","Balada / Festas","Romântico / Encontros","Dias Frios","Formal / Eventos"]};
-function aplicaPatchOcasioesRevisadas(){
-  if(data.patchOcasioesRevisadas47) return 0;
-  let alterados=0, naoEncontrados=[];
-  data.products.forEach(p=>{
-    const recomendadas=PATCH_OCASIOES_REVISADAS[p.nome];
-    if(recomendadas){
-      const atuais=Array.isArray(p.ocasioes)?p.ocasioes:[];
-      if(JSON.stringify(atuais)!==JSON.stringify(recomendadas)){ p.ocasioes=[...recomendadas]; alterados++; }
-    }
-  });
-  data.patchOcasioesRevisadas47=true;
-  return alterados;
-}
-
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
     if(raw){ data = Object.assign({products:[],purchases:[],sales:[],expenses:[],consignments:[]}, JSON.parse(raw));
-      migra(); const a=aplicaPatchCompras(), b=aplicaPatchFicha(), c=aplicaPatchFamilia(), d=aplicaPatchOcasiao(), e=aplicaPatchOcasioesRevisadas(); if(a||b||c||d||e) save(); return; }
+      migra(); const a=aplicaPatchCompras(), b=aplicaPatchFicha(), c=aplicaPatchFamilia(), d=aplicaPatchOcasiao(); if(a||b||c||d) save(); return; }
   }catch(e){ flag('vermelho','este navegador bloqueou o salvamento — use backup'); }
   data = JSON.parse(JSON.stringify(SEED));
-  migra(); aplicaPatchCompras(); aplicaPatchFicha(); aplicaPatchFamilia(); aplicaPatchOcasiao(); aplicaPatchOcasioesRevisadas(); save();
+  migra(); aplicaPatchCompras(); aplicaPatchFicha(); aplicaPatchFamilia(); aplicaPatchOcasiao(); save();
 }
 function flag(c,t){ $('#dot').style.background=`var(--${c})`; $('#saveTxt').textContent=t; }
 let tmr;
@@ -3613,14 +3597,15 @@ function desenhaVitrine(c, auth){
           Ocasião <span class="seta" style="margin-left: 4px; font-size: 10px;">▼</span>
         </button>
         <div id="drop-occ" class="dropdown-content oculto">
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> ☀️ Dias Quentes (${countOcc("Dias Quentes")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> ❄️ Dias Frios (${countOcc("Dias Frios")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> 🌅 Diurno (${countOcc("Diurno")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> 🌃 Noturno (${countOcc("Noturno")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> 💼 Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> 👔 Formal / Eventos (${countOcc("Formal / Eventos")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> ❤️ Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
-          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> 🪩 Balada / Festas (${countOcc("Balada / Festas")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Quentes"> Dias Quentes (${countOcc("Dias Quentes")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Dias Frios"> Dias Frios (${countOcc("Dias Frios")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Diurno"> Diurno (${countOcc("Diurno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Noturno"> Noturno (${countOcc("Noturno")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Casual / Trabalho"> Casual / Trabalho (${countOcc("Casual / Trabalho")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Formal / Eventos"> Formal / Eventos (${countOcc("Formal / Eventos")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Romântico / Encontros"> Romântico / Encontros (${countOcc("Romântico / Encontros")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Balada / Festas"> Balada / Festas (${countOcc("Balada / Festas")})</label>
+          <label class="chk-btn"><input type="checkbox" class="fchk" name="occ" value="Academia / Esportes"> Academia / Esportes (${countOcc("Academia / Esportes")})</label>
         </div>
       </div>
       <div class="dropdown-filtro">
