@@ -3545,7 +3545,7 @@ function desenhaVitrine(c, auth){
       <h3>${esc(p.nome)}</h3>
       <div class="sub" style="text-transform: none; letter-spacing: normal; color: var(--ink-soft); font-size: 12px; margin-top: 2px; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">${[p.conc,p.vol].filter(Boolean).map(esc).join(' · ')} ${p.familia ? badgeFamilia(p.familia) : ''}</div>
       ${p.inspiracao?`<div class="insp" style="margin-top:8px;">Inspirado em <b>${esc(p.inspiracao)}</b>${p.marca?` · ${esc(p.marca)}`:''}</div>`:''}
-      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<span class="badge" title="${esc(p.ocasioes.slice(3).join(', '))}" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding: 2px 8px; border-radius:4px; border:1px solid #e9ecef; cursor:help;">+${p.ocasioes.length - 3}</span>` : ''}</div>`:''}
+      ${(p.ocasioes && p.ocasioes.length)?`<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${p.ocasioes.slice(0,3).map(o => badgeOcasiao(o)).join('')}${p.ocasioes.length > 3 ? `<button type="button" class="badge oc-more" aria-expanded="false" aria-label="Mostrar mais ocasiões" data-oc-hidden="${esc(JSON.stringify(p.ocasioes.slice(3)))}" style="background:#f1f3f5; color:#495057; font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:4px; border:1px solid #e9ecef; cursor:pointer;">+${p.ocasioes.length - 3}</button>` : ''}</div>`:''}
       ${(p.topo||p.coracao||p.fundo)?`<div class="notas">
         ${p.topo?`<b>TOPO</b> ${esc(p.topo)}<br>`:''}
         ${p.coracao?`<b>CORAÇÃO</b> ${esc(p.coracao)}<br>`:''}
@@ -3631,6 +3631,27 @@ function desenhaVitrine(c, auth){
     </div>`;
 
   $('#vitrine').addEventListener('click', e=>{
+    const btnOcMore = e.target.closest('.oc-more');
+    if (btnOcMore) {
+      const wrap = btnOcMore.parentElement;
+      const hiddenOccasions = JSON.parse(btnOcMore.dataset.ocHidden || '[]');
+      const expanded = btnOcMore.getAttribute('aria-expanded') === 'true';
+      if (!expanded) {
+        btnOcMore.insertAdjacentHTML('beforebegin', hiddenOccasions.map(o => badgeOcasiao(o)).join(''));
+        btnOcMore.dataset.ocOriginal = btnOcMore.textContent;
+        btnOcMore.textContent = '− menos';
+        btnOcMore.setAttribute('aria-expanded', 'true');
+        btnOcMore.setAttribute('aria-label', 'Ocultar ocasiões adicionais');
+      } else {
+        // Remove apenas os badges adicionados ao expandir; mantém os três primeiros.
+        const badges = Array.from(wrap.querySelectorAll('.badge:not(.oc-more)'));
+        badges.slice(3).forEach(b => b.remove());
+        btnOcMore.textContent = btnOcMore.dataset.ocOriginal || `+${hiddenOccasions.length}`;
+        btnOcMore.setAttribute('aria-expanded', 'false');
+        btnOcMore.setAttribute('aria-label', 'Mostrar mais ocasiões');
+      }
+      return;
+    }
     const btnDrop = e.target.closest('.dropdown-btn');
     if (btnDrop) {
       const targetId = 'drop-' + btnDrop.dataset.drop;
